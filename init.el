@@ -31,6 +31,23 @@
 
 (eval-when-compile (require 'use-package))
 
+(defvar bootstrap-version)
+
+(let ((bootstrap-file
+       (expand-file-name
+        "straight/repos/straight.el/bootstrap.el"
+        (or (bound-and-true-p straight-base-dir)
+            user-emacs-directory)))
+      (bootstrap-version 7))
+  (unless (file-exists-p bootstrap-file)
+    (with-current-buffer
+        (url-retrieve-synchronously
+         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+         'silent 'inhibit-cookies)
+      (goto-char (point-max))
+      (eval-print-last-sexp)))
+  (load bootstrap-file nil 'nomessage))
+
 ;;; Vim Bindings
 (use-package evil
   :demand t
@@ -314,6 +331,23 @@
   ;; enabled right away. Note that this forces loading the package.
   (marginalia-mode))
 
+(use-package doom-modeline
+  :ensure t
+  :init (doom-modeline-mode 1)
+  :config (column-number-mode 1)
+  :custom
+  (doom-modeline-height 30)
+  (doom-modeline-window-width-limit nil)
+  (doom-modeline-buffer-file-name-style 'truncate-with-project)
+  (doom-modeline-minor-modes nil)
+  (doom-modeline-enable-word-count nil)
+  (doom-modeline-buffer-encoding nil)
+  (doom-modeline-buffer-modification-icon t)
+  (doom-modeline-env-python-executable "python")
+  ;; needs display-time-mode to be one
+  (doom-modeline-time t)
+  (doom-modeline-vcs-max-length 50))
+
 (use-package embark
   :ensure t
   :defer
@@ -328,5 +362,76 @@
   :ensure t
   :hook (prog-mode . rainbow-mode))
 
+(use-package visual-fill-column
+  :ensure t
+  :defer
+  :custom
+  (visual-fill-column-width 140)
+  (visual-fill-column-center-text t))
+
+(use-package tree-sitter
+  :hook (prog-mode . turn-on-tree-sitter-mode)
+  :hook (tree-sitter-after-on . tree-sitter-hl-mode)
+  :config (require 'tree-sitter-langs)
+  ;; This makes every node a link to a section of code
+  (setq tree-sitter-debug-jump-buttons t
+        ;; and this highlights the entire sub tree in your code
+        tree-sitter-debug-highlight-jump-region t))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode)
+  :config (setq rainbow-delimiters-max-face-count 4))
+
+;; Show info about the file under editing, see: 'https://github.com/Artawower/file-info.el'
+(use-package file-info
+  :ensure t
+  :bind (("C-c d" . 'file-info-show)))
+
+(use-package yank-indent
+  :straight (:host github :repo "jimeh/yank-indent")
+  :config (global-yank-indent-mode t))
+
+;; Projectile
+
+(use-package projectile
+  :ensure t)
+
+(setq projectile-enable-caching nil)
+(setq projectile-project-search-path '("~/dev"))
+
 (evil-define-key 'normal 'global (kbd "ö") 'save-buffer)
 (evil-define-key 'normal 'global (kbd "ä") 'delete-other-windows)
+(evil-define-key 'normal 'global (kbd "C-ä") 'split-window-right)
+(evil-define-key 'normal 'global (kbd "C-ö") 'split-window-below)
+(evil-define-key 'normal 'global (kbd "C-å") 'consult-line)
+(evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
+(evil-define-key 'normal 'global (kbd "å") 'yank-from-kill-ring)
+(evil-define-key 'normal 'global (kbd "¨") 'evil-ex-search-forward)
+(evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
+(evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
+
+(setq kill-ring-max 1000)
+
+(setq which-key-idle-delay 0.5)
+
+(setq global-visual-line-mode t)
+(global-auto-revert-mode t)
+
+(pixel-scroll-precision-mode)
+(display-time-mode 1)
+(global-subword-mode 1)
+
+(setq undo-limit 80000000
+      evil-want-fine-undo t
+      auto-save-default t
+      truncate-string-ellipsis "…"
+      password-cache-expiry nil
+      display-time-default-load-average nil)
+
+;; Line numbers
+
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+
+;; This determines the style of line numbers in effect. If set to `nil', line
+;; numbers are disabled. For relative line numbers, set this to `relative'.
+(setq display-line-numbers-type 'relative)
