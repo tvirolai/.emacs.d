@@ -8,23 +8,34 @@
                          ("org" . "https://orgmode.org/elpa/")))
 ;; (setq gnutls-algorithm-priority "normal:-vers-tls1.3")
 
-(setq custom-file "~/.config/emacs-vanilla/custom.el")
-(load custom-file)
-
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 (setq make-backup-files nil)
 
+(setq native-comp-async-report-warnings-errors nil)
+
+;; (setq emacs-directory (file-name-directory (buffer-file-name)))
+
 (cond
  ((find-font (font-spec :name "SF Mono"))
-  (set-frame-font "SF Mono-14"))
+  (set-frame-font "SF Mono-13"))
  ((find-font (font-spec :name "Menlo"))
-  (set-frame-font "Menlo-14"))
+  (set-frame-font "Menlo-13"))
  ((find-font (font-spec :name "DejaVu Sans Mono"))
-  (set-frame-font "DejaVu Sans Mono-14"))
+  (set-frame-font "DejaVu Sans Mono-13"))
  ((find-font (font-spec :name "Inconsolata"))
-  (set-frame-font "Inconsolata-14")))
+  (set-frame-font "Inconsolata-13")))
 
-(package-initialize)
+(setq load-prefer-newer t)
+(setq gc-cons-percentage .6)
+
+(set-frame-parameter nil 'ns-transparent-titlebar t)
+
+(use-package no-littering
+  :ensure t)
+
+(use-package quelpa :ensure t)
+(use-package quelpa-use-package :ensure t)
+
 (setq use-package-always-ensure t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
@@ -49,7 +60,7 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-;;; Vim Bindings
+    ;;; Vim Bindings
 (use-package evil
   :demand t
   :bind (("<escape>" . keyboard-escape-quit))
@@ -113,8 +124,8 @@
 (line-number-mode t)
 (column-number-mode t)
 (size-indication-mode t)
-(menu-bar-mode -1)
 (tool-bar-mode -1)
+(scroll-bar-mode -1)
 (fset 'yes-or-no-p 'y-or-n-p)
 
 (setq mac-option-modifier 'nil
@@ -171,6 +182,10 @@
 
 (define-key evil-normal-state-map (kbd "SPC g") my-magit-map)
 (define-key my-magit-map "g" 'magit-status)
+
+(use-package git-gutter
+  :ensure t
+  :hook (after-init . global-git-gutter-mode))
 
 (use-package vertico
   :ensure t
@@ -254,8 +269,7 @@
       (corfu-mode 1)))
 
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
-  :bind ("C-c SPC" . cape-dabbrev)
-  )
+  :bind ("C-c SPC" . cape-dabbrev))
 
 (use-package orderless
   :ensure t
@@ -439,4 +453,142 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type 'relative)
+#+end_src
+
+#+begin_src elisp
+(use-package org
+  :defer
+  :custom
+  (fill-column 100)
+  (org-agenda-include-diary t)
+  ;; Where the org files live
+  (org-directory "~/Dropbox/org/")
+  ;; Where archives should go
+  (org-archive-location (concat (expand-file-name "~/.emacs.d/org/private/org-roam/gtd/archives.org") "::"))
+  ;; Make sure we see syntax highlighting
+  (org-src-fontify-natively t)
+  ;; I dont use it for subs/super scripts
+  (org-use-sub-superscripts nil)
+  ;; Should everything be hidden?
+  (org-startup-folded 'content)
+  (org-M-RET-may-split-line '((default . nil)))
+  ;; Don't hide stars
+  (org-hide-leading-stars nil)
+  (org-hide-emphasis-markers nil)
+  ;; Show as utf-8 chars
+  (org-pretty-entities t)
+  ;; put timestamp when finished a todo
+  (org-log-done 'time)
+  ;; timestamp when we reschedule
+  (org-log-reschedule t)
+  ;; Don't indent the stars
+  (org-startup-indented nil)
+  (org-list-allow-alphabetical t)
+  (org-image-actual-width nil)
+  ;; Save notes into log drawer
+  (org-log-into-drawer t)
+  ;;
+  (org-fontify-whole-heading-line t)
+  (org-fontify-done-headline t)
+  ;;
+  (org-fontify-quote-and-verse-blocks t)
+  ;; See down arrow instead of "..." when we have subtrees
+  ;; (org-ellipsis "⤵")
+  ;; catch invisible edit
+  (org-catch-invisible-edits 'show-and-error)
+  ;; Only useful for property searching only but can slow down search
+  (org-use-property-inheritance t)
+  ;; Count all children TODO's not just direct ones
+  (org-hierarchical-todo-statistics nil)
+  ;; Unchecked boxes will block switching the parent to DONE
+  (org-enforce-todo-checkbox-dependencies t)
+  ;; Don't allow TODO's to close without their dependencies done
+  (org-enforce-todo-dependencies t)
+  (org-track-ordered-property-with-tag t)
+  ;; Where should notes go to? Dont even use them tho
+  (org-default-notes-file (concat org-directory "notes.org"))
+  ;; The right side of | indicates the DONE states
+  (org-todo-keywords
+   '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(i!)" "WAITING(w!)" "|" "DONE(d!)" "CANCELED(c!)" "DELEGATED(p!)")))
+  ;; Needed to allow helm to compute all refile options in buffer
+  (org-outline-path-complete-in-steps nil)
+  (org-deadline-warning-days 2)
+  (org-log-redeadline t)
+  (org-log-reschedule t)
+  ;; Repeat to previous todo state
+  ;; If there was no todo state, then dont set a state
+  (org-todo-repeat-to-state t)
+  ;; Refile options
+  (org-refile-use-outline-path 'file)
+  (org-refile-allow-creating-parent-nodes 'confirm)
+  (org-refile-targets '(("~/.emacs.d/org/private/org-roam/gtd/gtd.org" :maxlevel . 3)
+                        ("~/.emacs.d/org/private/org-roam/gtd/someday.org" :level . 1)
+                        ("~/.emacs.d/org/private/org-roam/gtd/tickler.org" :maxlevel . 1)
+                        ("~/.emacs.d/org/private/org-roam/gtd/repeat.org" :maxlevel . 1)
+                        ))
+  ;; Lets customize which modules we load up
+  (org-modules '(;; ol-eww
+                 ;; Stuff I've enabled below
+                 org-habit
+                 ;; org-checklist
+                 ))
+  (org-special-ctrl-a/e t)
+  (org-insert-heading-respect-content t)
+  :hook ((org-mode . org-indent-mode)
+         (org-mode . org-display-inline-images))
+  :custom-face
+  (org-scheduled-previously ((t (:foreground "orange"))))
+  :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((sql . t)
+     (sqlite . t)
+     (python . t)
+     (java . t)
+     ;; (cpp . t)
+     (C . t)
+     (emacs-lisp . t)
+     (shell . t)))
+  ;; Save history throughout sessions
+  (org-clock-persistence-insinuate))
+
+(use-package org-indent
+  :ensure nil
+  :diminish
+  :custom
+  (org-indent-mode-turns-on-hiding-stars nil))
+
+(use-package org-modern
+  :ensure t
+  :hook ((org-mode . org-modern-mode)))
+#+end_src
+
+* Spacious padding
+
+#+begin_src elisp
+(use-package spacious-padding
+  :ensure t
+  :defer
+  :hook (after-init . spacious-padding-mode))
+#+end_src
+
+
+* Snippets
+#+begin_src elisp
+    (use-package yasnippet
+      :diminish yas-minor-mode
+      :init (yas-global-mode)
+      :config
+      (push '(yasnippet backquote-change) warning-suppress-types)
+      (yas-global-mode)
+      (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
+      (setq yas-key-syntaxes '("w_" "w_." "^ "))
+      (setq yas-installed-snippets-dir ".config/emacs-vanilla/snippets")
+      (setq yas-expand-only-for-last-commands nil)
+      (yas-global-mode 1)
+      (bind-key "\t" 'hippie-expand yas-minor-mode-map))
+
+(use-package doom-snippets
+  :after yasnippet
+  :straight (doom-snippets :type git :host github :repo "doomemacs/snippets" :files ("*.el" "*")))
 #+end_src
