@@ -1,5 +1,5 @@
 #+title: Config
-#+STARTUP: overview
+#+STARTUP: content
 
 * General setup
 
