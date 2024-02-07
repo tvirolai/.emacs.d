@@ -208,6 +208,16 @@ This maybe fixes some indentation issues in org mode.
 (setq evil-want-c-i-jump nil)
 #+end_src
 
+[[https://zck.org/balance-emacs-windows
+][Balance]] windows automatically.
+
+#+begin_src emacs-lisp :tangle yes
+(seq-doseq (fn (list #'split-window #'delete-window))
+  (advice-add fn
+              :after
+              #'(lambda (&rest _args) (balance-windows))))
+#+end_src
+
 * Version control
 
 #+begin_src emacs-lisp :tangle yes
@@ -219,6 +229,32 @@ This maybe fixes some indentation issues in org mode.
   :ensure t
   :defer
   :hook (after-init . global-git-gutter-mode))
+
+(defun kill-magit-diff-buffer-in-current-repo (&rest _)
+  "Delete the magit-diff buffer related to the current repo."
+  (let ((magit-diff-buffer-in-current-repo
+         (magit-mode-get-buffer 'magit-diff-mode)))
+    (kill-buffer magit-diff-buffer-in-current-repo)))
+
+;; When 'C-c C-c' is pressed in the magit commit message buffer,
+;; delete the magit-diff buffer related to the current repo.
+;;
+(add-hook 'git-commit-setup-hook
+          (lambda ()
+            (add-hook 'with-editor-post-finish-hook
+                      #'kill-magit-diff-buffer-in-current-repo
+                      nil t)))
+
+(setq forge-owned-accounts '(("tvirolai")))
+
+(with-eval-after-load 'magit
+  (defun mu-magit-kill-buffers ()
+    "Restore window configuration and kill all Magit buffers."
+    (interactive)
+    (let ((buffers (magit-mode-get-buffers)))
+      (magit-restore-window-configuration)
+      (mapc #'kill-buffer buffers)))
+  (bind-key "q" #'mu-magit-kill-buffers magit-status-mode-map))
 #+end_src
 
 * Keybindings
@@ -375,11 +411,12 @@ Restclient is essential.
   ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
   ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
   ;;(add-to-list 'completion-at-point-functions #'cape-line)
+
   (defun corfu-enable-always-in-minibuffer ()
     "Enable Corfu in the minibuffer if Vertico/Mct are not active."
     (unless (or (bound-and-true-p mct--active)
-		(bound-and-true-p vertico--input)
-		(eq (current-local-map) read-passwd-map))
+                (bound-and-true-p vertico--input)
+                (eq (current-local-map) read-passwd-map))
       ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
       (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
 		  corfu-popupinfo-delay nil)
@@ -647,31 +684,63 @@ Set keybindings.
   :defer
   :custom
   (vterm-max-scrollback 100000))
+#+end_src
 
-;; (use-package multi-vterm
-;;   :after vterm
-;;   :config (add-hook 'vterm-mode-hook
-;;                     (lambda ()
-;; 											(evil-insert-state)))
+* SQL
 
-;; 	(setq vterm-shell "/bin/zsh")
-;;   (setq vterm-max-scrollback 100000)
-;;   (setq vterm-keymap-exceptions nil)
+#+begin_src emacs-lisp :tangle yes
+(setq sql-postgres-login-params nil)
 
-;;   ;; (map! :map vterm-mode-map
-;;   ;;       :i "<C-backspace>" #'(lambda () (interactive) (vterm-send-key (kbd "C-w")))
-;;   ;;       :i "<M-backspace>" #'(lambda () (interactive) (vterm-send-key (kbd "C-w")))
-;;   ;;       :i "RET" #'vterm-send-return
-;;   ;;       :gnvi "C-k" #'evil-window-up
-;;   ;;       :gnvi "C-j" #'evil-window-down
-;;   ;;       :gnvi "C-l" #'evil-window-right
-;;   ;;       :gnvi "C-h" #'evil-window-left
-;;   ;;       :n ",c" #'multi-vterm
-;;   ;;       :n ",n" #'multi-vterm-next
-;;   ;;       :n ",p" #'multi-vterm-prev
-;;   ;;       :n "<return>" #'evil-insert-resume)
-;; 	)
+(setq lsp-sqls-workspace-config-path nil)
 
-;; (setq vterm-kill-buffer-on-exit t)
+(defun maybe-highlight-ms-sql-kws ()
+  "Highlight MS SQL keywords when it's certain that's the dialect we're
+working with."
+  (when (string-match "umaija" (buffer-file-name))
+    (sql-highlight-ms-keywords)))
+#+end_src
 
+#+begin_src emacs-lisp :tangle yes
+(use-package sql
+  :hook ((sql-mode . sqlint-minor-mode))
+  :ensure t
+  :defer
+  :config
+  (maybe-highlight-ms-sql-kws)
+  (sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
+#+end_src
+
+Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mode.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sql-indent
+  :ensure t
+  :defer)
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/indent-sql-buffer ()
+  "Since there's some bug that breaks the indentation (`sqlind-indent-line`
+specifically) when running it with `newline-and-indent`, I've resorted
+to this hack to run the indentation for the whole buffer."
+  (interactive)
+  (sqlind-minor-mode)
+  (indent-region (point-min) (point-max))
+  (setq sqlind-minor-mode nil)
+  (progn
+    (kill-local-variable 'indent-line-function)
+    (kill-local-variable 'align-mode-rules-list)))
+
+(defun tv/format-sql-buffer ()
+  (interactive)
+  (tv/indent-sql-buffer)
+  (sqlup-capitalize-keywords-in-region (point-min) (point-max)))
+
+(evil-define-key 'normal sql-mode-map
+  "ö" #'(lambda ()
+          (interactive)
+          (when (< (buffer-size) 4000)
+            (tv/format-sql-buffer))
+          (save-buffer)))
 #+end_src
