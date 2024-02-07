@@ -220,8 +220,7 @@ This maybe fixes some indentation issues in org mode.
 (setq evil-want-c-i-jump nil)
 #+end_src
 
-[[https://zck.org/balance-emacs-windows
-][Balance]] windows automatically.
+[[https://zck.org/balance-emacs-windows][Balance]] windows automatically.
 
 #+begin_src emacs-lisp :tangle yes
 (seq-doseq (fn (list #'split-window #'delete-window))
@@ -335,6 +334,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
+(evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 #+end_src
 
 Elisp keybindings.
@@ -375,6 +375,17 @@ Restclient is essential.
   (setq projectile-enable-caching t)
   (setq projectile-project-search-path '("~/dev"))
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+#+end_src
+
+* Ripgrep
+
+Ripgrep package is needed for =projectile-ripgrep= to be usable.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ripgrep
+	:ensure t
+	:config
+	(evil-define-key 'normal 'global "Ä" 'projectile-ripgrep))
 #+end_src
 
 * Clojure
