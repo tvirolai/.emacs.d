@@ -801,20 +801,20 @@ to this hack to run the indentation for the whole buffer."
 
 #+begin_src emacs-lisp :tangle yes
 (use-package elfeed
-	:defer
-	:ensure t
-	:init
-	(elfeed-org)
-	(elfeed-update)
-	:config
-	(setq elfeed-search-filter "@2-week-ago +unread"
+  :defer
+  :ensure t
+  :init
+  (elfeed-org)
+  (elfeed-update)
+  :config
+  (setq elfeed-search-filter "@2-week-ago +unread"
         shr-max-image-proportion 0.6))
 
 (use-package elfeed-org
-	:defer
-	:ensure t
-	:config
-	(setq rmh-elfeed-org-files (list "~/Dropbox/org/elfeed.org")))
+  :defer
+  :ensure t
+  :config
+  (setq rmh-elfeed-org-files (list "~/Dropbox/org/elfeed.org")))
 
 (defun elfeed-mark-all-as-read ()
   "Mark all elfeed items as read."
