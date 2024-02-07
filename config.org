@@ -286,6 +286,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
+(evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
 #+end_src
 
 Elisp keybindings.
@@ -306,14 +307,14 @@ Restclient is essential.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package restclient
-	:ensure t
-	:defer
-	:mode ("\\.http\\'" . restclient-mode)
-	:init
-	(evil-define-key 'normal restclient-mode-map
-		"§" 'restclient-http-send-current)
-	;; https://github.com/doomemacs/doomemacs/issues/6073
-	(require 'gnutls))
+  :ensure t
+  :defer
+  :mode ("\\.http\\'" . restclient-mode)
+  :init
+  (evil-define-key 'normal restclient-mode-map
+    "§" 'restclient-http-send-current)
+  ;; https://github.com/doomemacs/doomemacs/issues/6073
+  (require 'gnutls))
 #+end_src
 
 * Projectile
@@ -323,9 +324,9 @@ Restclient is essential.
   :ensure t
   :init
   (projectile-global-mode)
-	(setq projectile-enable-caching t)
-	(setq projectile-project-search-path '("~/dev"))
-	(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+  (setq projectile-enable-caching t)
+  (setq projectile-project-search-path '("~/dev"))
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+end_src
 
 * Completion
@@ -377,11 +378,11 @@ Restclient is essential.
   (defun corfu-enable-always-in-minibuffer ()
     "Enable Corfu in the minibuffer if Vertico/Mct are not active."
     (unless (or (bound-and-true-p mct--active)
-                (bound-and-true-p vertico--input)
-                (eq (current-local-map) read-passwd-map))
+		(bound-and-true-p vertico--input)
+		(eq (current-local-map) read-passwd-map))
       ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
       (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                  corfu-popupinfo-delay nil)
+		  corfu-popupinfo-delay nil)
       (corfu-mode 1)))
 
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
@@ -394,30 +395,30 @@ Restclient is essential.
   ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
   ;;       orderless-component-separator #'orderless-escapable-split-on-space)
   (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles partial-completion)))))
+	completion-category-defaults nil
+	completion-category-overrides '((file (styles partial-completion)))))
 
 (use-package consult
   :ensure
   :after projectile
   :bind (("C-s" . consult-line)
-         ("C-c M-x" . consult-mode-command)
-         ("C-x b" . consult-buffer)
-         ("C-x r b" . consult-bookmark)
-         ("M-y" . consult-yank-pop)
-         ;; M-g bindings (goto-map)
-         ("M-g M-g" . consult-goto-line)
-         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-         ("M-g m" . consult-mark)
-         ("M-g k" . consult-global-mark)
-         ("C-z" . consult-theme)
-         :map minibuffer-local-map
-         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-         ("M-r" . consult-history)
-         :map projectile-command-map
-         ("b" . consult-project-buffer)
-         :map prog-mode-map
-         ("M-g o" . consult-imenu))
+	 ("C-c M-x" . consult-mode-command)
+	 ("C-x b" . consult-buffer)
+	 ("C-x r b" . consult-bookmark)
+	 ("M-y" . consult-yank-pop)
+	 ;; M-g bindings (goto-map)
+	 ("M-g M-g" . consult-goto-line)
+	 ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+	 ("M-g m" . consult-mark)
+	 ("M-g k" . consult-global-mark)
+	 ("C-z" . consult-theme)
+	 :map minibuffer-local-map
+	 ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+	 ("M-r" . consult-history)
+	 :map projectile-command-map
+	 ("b" . consult-project-buffer)
+	 :map prog-mode-map
+	 ("M-g o" . consult-imenu))
 
   :init
   (defun remove-items (x y)
@@ -427,7 +428,7 @@ Restclient is essential.
   ;; Any themes that are incomplete/lacking don't work with centaur tabs/solair mode
   (setq consult-project-function (lambda (_) (projectile-project-root)))
   (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
+	xref-show-definitions-function #'consult-xref)
   (setq consult-narrow-key "<")
   (setq consult-line-start-from-top nil))
 
@@ -435,8 +436,8 @@ Restclient is essential.
   :ensure
   :defer
   :bind (:map projectile-command-map
-              ("s s" . consult-ag)
-              ("s g" . consult-grep)))
+	      ("s s" . consult-ag)
+	      ("s g" . consult-grep)))
 
 (use-package consult-org-roam
   :ensure t
@@ -483,7 +484,6 @@ Restclient is essential.
      (java . t)
      (C . t)
      (emacs-lisp . t)
-     (restclient . t)
      (clojure . t)
      (shell . t)))
   (setq org-src-preserve-indentation nil
@@ -527,8 +527,8 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 (setq savehist-save-minibuffer-history 1)
 (setq savehist-additional-variables
       '(kill-ring
-        search-ring
-        regexp-search-ring))
+	search-ring
+	regexp-search-ring))
 #+end_src
 
 Enable =recentf-mode=.
@@ -642,30 +642,36 @@ Set keybindings.
 * Shell stuff
 
 #+begin_src emacs-lisp :tangle yes
-(use-package multi-vterm
-  :after vterm
-  :config (add-hook 'vterm-mode-hook
-                    (lambda ()
-											(evil-insert-state)))
+(use-package vterm
+  :ensure t
+  :defer
+  :custom
+  (vterm-max-scrollback 100000))
 
-	(setq vterm-shell "/bin/zsh")
-  (setq vterm-max-scrollback 100000)
-  (setq vterm-keymap-exceptions nil)
+;; (use-package multi-vterm
+;;   :after vterm
+;;   :config (add-hook 'vterm-mode-hook
+;;                     (lambda ()
+;; 											(evil-insert-state)))
 
-  ;; (map! :map vterm-mode-map
-  ;;       :i "<C-backspace>" #'(lambda () (interactive) (vterm-send-key (kbd "C-w")))
-  ;;       :i "<M-backspace>" #'(lambda () (interactive) (vterm-send-key (kbd "C-w")))
-  ;;       :i "RET" #'vterm-send-return
-  ;;       :gnvi "C-k" #'evil-window-up
-  ;;       :gnvi "C-j" #'evil-window-down
-  ;;       :gnvi "C-l" #'evil-window-right
-  ;;       :gnvi "C-h" #'evil-window-left
-  ;;       :n ",c" #'multi-vterm
-  ;;       :n ",n" #'multi-vterm-next
-  ;;       :n ",p" #'multi-vterm-prev
-  ;;       :n "<return>" #'evil-insert-resume)
-	)
+;; 	(setq vterm-shell "/bin/zsh")
+;;   (setq vterm-max-scrollback 100000)
+;;   (setq vterm-keymap-exceptions nil)
 
-(setq vterm-kill-buffer-on-exit t)
+;;   ;; (map! :map vterm-mode-map
+;;   ;;       :i "<C-backspace>" #'(lambda () (interactive) (vterm-send-key (kbd "C-w")))
+;;   ;;       :i "<M-backspace>" #'(lambda () (interactive) (vterm-send-key (kbd "C-w")))
+;;   ;;       :i "RET" #'vterm-send-return
+;;   ;;       :gnvi "C-k" #'evil-window-up
+;;   ;;       :gnvi "C-j" #'evil-window-down
+;;   ;;       :gnvi "C-l" #'evil-window-right
+;;   ;;       :gnvi "C-h" #'evil-window-left
+;;   ;;       :n ",c" #'multi-vterm
+;;   ;;       :n ",n" #'multi-vterm-next
+;;   ;;       :n ",p" #'multi-vterm-prev
+;;   ;;       :n "<return>" #'evil-insert-resume)
+;; 	)
+
+;; (setq vterm-kill-buffer-on-exit t)
 
 #+end_src
