@@ -214,6 +214,13 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
   (evil-owl-mode))
 #+end_src
 
+#+begin_src emacs-lisp :tangle yes
+(with-eval-after-load 'evil
+  (defalias #'forward-evil-word #'forward-evil-symbol)
+  ;; make evil-search-word look for symbol rather than word boundaries
+  (setq-default evil-symbol-word-search t))
+#+end_src
+
 This maybe fixes some indentation issues in org mode.
 
 #+begin_src emacs-lisp :tangle yes
@@ -700,7 +707,8 @@ Enable =recentf-mode=.
 #+begin_src emacs-lisp :tangle yes
 (use-package yaml-mode
   :ensure t
-  :defer)
+  :defer
+	:hook (yaml-mode . display-line-numbers-mode))
 #+end_src
 
 * Presentation-mode
