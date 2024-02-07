@@ -708,7 +708,7 @@ Enable =recentf-mode=.
 (use-package yaml-mode
   :ensure t
   :defer
-	:hook (yaml-mode . display-line-numbers-mode))
+  :hook (yaml-mode . display-line-numbers-mode))
 #+end_src
 
 * Presentation-mode
