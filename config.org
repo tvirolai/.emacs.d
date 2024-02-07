@@ -695,6 +695,31 @@ Enable =recentf-mode=.
   :init (setq markdown-command "multimarkdown"))
 #+end_src
 
+* YAML
+
+#+begin_src emacs-lisp :tangle yes
+(use-package yaml-mode
+  :ensure t
+  :defer)
+#+end_src
+
+* Presentation-mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package presentation
+  :defer
+  :ensure t)
+#+end_src
+
+* Rainbow-mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package rainbow-mode
+  :defer
+  :ensure t
+  :hook (prog-mode . rainbow-mode))
+#+end_src
+
 * Shell stuff
 
 #+begin_src emacs-lisp :tangle yes
