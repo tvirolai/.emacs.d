@@ -100,7 +100,7 @@ Configure tab width.
 
 #+begin_src emacs-lisp :tangle yes
 (setq-default tab-width 2)
-(setq indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil)
 #+end_src
 
 Maximize the frame on startup.
@@ -841,7 +841,10 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   :ensure t
   :init
   (elfeed-org)
-  (elfeed-update)
+  (run-at-time 10 (* 60 60) #'(lambda ()
+                               (interactive)
+                               (message "Updating RSS feeds...")
+                               (elfeed-update)))
   :config
   (setq elfeed-search-filter "@2-week-ago +unread"
         shr-max-image-proportion 0.6))
