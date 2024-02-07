@@ -155,6 +155,13 @@ Use =spacious-padding=.
   :hook (after-init . spacious-padding-mode))
 #+end_src
 
+Setup line numbers. 
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+(setq display-line-numbers-type 'relative)
+#+end_src
+
 * Evil mode
 
 #+begin_src emacs-lisp :tangle yes
@@ -179,6 +186,7 @@ Use =spacious-padding=.
 
 (use-package evil-commentary
   :after evil
+
   :config
   (evil-commentary-mode))
 
@@ -248,6 +256,9 @@ Make =ESC= quit wherever possible.
 
 (define-key evil-normal-state-map (kbd "SPC") my-leader-map)
 (define-key my-leader-map "b" 'list-buffers)
+(define-key my-leader-map (kbd "RET") 'consult-bookmark)
+(define-key my-leader-map "<" 'consult-buffer)
+(define-key my-leader-map "z" 'consult-recent-file)
 
 (define-key evil-normal-state-map (kbd "SPC g") my-magit-map)
 (define-key my-magit-map "g" 'magit-status)
@@ -256,17 +267,6 @@ Make =ESC= quit wherever possible.
 
 (define-key evil-normal-state-map (kbd "SPC d") my-dired-map)
 (define-key my-dired-map "-" 'dired-jump)
-#+end_src
-
-Projectile keys.
-
-#+begin_src emacs-lisp :tangle yes
-(defvar my-projectile-map (make-sparse-keymap))
-
-(define-key evil-normal-state-map (kbd "SPC p") my-projectile-map)
-
-(define-key my-projectile-map "p" 'projectile-switch-project)
-(define-key my-projectile-map "f" 'projectile-find-file)
 #+end_src
 
 A handful of must-have keybindings for me.
@@ -285,6 +285,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
 (evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
+(evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 #+end_src
 
 Elisp keybindings.
@@ -299,14 +300,32 @@ Elisp keybindings.
   "§" 'eval-defun)
 #+end_src
 
+* Restclient
+
+Restclient is essential.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package restclient
+	:ensure t
+	:defer
+	:mode ("\\.http\\'" . restclient-mode)
+	:init
+	(evil-define-key 'normal restclient-mode-map
+		"§" 'restclient-http-send-current)
+	;; https://github.com/doomemacs/doomemacs/issues/6073
+	(require 'gnutls))
+#+end_src
+
 * Projectile
 
 #+begin_src emacs-lisp :tangle yes
 (use-package projectile
-  :ensure t)
-
-(setq projectile-enable-caching nil)
-(setq projectile-project-search-path '("~/dev"))
+  :ensure t
+  :init
+  (projectile-global-mode)
+	(setq projectile-enable-caching t)
+	(setq projectile-project-search-path '("~/dev"))
+	(define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+end_src
 
 * Completion
@@ -453,9 +472,27 @@ Elisp keybindings.
 ;; (org-startup-folded 'nofold)
 (use-package org
   :defer
+  :custom
+  (org-directory "~/Dropbox/org/")
   :config
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((sql . t)
+     (sqlite . t)
+     (python . t)
+     (java . t)
+     (C . t)
+     (emacs-lisp . t)
+     (restclient . t)
+     (clojure . t)
+     (shell . t)))
   (setq org-src-preserve-indentation nil
-        org-edit-src-content-indentation 0))
+	org-edit-src-content-indentation 0
+	doom-modeline-enable-word-count t
+	org-indent-mode t
+	visual-line-mode t))
+
+(global-set-key (kbd "C-c c") 'org-capture)
 #+end_src
 
 * Snippets
@@ -479,6 +516,34 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 (use-package doom-snippets
   :after yasnippet
   :straight (doom-snippets :type git :host github :repo "doomemacs/snippets" :files ("*.el" "*")))
+#+end_src
+
+* History
+
+#+begin_src emacs-lisp :tangle yes
+(savehist-mode 1)
+(setq history-length t)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history 1)
+(setq savehist-additional-variables
+      '(kill-ring
+        search-ring
+        regexp-search-ring))
+#+end_src
+
+Enable =recentf-mode=.
+
+#+begin_src emacs-lisp :tangle yes
+(recentf-mode 1)
+#+end_src
+
+* Markdown
+
+#+begin_src emacs-lisp :tangle yes
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
 #+end_src
 
 * Clojure
@@ -522,15 +587,6 @@ Configure the necessary packages.
   (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
 
 (add-hook 'clojure-mode-hook #'eglot)
-
-(defun cider-custom-test-ns-fn (ns)
-  "Recognize namespaces (NS) with suffix -spec or -test as test namespaces."
-  (when ns
-    (cond ((string-match-p "-spec" ns) ns)
-          ((string-match-p "-test" ns) ns)
-          (t (concat ns "-test")))))
-
-(setq cider-test-infer-test-ns #'cider-custom-test-ns-fn)
 
 (defun initialize-kondo ()
   (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
@@ -580,4 +636,36 @@ Set keybindings.
   "K" #'cider-doc
   "DEL" #'paredit-splice-sexp
   "C-DEL" #'paredit-splice-sexp)
+#+end_src
+
+
+* Shell stuff
+
+#+begin_src emacs-lisp :tangle yes
+(use-package multi-vterm
+  :after vterm
+  :config (add-hook 'vterm-mode-hook
+                    (lambda ()
+											(evil-insert-state)))
+
+	(setq vterm-shell "/bin/zsh")
+  (setq vterm-max-scrollback 100000)
+  (setq vterm-keymap-exceptions nil)
+
+  ;; (map! :map vterm-mode-map
+  ;;       :i "<C-backspace>" #'(lambda () (interactive) (vterm-send-key (kbd "C-w")))
+  ;;       :i "<M-backspace>" #'(lambda () (interactive) (vterm-send-key (kbd "C-w")))
+  ;;       :i "RET" #'vterm-send-return
+  ;;       :gnvi "C-k" #'evil-window-up
+  ;;       :gnvi "C-j" #'evil-window-down
+  ;;       :gnvi "C-l" #'evil-window-right
+  ;;       :gnvi "C-h" #'evil-window-left
+  ;;       :n ",c" #'multi-vterm
+  ;;       :n ",n" #'multi-vterm-next
+  ;;       :n ",p" #'multi-vterm-prev
+  ;;       :n "<return>" #'evil-insert-resume)
+	)
+
+(setq vterm-kill-buffer-on-exit t)
+
 #+end_src
