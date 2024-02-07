@@ -174,6 +174,23 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
                                (display-line-numbers-mode))))
 #+end_src
 
+** Presentation-mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package presentation
+  :defer
+  :ensure t)
+#+end_src
+
+** Rainbow-mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package rainbow-mode
+  :defer
+  :ensure t
+  :hook (prog-mode . rainbow-mode))
+#+end_src
+
 * Evil mode
 
 #+begin_src emacs-lisp :tangle yes
@@ -356,46 +373,9 @@ Elisp keybindings.
   "§" 'eval-defun)
 #+end_src
 
-* Restclient
+* Programming languages
 
-Restclient is essential.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package restclient
-  :ensure t
-  :defer
-  :mode ("\\.http\\'" . restclient-mode)
-  :init
-  (evil-define-key 'normal restclient-mode-map
-    "§" 'restclient-http-send-current)
-  ;; https://github.com/doomemacs/doomemacs/issues/6073
-  (require 'gnutls))
-#+end_src
-
-* Projectile
-
-#+begin_src emacs-lisp :tangle yes
-(use-package projectile
-  :ensure t
-  :init
-  (projectile-global-mode)
-  (setq projectile-enable-caching t)
-  (setq projectile-project-search-path '("~/dev"))
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
-#+end_src
-
-* Ripgrep
-
-Ripgrep package is needed for =projectile-ripgrep= to be usable.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package ripgrep
-  :ensure t
-  :config
-  (evil-define-key 'normal 'global "Ä" 'projectile-ripgrep))
-#+end_src
-
-* Clojure
+** Clojure
 
 Configure the necessary packages.
 
@@ -485,7 +465,108 @@ Set keybindings.
   "DEL" #'paredit-splice-sexp
   "C-DEL" #'paredit-splice-sexp)
 #+end_src
+
+** SQL
+
+#+begin_src emacs-lisp :tangle yes
+(setq sql-postgres-login-params nil)
+
+(setq lsp-sqls-workspace-config-path nil)
+
+(defun maybe-highlight-ms-sql-kws ()
+  "Highlight MS SQL keywords when it's certain that's the dialect we're
+working with."
+  (when (string-match "umaija" (buffer-file-name))
+    (sql-highlight-ms-keywords)))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sql
+  :hook ((sql-mode . sqlint-minor-mode))
+  :ensure t
+  :defer
+  :config
+  (maybe-highlight-ms-sql-kws)
+  (sqlup-mode)
+  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
+#+end_src
+
+Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mode.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sql-indent
+  :ensure t
+  :defer)
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/indent-sql-buffer ()
+  "Since there's some bug that breaks the indentation (`sqlind-indent-line`
+specifically) when running it with `newline-and-indent`, I've resorted
+to this hack to run the indentation for the whole buffer."
+  (interactive)
+  (sqlind-minor-mode)
+  (indent-region (point-min) (point-max))
+  (setq sqlind-minor-mode nil)
+  (progn
+    (kill-local-variable 'indent-line-function)
+    (kill-local-variable 'align-mode-rules-list)))
+
+(defun tv/format-sql-buffer ()
+  (interactive)
+  (tv/indent-sql-buffer)
+  (sqlup-capitalize-keywords-in-region (point-min) (point-max)))
+
+(evil-define-key 'normal sql-mode-map
+  "ö" #'(lambda ()
+          (interactive)
+          (when (< (buffer-size) 4000)
+            (format-sql-buffer))
+          (save-buffer)))
+#+end_src
+
+* Restclient
+
+Restclient is essential.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package restclient
+  :ensure t
+  :defer
+  :mode ("\\.http\\'" . restclient-mode)
+  :init
+  (evil-define-key 'normal restclient-mode-map
+    "§" 'restclient-http-send-current)
+  ;; https://github.com/doomemacs/doomemacs/issues/6073
+  (require 'gnutls))
+#+end_src
+
+* Projectile
+
+#+begin_src emacs-lisp :tangle yes
+(use-package projectile
+  :ensure t
+  :init
+  (projectile-global-mode)
+  (setq projectile-enable-caching t)
+  (setq projectile-project-search-path '("~/dev"))
+  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
+#+end_src
+
+* Ripgrep
+
+Ripgrep package is needed for =projectile-ripgrep= to be usable.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ripgrep
+  :ensure t
+  :config
+  (evil-define-key 'normal 'global "Ä" 'projectile-ripgrep))
+#+end_src
+
 * Completion
+
+** Vertico
 
 #+begin_src emacs-lisp :tangle yes
 (use-package vertico
@@ -498,7 +579,11 @@ Set keybindings.
 (use-package vertico-multiform
   :ensure nil
   :hook (after-init . vertico-multiform-mode))
+#+end_src
 
+** Dabbrev
+
+#+begin_src emacs-lisp :tangle yes
 (use-package dabbrev
   :custom
   (dabbrev-upcase-means-case-search t)
@@ -506,7 +591,11 @@ Set keybindings.
   (dabbrev-check-other-buffers t)
   (dabbrev-friend-buffer-function 'dabbrev--same-major-mode-p)
   (dabbrev-ignored-buffer-regexps '("\\.\\(?:pdf\\|jpe?g\\|png\\)\\'")))
+#+end_src
 
+** Corfu
+
+#+begin_src emacs-lisp :tangle yes
 (use-package corfu
   :ensure t
   ;; Optional customizations
@@ -526,11 +615,6 @@ Set keybindings.
   (setq cape-dabbrev-check-other-buffers 'some)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
-  ;; (add-to-list 'completion-at-point-functions #'cape-history)
-  ;;(add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
 
   (defun corfu-enable-always-in-minibuffer ()
     "Enable Corfu in the minibuffer if Vertico/Mct are not active."
@@ -545,16 +629,22 @@ Set keybindings.
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
   :bind ("C-c SPC" . cape-dabbrev))
 
+#+end_src
+
+** Orderless
+
+#+begin_src emacs-lisp :tangle yes
 (use-package orderless
   :ensure t
   :init
-  ;; Configure a custom style dispatcher (see the Consult wiki)
-  ;; (setq orderless-style-dispatchers '(+orderless-dispatch)
-  ;;       orderless-component-separator #'orderless-escapable-split-on-space)
   (setq completion-styles '(orderless basic)
 	completion-category-defaults nil
 	completion-category-overrides '((file (styles partial-completion)))))
+#+end_src
 
+** Consult
+
+#+begin_src emacs-lisp :tangle yes
 (use-package consult
   :ensure
   :after projectile
@@ -615,16 +705,96 @@ Set keybindings.
   (consult-customize
    consult-org-roam-forward-links
    :preview-key (kbd "M-.")))
+#+end_src
 
+** Marginalia
+
+#+begin_src emacs-lisp :tangle yes
 (use-package marginalia
   :ensure
   :init
-  ;; Must be in the :init section of use-package such that the mode gets
-  ;; enabled right away. Note that this forces loading the package.
   (marginalia-mode))
 #+end_src
 
-* Org-mode
+** Yasnippet
+
+Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :init (yas-global-mode)
+  :config
+  (push '(yasnippet backquote-change) warning-suppress-types)
+  (yas-global-mode)
+  (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
+  (setq yas-key-syntaxes '("w_" "w_." "^ "))
+  (setq yas-installed-snippets-dir ".config/emacs-vanilla/snippets")
+  (setq yas-expand-only-for-last-commands nil)
+  (yas-global-mode 1)
+  (bind-key "\t" 'hippie-expand yas-minor-mode-map))
+
+(use-package doom-snippets
+  :after yasnippet
+  :straight (doom-snippets :type git :host github :repo "doomemacs/snippets" :files ("*.el" "*")))
+#+end_src
+
+* History
+
+** Savehist-mode
+
+#+begin_src emacs-lisp :tangle yes
+(savehist-mode 1)
+(setq history-length t)
+(setq history-delete-duplicates t)
+(setq savehist-save-minibuffer-history 1)
+(setq savehist-additional-variables
+      '(kill-ring
+	search-ring
+	regexp-search-ring))
+#+end_src
+
+** Recentf-mode
+
+Enable =recentf-mode=.
+
+#+begin_src emacs-lisp :tangle yes
+(recentf-mode 1)
+#+end_src
+
+* File formats
+** Docker
+
+#+begin_src emacs-lisp :tangle yes
+(use-package dockerfile-mode
+  :ensure t
+  :defer)
+
+(use-package docker
+  :ensure t
+  :defer
+  :bind ("C-c d" . docker))
+#+end_src
+
+** Markdown
+
+#+begin_src emacs-lisp :tangle yes
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown"))
+#+end_src
+
+** YAML
+
+#+begin_src emacs-lisp :tangle yes
+(use-package yaml-mode
+  :ensure t
+  :defer
+  :hook (yaml-mode . display-line-numbers-mode))
+#+end_src
+
+** Org-mode
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org
@@ -651,83 +821,6 @@ Set keybindings.
 (global-set-key (kbd "C-c c") 'org-capture)
 #+end_src
 
-* Snippets
-
-Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package yasnippet
-  :diminish yas-minor-mode
-  :init (yas-global-mode)
-  :config
-  (push '(yasnippet backquote-change) warning-suppress-types)
-  (yas-global-mode)
-  (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
-  (setq yas-key-syntaxes '("w_" "w_." "^ "))
-  (setq yas-installed-snippets-dir ".config/emacs-vanilla/snippets")
-  (setq yas-expand-only-for-last-commands nil)
-  (yas-global-mode 1)
-  (bind-key "\t" 'hippie-expand yas-minor-mode-map))
-
-(use-package doom-snippets
-  :after yasnippet
-  :straight (doom-snippets :type git :host github :repo "doomemacs/snippets" :files ("*.el" "*")))
-#+end_src
-
-* History
-
-#+begin_src emacs-lisp :tangle yes
-(savehist-mode 1)
-(setq history-length t)
-(setq history-delete-duplicates t)
-(setq savehist-save-minibuffer-history 1)
-(setq savehist-additional-variables
-      '(kill-ring
-	search-ring
-	regexp-search-ring))
-#+end_src
-
-Enable =recentf-mode=.
-
-#+begin_src emacs-lisp :tangle yes
-(recentf-mode 1)
-#+end_src
-
-* Markdown
-
-#+begin_src emacs-lisp :tangle yes
-(use-package markdown-mode
-  :ensure t
-  :mode ("README\\.md\\'" . gfm-mode)
-  :init (setq markdown-command "multimarkdown"))
-#+end_src
-
-* YAML
-
-#+begin_src emacs-lisp :tangle yes
-(use-package yaml-mode
-  :ensure t
-  :defer
-  :hook (yaml-mode . display-line-numbers-mode))
-#+end_src
-
-* Presentation-mode
-
-#+begin_src emacs-lisp :tangle yes
-(use-package presentation
-  :defer
-  :ensure t)
-#+end_src
-
-* Rainbow-mode
-
-#+begin_src emacs-lisp :tangle yes
-(use-package rainbow-mode
-  :defer
-  :ensure t
-  :hook (prog-mode . rainbow-mode))
-#+end_src
-
 * Shell stuff
 
 #+begin_src emacs-lisp :tangle yes
@@ -738,66 +831,9 @@ Enable =recentf-mode=.
   (vterm-max-scrollback 100000))
 #+end_src
 
-* SQL
-
-#+begin_src emacs-lisp :tangle yes
-(setq sql-postgres-login-params nil)
-
-(setq lsp-sqls-workspace-config-path nil)
-
-(defun maybe-highlight-ms-sql-kws ()
-  "Highlight MS SQL keywords when it's certain that's the dialect we're
-working with."
-  (when (string-match "umaija" (buffer-file-name))
-    (sql-highlight-ms-keywords)))
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes
-(use-package sql
-  :hook ((sql-mode . sqlint-minor-mode))
-  :ensure t
-  :defer
-  :config
-  (maybe-highlight-ms-sql-kws)
-  (sqlup-mode)
-  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
-#+end_src
-
-Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mode.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package sql-indent
-  :ensure t
-  :defer)
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/indent-sql-buffer ()
-  "Since there's some bug that breaks the indentation (`sqlind-indent-line`
-specifically) when running it with `newline-and-indent`, I've resorted
-to this hack to run the indentation for the whole buffer."
-  (interactive)
-  (sqlind-minor-mode)
-  (indent-region (point-min) (point-max))
-  (setq sqlind-minor-mode nil)
-  (progn
-    (kill-local-variable 'indent-line-function)
-    (kill-local-variable 'align-mode-rules-list)))
-
-(defun tv/format-sql-buffer ()
-  (interactive)
-  (tv/indent-sql-buffer)
-  (sqlup-capitalize-keywords-in-region (point-min) (point-max)))
-
-(evil-define-key 'normal sql-mode-map
-  "ö" #'(lambda ()
-          (interactive)
-          (when (< (buffer-size) 4000)
-            (format-sql-buffer))
-          (save-buffer)))
-#+end_src
-
 * Elfeed
+
+RSS feeds are a convenient way to consume information on a pull-basis from different sources. I can't be bothered to tweak the stock elfeed experience too much.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package elfeed
@@ -830,3 +866,4 @@ to this hack to run the indentation for the whole buffer."
     (kill-buffer buffer)
     (elfeed-kill-buffer)))
 #+end_src
+
