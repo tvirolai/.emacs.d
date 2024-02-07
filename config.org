@@ -157,7 +157,7 @@ Use =spacious-padding=.
   :hook (after-init . spacious-padding-mode))
 #+end_src
 
-Setup line numbers. 
+Setup line numbers.
 
 #+begin_src emacs-lisp :tangle yes
 (setq display-line-numbers-type 'relative)
@@ -383,9 +383,9 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ripgrep
-	:ensure t
-	:config
-	(evil-define-key 'normal 'global "Ä" 'projectile-ripgrep))
+  :ensure t
+  :config
+  (evil-define-key 'normal 'global "Ä" 'projectile-ripgrep))
 #+end_src
 
 * Clojure
