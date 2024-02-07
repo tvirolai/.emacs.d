@@ -797,3 +797,36 @@ to this hack to run the indentation for the whole buffer."
           (save-buffer)))
 #+end_src
 
+* Elfeed
+
+#+begin_src emacs-lisp :tangle yes
+(use-package elfeed
+	:defer
+	:ensure t
+	:init
+	(elfeed-org)
+	(elfeed-update)
+	:config
+	(setq elfeed-search-filter "@2-week-ago +unread"
+        shr-max-image-proportion 0.6))
+
+(use-package elfeed-org
+	:defer
+	:ensure t
+	:config
+	(setq rmh-elfeed-org-files (list "~/Dropbox/org/elfeed.org")))
+
+(defun elfeed-mark-all-as-read ()
+  "Mark all elfeed items as read."
+  (interactive)
+  (when (equal 'elfeed-search-mode major-mode)
+    (elfeed-untag elfeed-search-entries 'unread)
+    (elfeed-search-update :force)))
+
+(defun elfeed-kill-buffers ()
+  "Kill elfeed buffer and the elfeed.org feed definition buffer."
+  (interactive)
+  (let ((buffer (get-buffer "elfeed.org")))
+    (kill-buffer buffer)
+    (elfeed-kill-buffer)))
+#+end_src
