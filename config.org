@@ -365,6 +365,96 @@ Restclient is essential.
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+end_src
 
+* Clojure
+
+Configure the necessary packages.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package paredit
+  :ensure t
+  :config
+  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
+  ;; enable in the *scratch* buffer
+  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
+  (add-hook 'ielm-mode-hook #'paredit-mode)
+  (add-hook 'lisp-mode-hook #'paredit-mode))
+
+(use-package clojure-mode
+  :ensure t
+  :config
+  (define-clojure-indent
+   (returning 1)
+   (testing-dynamic 1)
+   (testing-print 1))
+
+  (add-hook 'clojure-mode-hook #'paredit-mode)
+  (add-hook 'clojure-mode-hook #'subword-mode)
+  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+
+(use-package inf-clojure
+  :ensure t
+  :config
+  (add-hook 'inf-clojure-mode-hook #'paredit-mode)
+  (add-hook 'inf-clojure-mode-hook #'rainbow-delimiters-mode))
+
+(use-package cider
+  :ensure t
+  :config
+  (setq nrepl-log-messages t)
+  (add-hook 'cider-repl-mode-hook #'paredit-mode)
+  (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
+
+(add-hook 'clojure-mode-hook #'eglot)
+
+(defun initialize-kondo ()
+  (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+    (setq flycheck-checkers (cons checker (delq checker flycheck-checkers)))))
+
+(defun my-clojure-mode-hook ()
+  (clj-refactor-mode 1)
+  (yas-minor-mode 1)        ; for adding require/use/import statements
+  ;; This choice of keybinding leaves cider-macroexpand-1 unbound
+  (paredit-mode 1)
+  (flycheck-mode 1)
+  (tree-sitter-hl-mode -1)
+  (initialize-kondo))
+
+(defun my-cider-repl-mode-hook ()
+  (paredit-mode 1)
+  (evil-local-set-key 'insert (kbd "C-<return>") 'paredit-RET)
+  (evil-local-set-key 'insert (kbd "RET") 'cider-repl-closing-return)
+  (setq cider-repl-buffer-size-limit 20000))
+
+(setq gc-cons-threshold (* 100 1024 1024)
+      read-process-output-max (* 1024 1024)
+      cider-font-lock-dynamically nil
+      cider-repl-buffer-size-limit 1000
+      lsp-lens-enable nil ; Show the "1 references" etc text above definitions.
+      lsp-enable-indentation nil ; uncomment to use cider indentation instead of lsp
+      lsp-completion-enable nil ; uncomment to use cider completion instead of lsp
+      )
+
+(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
+(add-hook 'cider-repl-mode-hook #'my-cider-repl-mode-hook)
+;; (add-hook 'clojure-ts-mode-hook #'my-clojure-mode-hook)
+
+(add-hook 'clojure-mode-hook #'lsp)
+(add-hook 'clojurescript-mode-hook #'lsp)
+(add-hook 'clojurescript-mode-hook #'locally-defer-font-lock)
+#+end_src
+
+Set keybindings.
+
+#+begin_src emacs-lisp :tangle yes
+(evil-define-key 'normal clojure-mode-map
+  "°" #'cider-eval-buffer
+  "§" #'cider-eval-defun-at-point
+  "Ö" #'cider-find-var
+  "q" #'cider-popup-buffer-quit
+  "K" #'cider-doc
+  "DEL" #'paredit-splice-sexp
+  "C-DEL" #'paredit-splice-sexp)
+#+end_src
 * Completion
 
 #+begin_src emacs-lisp :tangle yes
@@ -583,99 +673,6 @@ Enable =recentf-mode=.
   :init (setq markdown-command "multimarkdown"))
 #+end_src
 
-* Clojure
-
-Configure the necessary packages.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package paredit
-  :ensure t
-  :config
-  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-  ;; enable in the *scratch* buffer
-  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-  (add-hook 'ielm-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode)
-  (add-hook 'eval-expression-minibuffer-setup-hook #'paredit-mode))
-
-(use-package clojure-mode
-  :ensure t
-  :config
-  (define-clojure-indent
-   (returning 1)
-   (testing-dynamic 1)
-   (testing-print 1))
-
-  (add-hook 'clojure-mode-hook #'paredit-mode)
-  (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
-
-(use-package inf-clojure
-  :ensure t
-  :config
-  (add-hook 'inf-clojure-mode-hook #'paredit-mode)
-  (add-hook 'inf-clojure-mode-hook #'rainbow-delimiters-mode))
-
-(use-package cider
-  :ensure t
-  :config
-  (setq nrepl-log-messages t)
-  (add-hook 'cider-repl-mode-hook #'paredit-mode)
-  (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
-
-(add-hook 'clojure-mode-hook #'eglot)
-
-(defun initialize-kondo ()
-  (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-    (setq flycheck-checkers (cons checker (delq checker flycheck-checkers)))))
-
-(defun my-clojure-mode-hook ()
-  (clj-refactor-mode 1)
-  (yas-minor-mode 1)        ; for adding require/use/import statements
-  ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-  (paredit-mode 1)
-  (flycheck-mode 1)
-  (tree-sitter-hl-mode -1)
-  (initialize-kondo))
-
-(defun my-cider-repl-mode-hook ()
-  (paredit-mode 1)
-  (evil-local-set-key 'insert (kbd "C-<return>") 'paredit-RET)
-  (evil-local-set-key 'insert (kbd "RET") 'cider-repl-closing-return)
-  (setq cider-repl-buffer-size-limit 20000))
-
-(setq gc-cons-threshold (* 100 1024 1024)
-      read-process-output-max (* 1024 1024)
-      cider-font-lock-dynamically nil
-      cider-repl-buffer-size-limit 1000
-      lsp-lens-enable nil ; Show the "1 references" etc text above definitions.
-      lsp-enable-indentation nil ; uncomment to use cider indentation instead of lsp
-      lsp-completion-enable nil ; uncomment to use cider completion instead of lsp
-      )
-
-(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
-(add-hook 'cider-repl-mode-hook #'my-cider-repl-mode-hook)
-;; (add-hook 'clojure-ts-mode-hook #'my-clojure-mode-hook)
-
-(add-hook 'clojure-mode-hook #'lsp)
-(add-hook 'clojurescript-mode-hook #'lsp)
-(add-hook 'clojurescript-mode-hook #'locally-defer-font-lock)
-#+end_src
-
-Set keybindings.
-
-#+begin_src emacs-lisp :tangle yes
-(evil-define-key 'normal clojure-mode-map
-  "°" #'cider-eval-buffer
-  "§" #'cider-eval-defun-at-point
-  "Ö" #'cider-find-var
-  "q" #'cider-popup-buffer-quit
-  "K" #'cider-doc
-  "DEL" #'paredit-splice-sexp
-  "C-DEL" #'paredit-splice-sexp)
-#+end_src
-
-
 * Shell stuff
 
 #+begin_src emacs-lisp :tangle yes
@@ -741,6 +738,7 @@ to this hack to run the indentation for the whole buffer."
   "ö" #'(lambda ()
           (interactive)
           (when (< (buffer-size) 4000)
-            (tv/format-sql-buffer))
+            (format-sql-buffer))
           (save-buffer)))
 #+end_src
+
