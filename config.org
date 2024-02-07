@@ -100,6 +100,7 @@ Configure tab width.
 
 #+begin_src emacs-lisp :tangle yes
 (setq-default tab-width 2)
+(setq indent-tabs-mode nil)
 #+end_src
 
 Maximize the frame on startup.
@@ -167,11 +168,10 @@ Setup line numbers.
 We don't want line numbers to be shown in org-mode buffers, apart from this one.
 
 #+begin_src emacs-lisp :tangle yes
-(add-hook 'org-mode-hook
-					#'(lambda ()
-							(interactive)
-							(when (cl-search "config.org" (buffer-name))
-								(display-line-numbers-mode))))
+(add-hook 'org-mode-hook #'(lambda ()
+                             (interactive)
+                             (when (cl-search "config.org" (buffer-name))
+                               (display-line-numbers-mode))))
 #+end_src
 
 * Evil mode
