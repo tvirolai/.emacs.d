@@ -1,4 +1,5 @@
 #+title: Config
+#+STARTUP: overview
 
 * General setup
 
@@ -158,8 +159,18 @@ Use =spacious-padding=.
 Setup line numbers. 
 
 #+begin_src emacs-lisp :tangle yes
-(add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (setq display-line-numbers-type 'relative)
+
+(add-hook 'prog-mode-hook #'display-line-numbers-mode)
+#+end_src
+
+We don't want line numbers to be shown in org-mode buffers, apart from this one.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'org-mode-hook #'(lambda ()
+														 (interactive)
+														 (when (cl-search "config.org" (buffer-name))
+															 (display-line-numbers-mode))))
 #+end_src
 
 * Evil mode
@@ -597,7 +608,6 @@ Set keybindings.
 * Org-mode
 
 #+begin_src emacs-lisp :tangle yes
-;; (org-startup-folded 'nofold)
 (use-package org
   :defer
   :custom
