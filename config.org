@@ -289,7 +289,7 @@ This maybe fixes some indentation issues in org mode.
     (let ((buffers (magit-mode-get-buffers)))
       (magit-restore-window-configuration)
       (mapc #'kill-buffer buffers)))
-  (bind-key "q" #'mu-magit-kill-buffers magit-status-mode-map))
+  (advice-add 'magit-mode-bury-buffer :after #'mu-magit-kill-buffers))
 #+end_src
 
 * Keybindings
