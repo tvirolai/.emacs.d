@@ -10,6 +10,10 @@ Add personal details.
       user-mail-address "tuomo.virolainen@siili.com")
 #+end_src
 
+#+begin_src emacs-lisp :tangle yes
+(setq load-prefer-newer t)
+#+end_src
+
 Configure path.
 
 #+begin_src emacs-lisp :tangle yes
@@ -73,13 +77,30 @@ Disable unnecessary stuff.
 (fset 'yes-or-no-p 'y-or-n-p)
 #+end_src
 
+Set 50MB as the limit for garbage collection.
+
+#+begin_src emacs-lisp :tangle yes
+(setq gc-cons-threshold 50000000)
+#+end_src
+
+Warn when opening files bigger than 100MB.
+
+#+begin_src emacs-lisp :tangle yes
+(setq large-file-warning-threshold 100000000)
+#+end_src
+
+Shut Emacs down when I'm asking, even if processes are running.
+
+#+begin_src emacs-lisp :tangle yes
+(setq confirm-kill-processes nil)
+#+end_src
+
 Revert buffers when the underlying file has changed.
 
 #+begin_src emacs-lisp :tangle yes
 (global-auto-revert-mode 1)
 
 (setq global-auto-revert-non-file-buffers t)
-(add-hook 'dired-mode-hook #'dired-revert)
 #+end_src
 
 Mac-specific settings.
@@ -89,6 +110,36 @@ Mac-specific settings.
       mac-command-modifier 'meta
       mac-function-modifier 'super
       select-enable-clipboard t)
+#+end_src
+
+UTF-8 should be preferred everywhere.
+
+#+begin_src emacs-lisp :tangle yes
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+#+end_src
+
+Highlight the current line.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package hl-line
+  :config
+  (global-hl-line-mode +1))
+#+end_src
+
+Create a directory for savefiles if it doesn't exist.
+
+#+begin_src emacs-lisp :tangle yes
+(defconst tv-savefile-dir (expand-file-name "savefile" user-emacs-directory))
+#+end_src
+
+* Tree-sitter
+
+#+begin_src emacs-lisp :tangle yes
+(setq treesit-extra-load-path `(,(concat user-emacs-directory "var/tree-sitter-dist/")
+                                ,(concat user-emacs-directory "tree-sitter")))
 #+end_src
 
 * Appearance
@@ -220,6 +271,16 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
   :defer
   :ensure t
   :hook (prog-mode . rainbow-mode))
+#+end_src
+
+** Highlight mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package highlight-indentation
+  :ensure t
+  :defer
+  :hook ((prog-mode . highlight-indentation-mode)
+         (prog-mode . highlight-indentation-current-column-mode)))
 #+end_src
 
 * Evil mode
@@ -397,7 +458,6 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
-(evil-define-key 'normal 'global (kbd "C-M-ä") 'dired-jump)
 #+end_src
 
 * Programming languages
@@ -422,8 +482,11 @@ Configure the necessary packages.
   (define-clojure-indent
    (returning 1)
    (testing-dynamic 1)
-   (testing-print 1))
-
+   (testing-print 1)
+   (POST 2)
+   (GET 2)
+   (PATCH 2)
+   (PUT 2))
   (add-hook 'clojure-mode-hook #'paredit-mode)
   (add-hook 'clojure-mode-hook #'subword-mode)
   (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
@@ -570,6 +633,20 @@ Elisp keybindings.
 (evil-define-key 'normal lisp-interaction-mode-map
   "°" 'eval-buffer
   "§" 'eval-defun)
+
+(use-package ielm
+  :config
+  (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode))
+#+end_src
+
+** Typescript
+
+#+begin_src emacs-lisp :tangle yes
+(use-package typescript-mode
+  :ensure t
+  :defer
+  :custom
+  (typescript-indent-level 2))
 #+end_src
 
 * Restclient
@@ -791,8 +868,17 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 ** Savehist-mode
 
 #+begin_src emacs-lisp :tangle yes
-(setq history-length 25)
-(savehist-mode 1)
+(use-package savehist
+  :config
+  (setq savehist-additional-variables
+        ;; search entries
+        '(search-ring regexp-search-ring)
+        ;; save every minute
+        savehist-autosave-interval 60
+        ;; keep the home clean
+        history-length 25
+        savehist-file (expand-file-name "savehist" tv-savefile-dir))
+  (savehist-mode +1))
 #+end_src
 
 ** Save-place-mode
@@ -800,7 +886,11 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 Remember and restore the last cursor location of opened files.
 
 #+begin_src emacs-lisp :tangle yes
-(save-place-mode 1)
+(use-package saveplace
+  :config
+  (setq save-place-file (expand-file-name "saveplace" tv-savefile-dir))
+  ;; activate it for all buffers
+  (setq-default save-place t))
 #+end_src
 
 ** Savehist-mode
@@ -821,7 +911,15 @@ Remember and restore the last cursor location of opened files.
 Enable =recentf-mode=.
 
 #+begin_src emacs-lisp :tangle yes
-(recentf-mode 1)
+(use-package recentf
+  :config
+  (setq recentf-save-file (expand-file-name "recentf" tv-savefile-dir)
+        recentf-max-saved-items 500
+        recentf-max-menu-items 15
+        ;; disable recentf-cleanup on Emacs start, because it can cause
+        ;; problems with remote files
+        recentf-auto-cleanup 'never)
+  (recentf-mode +1))
 #+end_src
 
 * File formats
@@ -881,6 +979,12 @@ Enable =recentf-mode=.
         visual-line-mode t))
 
 (global-set-key (kbd "C-c c") 'org-capture)
+
+(use-package hl-todo
+  :ensure t
+  :defer t
+  :hook ((org-mode . hl-todo-mode)
+         (prog-mode . hl-todo-mode)))
 #+end_src
 
 * Elfeed
@@ -932,6 +1036,20 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
 (setq eshell-prefer-lisp-functions t)
 #+end_src
 
+Use syntax highlighting in =eshell=.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package eshell-syntax-highlighting
+  :ensure t
+  :config
+  (eshell-syntax-highlighting-global-mode +1)
+  :init
+  (defface eshell-syntax-highlighting-invalid-face
+    '((t :inherit diff-error))
+    "Face used for invalid Eshell commands."
+    :group 'eshell-syntax-highlighting))
+#+end_src
+
 ** Vterm
 
 #+begin_src emacs-lisp :tangle yes
@@ -977,4 +1095,45 @@ Disable images.
 
 #+begin_src emacs-lisp :tangle yes
 (setq shr-inhibit-images t)
+#+end_src
+
+* Dired
+
+#+begin_src emacs-lisp :tangle yes
+(use-package dired
+  :ensure nil
+  :defer
+  :hook ((dired-mode . dired-hide-details-mode)
+         (dired-mode . hl-line-mode))
+  :custom
+  (dired-do-revert-buffer t)
+  (dired-auto-revert-buffer t)
+  (delete-by-moving-to-trash t)
+  (dired-mouse-drag-files t)
+  (dired-dwim-target t)
+  :config
+  (setq dired-recursive-deletes 'always)
+  (setq dired-recursive-copies 'always)
+  (setq dired-dwim-target t)
+  (evil-define-key 'normal 'global (kbd "C-M-ä") 'dired-jump))
+
+(use-package all-the-icons-dired
+  :ensure t
+  :defer
+  :hook (dired-mode . all-the-icons-dired-mode)
+  :custom
+  (all-the-icons-dired-monochrome nil))
+#+end_src
+
+* Whitespace
+
+#+begin_src emacs-lisp :tangle yes
+(use-package whitespace
+  :init
+  (dolist (hook '(prog-mode-hook text-mode-hook))
+    (add-hook hook #'whitespace-mode))
+  (add-hook 'before-save-hook #'whitespace-cleanup)
+  :config
+  (setq whitespace-line-column 80) ;; limit line length
+  (setq whitespace-style '(face tabs empty trailing lines-tail)))
 #+end_src
