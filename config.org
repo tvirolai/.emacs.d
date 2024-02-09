@@ -10,6 +10,16 @@ Add personal details.
       user-mail-address "tuomo.virolainen@siili.com")
 #+end_src
 
+Configure path.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package exec-path-from-shell
+  :ensure t
+  :init
+  (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize)))
+#+end_src
+
 Configure repos.
 
 #+begin_src emacs-lisp :tangle yes
@@ -61,6 +71,15 @@ Disable unnecessary stuff.
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (fset 'yes-or-no-p 'y-or-n-p)
+#+end_src
+
+Revert buffers when the underlying file has changed.
+
+#+begin_src emacs-lisp :tangle yes
+(global-auto-revert-mode 1)
+
+(setq global-auto-revert-non-file-buffers t)
+(add-hook 'dired-mode-hook #'dired-revert)
 #+end_src
 
 Mac-specific settings.
@@ -203,9 +222,12 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
   (setq evil-want-keybinding nil)
   ;; no vim insert bindings
   :config
-  (evil-mode 1))
-
-(setq evil-undo-system 'undo-redo)
+  (evil-mode 1)
+  (setq evil-undo-system 'undo-redo)
+  (setq evil-split-window-below t
+        evil-vsplit-window-right t)
+  (setq evil-ex-substitute-global t)
+  (setq evil-shift-width 2))
 
 (use-package evil-collection
   :after evil
@@ -215,7 +237,6 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
 
 (use-package evil-commentary
   :after evil
-
   :config
   (evil-commentary-mode))
 
@@ -307,6 +328,16 @@ Use =which-key=.
 Make =ESC= quit wherever possible.
 
 #+begin_src emacs-lisp :tangle yes
+(defun minibuffer-keyboard-quit ()
+  "Abort recursive edit.
+In Delete Selection mode, if the mark is active, just deactivate it;
+then it takes a second \\[keyboard-quit] to abort the minibuffer."
+  (interactive)
+  (if (and delete-selection-mode transient-mark-mode mark-active)
+      (setq deactivate-mark  t)
+    (when (get-buffer "*Completions*") (delete-windows-on "*Completions*"))
+    (abort-recursive-edit)))
+
 (define-key evil-normal-state-map [escape] 'keyboard-quit)
 (define-key evil-visual-state-map [escape] 'keyboard-quit)
 (define-key minibuffer-local-map [escape] 'minibuffer-keyboard-quit)
@@ -333,11 +364,6 @@ Make =ESC= quit wherever possible.
 
 (define-key evil-normal-state-map (kbd "SPC g") my-magit-map)
 (define-key my-magit-map "g" 'magit-status)
-
-(defvar my-dired-map (make-sparse-keymap))
-
-(define-key evil-normal-state-map (kbd "SPC d") my-dired-map)
-(define-key my-dired-map "-" 'dired-jump)
 #+end_src
 
 A handful of must-have keybindings for me.
@@ -359,6 +385,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
+(evil-define-key 'normal 'global (kbd "C-M-ä") 'dired-jump)
 #+end_src
 
 Elisp keybindings.
@@ -476,7 +503,7 @@ Set keybindings.
 (defun maybe-highlight-ms-sql-kws ()
   "Highlight MS SQL keywords when it's certain that's the dialect we're
 working with."
-  (when (string-match "umaija" (buffer-file-name))
+  (when (cl-search "umaija" (buffer-file-name))
     (sql-highlight-ms-keywords)))
 #+end_src
 
@@ -495,6 +522,12 @@ Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mod
 
 #+begin_src emacs-lisp :tangle yes
 (use-package sql-indent
+  :ensure t
+  :defer)
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sqlup-mode
   :ensure t
   :defer)
 #+end_src
@@ -729,7 +762,7 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
   (yas-global-mode)
   (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
   (setq yas-key-syntaxes '("w_" "w_." "^ "))
-  (setq yas-installed-snippets-dir ".config/emacs-vanilla/snippets")
+  (setq yas-installed-snippets-dir ".config/emacs/snippets")
   (setq yas-expand-only-for-last-commands nil)
   (yas-global-mode 1)
   (bind-key "\t" 'hippie-expand yas-minor-mode-map))
@@ -740,6 +773,21 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 #+end_src
 
 * History
+
+** Savehist-mode
+
+#+begin_src emacs-lisp :tangle yes
+(setq history-length 25)
+(savehist-mode 1)
+#+end_src
+
+** Save-place-mode
+
+Remember and restore the last cursor location of opened files.
+
+#+begin_src emacs-lisp :tangle yes
+(save-place-mode 1)
+#+end_src
 
 ** Savehist-mode
 
@@ -813,10 +861,10 @@ Enable =recentf-mode=.
      (clojure . t)
      (shell . t)))
   (setq org-src-preserve-indentation nil
-	org-edit-src-content-indentation 0
-	doom-modeline-enable-word-count t
-	org-indent-mode t
-	visual-line-mode t))
+        org-edit-src-content-indentation 0
+        doom-modeline-enable-word-count t
+        org-indent-mode t
+        visual-line-mode t))
 
 (global-set-key (kbd "C-c c") 'org-capture)
 #+end_src
@@ -847,7 +895,9 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
                                (elfeed-update)))
   :config
   (setq elfeed-search-filter "@2-week-ago +unread"
-        shr-max-image-proportion 0.6))
+        shr-max-image-proportion 0.6)
+  (evil-define-key 'normal elfeed-search-mode-map
+    (kbd "M-RET") #'elfeed-search-browse-url))
 
 (use-package elfeed-org
   :defer
@@ -870,3 +920,20 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
     (elfeed-kill-buffer)))
 #+end_src
 
+* Pass
+
+#+begin_src emacs-lisp :tangle yes
+(use-package pass
+  :ensure t
+  :defer)
+#+end_src
+
+* File info
+
+Show information about the file under editing.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package file-info
+  :ensure t
+  :bind (("C-c f" . 'file-info-show)))
+#+end_src
