@@ -143,8 +143,13 @@ Suppress compilation warnings.
 Display time on modeline.
 
 #+begin_src emacs-lisp :tangle yes
-(pixel-scroll-precision-mode)
 (display-time-mode 1)
+#+end_src
+
+Scroll smoothly.
+
+#+begin_src emacs-lisp :tangle yes
+(pixel-scroll-precision-mode)
 #+end_src
 
 Setup =doom-modeline=.
@@ -165,6 +170,13 @@ Setup =doom-modeline=.
   ;; needs display-time-mode to be one
   (doom-modeline-time t)
   (doom-modeline-vcs-max-length 50))
+#+end_src
+
+Show the buffer name in orange if the buffer contents have been modified.
+
+#+begin_src emacs-lisp :tangle yes
+(custom-set-faces
+ '(doom-modeline-buffer-modified ((t (:foreground "orange")))))
 #+end_src
 
 Use =spacious-padding=.
@@ -388,18 +400,6 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-M-ä") 'dired-jump)
 #+end_src
 
-Elisp keybindings.
-
-#+begin_src emacs-lisp :tangle yes
-(evil-define-key 'normal emacs-lisp-mode-map
-  "°" 'eval-buffer
-  "§" 'eval-defun)
-
-(evil-define-key 'normal lisp-interaction-mode-map
-  "°" 'eval-buffer
-  "§" 'eval-defun)
-#+end_src
-
 * Programming languages
 
 ** Clojure
@@ -556,6 +556,20 @@ to this hack to run the indentation for the whole buffer."
           (when (< (buffer-size) 4000)
             (format-sql-buffer))
           (save-buffer)))
+#+end_src
+
+** Emacs Lisp
+
+Elisp keybindings.
+
+#+begin_src emacs-lisp :tangle yes
+(evil-define-key 'normal emacs-lisp-mode-map
+  "°" 'eval-buffer
+  "§" 'eval-defun)
+
+(evil-define-key 'normal lisp-interaction-mode-map
+  "°" 'eval-buffer
+  "§" 'eval-defun)
 #+end_src
 
 * Restclient
@@ -869,16 +883,6 @@ Enable =recentf-mode=.
 (global-set-key (kbd "C-c c") 'org-capture)
 #+end_src
 
-* Shell stuff
-
-#+begin_src emacs-lisp :tangle yes
-(use-package vterm
-  :ensure t
-  :defer
-  :custom
-  (vterm-max-scrollback 100000))
-#+end_src
-
 * Elfeed
 
 RSS feeds are a convenient way to consume information on a pull-basis from different sources. I can't be bothered to tweak the stock elfeed experience too much.
@@ -920,6 +924,35 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
     (elfeed-kill-buffer)))
 #+end_src
 
+* Shell stuff
+
+** Eshell
+
+#+begin_src emacs-lisp :tangle yes
+(setq eshell-prefer-lisp-functions t)
+#+end_src
+
+** Vterm
+
+#+begin_src emacs-lisp :tangle yes
+(use-package vterm
+  :ensure t
+  :defer
+  :custom
+  (vterm-max-scrollback 100000)
+  :config
+  (setq vterm-shell "/bin/zsh")
+  (setq vterm-kill-buffer-on-exit t)
+  (setq vterm-max-scrollback 100000)
+  (setq vterm-keymap-exceptions nil))
+
+(use-package multi-vterm
+  :after vterm
+  :config (add-hook 'vterm-mode-hook
+                    (lambda ()
+                      (evil-insert-state))))
+#+end_src
+
 * Pass
 
 #+begin_src emacs-lisp :tangle yes
@@ -936,4 +969,12 @@ Show information about the file under editing.
 (use-package file-info
   :ensure t
   :bind (("C-c f" . 'file-info-show)))
+#+end_src
+
+* EWW
+
+Disable images.
+
+#+begin_src emacs-lisp :tangle yes
+(setq shr-inhibit-images t)
 #+end_src
