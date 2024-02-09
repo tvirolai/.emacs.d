@@ -367,40 +367,35 @@ This maybe fixes some indentation issues in org mode.
 * Version control
 
 #+begin_src emacs-lisp :tangle yes
-(use-package magit
-  :defer
-  :ensure t)
-
-(use-package git-gutter
-  :ensure t
-  :defer
-  :hook (after-init . global-git-gutter-mode))
-
 (defun kill-magit-diff-buffer-in-current-repo (&rest _)
   "Delete the magit-diff buffer related to the current repo."
   (let ((magit-diff-buffer-in-current-repo
          (magit-mode-get-buffer 'magit-diff-mode)))
     (kill-buffer magit-diff-buffer-in-current-repo)))
 
-;; When 'C-c C-c' is pressed in the magit commit message buffer,
-;; delete the magit-diff buffer related to the current repo.
-;;
-(add-hook 'git-commit-setup-hook
-          (lambda ()
-            (add-hook 'with-editor-post-finish-hook
-                      #'kill-magit-diff-buffer-in-current-repo
-                      nil t)))
-
-(setq forge-owned-accounts '(("tvirolai")))
-
-(with-eval-after-load 'magit
-  (defun mu-magit-kill-buffers ()
+(defun mu-magit-kill-buffers ()
     "Restore window configuration and kill all Magit buffers."
     (interactive)
     (let ((buffers (magit-mode-get-buffers)))
       (magit-restore-window-configuration)
       (mapc #'kill-buffer buffers)))
-  (advice-add 'magit-mode-bury-buffer :after #'mu-magit-kill-buffers))
+
+(use-package magit
+  :defer
+  :ensure t
+  :config
+  (add-hook 'git-commit-setup-hook
+          (lambda ()
+            (add-hook 'with-editor-post-finish-hook
+                      #'kill-magit-diff-buffer-in-current-repo
+                      nil t)))
+  (evil-define-key 'normal magit-status-mode-map
+    "q" #'mu-magit-kill-buffers))
+
+(use-package git-gutter
+  :ensure t
+  :defer
+  :hook (after-init . global-git-gutter-mode))
 #+end_src
 
 * Keybindings
