@@ -133,6 +133,23 @@ Create a directory for savefiles if it doesn't exist.
 
 #+begin_src emacs-lisp :tangle yes
 (defconst tv-savefile-dir (expand-file-name "savefile" user-emacs-directory))
+
+(unless (file-exists-p tv-savefile-dir)
+  (make-directory tv-savefile-dir))
+#+end_src
+
+Configure handling of temp files. Source: [[http://xahlee.info/emacs/emacs/emacs_auto-save_backup.html][Xah Lee]].
+
+#+begin_src emacs-lisp :tangle yes
+(defconst tv-savefile-dir (expand-file-name "backup" user-emacs-directory))
+
+(unless (file-exists-p tv-savefile-dir)
+  (make-directory tv-savefile-dir))
+
+(setq make-backup-files t)
+(setq version-control nil)
+(setq backup-by-copying t)
+(setq delete-old-versions t)
 #+end_src
 
 * Tree-sitter
