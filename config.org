@@ -1,5 +1,19 @@
 #+title: Config
+#+author: Tuomo Virolainen
 #+STARTUP: content
+
+* Introduction
+
+This is my personal Emacs configuration. After years of using configurations based on
+[[https://github.com/bbatsov/prelude][Prelude]], [[https://github.com/purcell/emacs.d][Purcell Emacs]] and [[https://github.com/doomemacs/doomemacs][Doom Emacs]]
+I decided to wipe the table clean and roll my own. While Doom Emacs is great,
+I wanted to try something more light-weight and less bloated, and to level-up my
+Elisp.
+
+For this config, I have used ideas and snippets from for example
+[[https://github.com/bbatsov/][Bozhidar]], [[https://github.com/elken/doom][Ellis Kenyo]], [[https://github.com/tecosaur/emacs-config][Tecosaur]], [[https://github.com/sachac/.emacs.d][Sacha Chua]] and [[https://github.com/gopar/.emacs.d][Gopar]].
+
+This is a work in progress (what Emacs config isn't?).
 
 * General setup
 
@@ -290,14 +304,11 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
   :hook (prog-mode . rainbow-mode))
 #+end_src
 
-** Highlight mode
+** Rainbow delimiters-mode
 
 #+begin_src emacs-lisp :tangle yes
-(use-package highlight-indentation
-  :ensure t
-  :defer
-  :hook ((prog-mode . highlight-indentation-mode)
-         (prog-mode . highlight-indentation-current-column-mode)))
+(use-package rainbow-delimiters
+  :ensure t)
 #+end_src
 
 * Evil mode
@@ -472,6 +483,18 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 #+end_src
 
+
+* Flycheck
+#+begin_src emacs-lisp :tangle yes
+(use-package flycheck
+  :ensure
+  :defer
+  :hook ((python-mode . flycheck-mode))
+  :bind (:map flycheck-mode-map
+              ("C-c C-n" . flycheck-next-error)
+              ("C-c C-p" . flycheck-previous-error)))
+#+end_src
+
 * Programming languages
 
 ** Clojure
@@ -488,6 +511,18 @@ Configure the necessary packages.
   (add-hook 'ielm-mode-hook #'paredit-mode)
   (add-hook 'lisp-mode-hook #'paredit-mode))
 
+(defun initialize-kondo ()
+  (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
+    (setq flycheck-checkers (cons checker (delq checker flycheck-checkers)))))
+
+(defun my-clojure-mode-hook ()
+  (message "clojure mode hook runs")
+  (let ((modes (list #'paredit-mode #'subword-mode #'electric-pairs-mode
+                     #'rainbow-delimiters-mode #'flycheck-mode
+                     #'subword-mode)))
+    (dolist (mode modes)
+      (mode 1))))
+
 (use-package clojure-mode
   :ensure t
   :config
@@ -498,10 +533,7 @@ Configure the necessary packages.
    (POST 2)
    (GET 2)
    (PATCH 2)
-   (PUT 2))
-  (add-hook 'clojure-mode-hook #'paredit-mode)
-  (add-hook 'clojure-mode-hook #'subword-mode)
-  (add-hook 'clojure-mode-hook #'rainbow-delimiters-mode))
+   (PUT 2)))
 
 (use-package inf-clojure
   :ensure t
@@ -516,20 +548,7 @@ Configure the necessary packages.
   (add-hook 'cider-repl-mode-hook #'paredit-mode)
   (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
 
-(add-hook 'clojure-mode-hook #'eglot)
-
-(defun initialize-kondo ()
-  (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-    (setq flycheck-checkers (cons checker (delq checker flycheck-checkers)))))
-
-(defun my-clojure-mode-hook ()
-  (clj-refactor-mode 1)
-  (yas-minor-mode 1)        ; for adding require/use/import statements
-  ;; This choice of keybinding leaves cider-macroexpand-1 unbound
-  (paredit-mode 1)
-  (flycheck-mode 1)
-  (tree-sitter-hl-mode -1)
-  (initialize-kondo))
+;; (add-hook 'clojure-mode-hook #'eglot)
 
 (defun my-cider-repl-mode-hook ()
   (paredit-mode 1)
@@ -541,18 +560,21 @@ Configure the necessary packages.
       read-process-output-max (* 1024 1024)
       cider-font-lock-dynamically nil
       cider-repl-buffer-size-limit 1000
-      lsp-lens-enable nil ; Show the "1 references" etc text above definitions.
-      lsp-enable-indentation nil ; uncomment to use cider indentation instead of lsp
-      lsp-completion-enable nil ; uncomment to use cider completion instead of lsp
+      ;; lsp-lens-enable nil ; Show the "1 references" etc text above definitions.
+      ;; lsp-enable-indentation nil ; uncomment to use cider indentation instead of lsp
+      ;; lsp-completion-enable nil ; uncomment to use cider completion instead of lsp
       )
 
-(add-hook 'clojure-mode-hook #'my-clojure-mode-hook)
 (add-hook 'cider-repl-mode-hook #'my-cider-repl-mode-hook)
 ;; (add-hook 'clojure-ts-mode-hook #'my-clojure-mode-hook)
 
-(add-hook 'clojure-mode-hook #'lsp)
-(add-hook 'clojurescript-mode-hook #'lsp)
-(add-hook 'clojurescript-mode-hook #'locally-defer-font-lock)
+(add-hook 'clojurescript-mode-hook #'paredit-mode)
+(add-hook 'clojurescript-mode-hook #'subword-mode)
+(add-hook 'clojurescript-mode-hook #'flycheck-mode)
+(add-hook 'clojurescript-mode-hook #'rainbow-delimiters-mode)
+(add-hook 'clojurescript-mode-hook #'electric-pair-mode)
+(add-hook 'clojure-mode-hook #'eglot-ensure)
+(add-hook 'clojurescript-mode-hook #'eglot-ensure)
 #+end_src
 
 Set keybindings.
@@ -563,9 +585,7 @@ Set keybindings.
   "§" #'cider-eval-defun-at-point
   "Ö" #'cider-find-var
   "q" #'cider-popup-buffer-quit
-  "K" #'cider-doc
-  "DEL" #'paredit-splice-sexp
-  "C-DEL" #'paredit-splice-sexp)
+  "K" #'cider-doc)
 #+end_src
 
 ** SQL
@@ -1146,6 +1166,6 @@ Disable images.
     (add-hook hook #'whitespace-mode))
   (add-hook 'before-save-hook #'whitespace-cleanup)
   :config
-  (setq whitespace-line-column 80) ;; limit line length
+  (setq whitespace-line-column 120) ;; limit line length
   (setq whitespace-style '(face tabs empty trailing lines-tail)))
 #+end_src
