@@ -97,6 +97,12 @@ Warn when opening files bigger than 100MB.
 (setq large-file-warning-threshold 100000000)
 #+end_src
 
+Increase kill-ring capacity.
+
+#+begin_src emacs-lisp :tangle yes
+(setq kill-ring-max 1000)
+#+end_src
+
 Shut Emacs down when I'm asking, even if processes are running.
 
 #+begin_src emacs-lisp :tangle yes
@@ -165,6 +171,18 @@ Configure handling of temp files. Source: [[http://xahlee.info/emacs/emacs/emacs
 #+begin_src emacs-lisp :tangle yes
 (setq treesit-extra-load-path `(,(concat user-emacs-directory "var/tree-sitter-dist/")
                                 ,(concat user-emacs-directory "tree-sitter")))
+(use-package tree-sitter
+  :hook ((tree-sitter-after-on . tree-sitter-hl-mode)
+         (prog-mode . turn-on-tree-sitter-mode))
+  :config (require 'tree-sitter-langs)
+  ;; This makes every node a link to a section of code
+  (setq tree-sitter-debug-jump-buttons t
+        ;; and this highlights the entire sub tree in your code
+        tree-sitter-debug-highlight-jump-region t))
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
 #+end_src
 
 * Appearance
@@ -202,6 +220,12 @@ Maximize the frame on startup.
 
 #+begin_src emacs-lisp :tangle yes
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+#+end_src
+
+Wrap lines by default.
+
+#+begin_src emacs-lisp :tangle yes
+(setq global-visual-line-mode t)
 #+end_src
 
 Make the titlebar transparent.
@@ -843,26 +867,6 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
   :bind (:map projectile-command-map
 	      ("s s" . consult-ag)
 	      ("s g" . consult-grep)))
-
-(use-package consult-org-roam
-  :ensure t
-  :after org-roam
-  :init
-  (require 'consult-org-roam)
-  ;; Activate the minor mode
-  (consult-org-roam-mode 1)
-  :custom
-  (consult-org-roam-grep-func #'consult-ag)
-  ;; Configure a custom narrow key for `consult-buffer'
-  (consult-org-roam-buffer-narrow-key ?r)
-  ;; Display org-roam buffers right after non-org-roam buffers
-  ;; in consult-buffer (and not down at the bottom)
-  (consult-org-roam-buffer-after-buffers nil)
-  :config
-  ;; Eventually suppress previewing for certain functions
-  (consult-customize
-   consult-org-roam-forward-links
-   :preview-key (kbd "M-.")))
 #+end_src
 
 ** Marginalia
@@ -981,9 +985,16 @@ Enable =recentf-mode=.
 #+begin_src emacs-lisp :tangle yes
 (use-package org
   :defer
-  :custom
-  (org-directory "~/Dropbox/org/")
   :config
+  (setq org-directory "~/Dropbox/org/")
+  (setq org-default-notes-file (concat org-directory "/inbox.org"))
+  (setq org-ellipsis " ▾")
+  (setq org-superstar-headline-bullets-list '("› "))
+  (setq org-agenda-start-with-log-mode t)
+  (setq org-log-done 'time)
+  (setq org-log-into-drawer t)
+  (setq org-cycle-emulate-tab nil)
+  (setq org-startup-folded 'nofold)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((sql . t)
@@ -997,16 +1008,65 @@ Enable =recentf-mode=.
   (setq org-src-preserve-indentation nil
         org-edit-src-content-indentation 0
         doom-modeline-enable-word-count t
-        org-indent-mode t
-        visual-line-mode t))
-
-(global-set-key (kbd "C-c c") 'org-capture)
+        org-indent-mode t)
+  (setq org-capture-templates
+        '(("f" "Fleeting note" item
+           (file+headline org-default-notes-file "Notes")
+           "- %?"
+           :jump-to-captured t)
+          ("t" "New task" entry
+           (file+headline org-default-notes-file "Tasks")
+           "* TODO %i%?")))
+  (global-set-key (kbd "C-c c") 'org-capture)
+  :hook (org-mode . visual-line-mode))
 
 (use-package hl-todo
   :ensure t
-  :defer t
+  :defer
   :hook ((org-mode . hl-todo-mode)
          (prog-mode . hl-todo-mode)))
+  #+end_src
+
+** Org Roam
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-roam
+  :ensure t
+  :defer
+  :custom
+  (org-roam-v2-ack t)
+  (org-roam-tag-sources '(prop))
+  (org-roam-db-update-method 'immediate)
+  :hook (after-init . org-roam-db-autosync-mode)
+  :bind (:map global-map
+              (("C-c n i" . org-roam-node-insert)
+               ("C-c n f" . org-roam-node-find)
+               ("C-c n g" . org-roam-graph)
+               ("C-c n n" . org-roam-capture)
+               ("C-c n d" . org-roam-dailies-capture-today)
+               ("C-c n s" . consult-org-roam-search)))
+  :config
+  (setq org-roam-node-display-template (concat "${title:50} " (propertize "${tags:10}" 'face 'org-tag)))
+  (setq org-roam-directory "~/Dropbox/org/roam")
+  (setq org-roam-capture-templates
+        `(("n" "default note" plain "%?"
+           :if-new
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+title: ${title}\n#+date: %t\n#+filetags: \n\n ")
+           :unnarrowed t)
+          ("b" "book" plain "%?"
+           :if-new
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+author: ${author}\n#+title: ${title}\n#+subtitle: \n#+date: %t\n#+origin: ${origin}\n#+category: \n#+filetags: :kirjat:\n\n")
+           :unnarrowed t)
+          ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Project")
+           :unnarrowed t)
+          ("m" "meeting" plain "%?"
+           :if-new
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+title: %^{title}\n#+present: %^{present} \n#+date: %t\n#+category: \n#+filetags: :työ:\n\n ")
+           :unnarrowed t))))
 #+end_src
 
 * Elfeed
@@ -1020,9 +1080,9 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   :init
   (elfeed-org)
   (run-at-time 10 (* 60 60) #'(lambda ()
-                               (interactive)
-                               (message "Updating RSS feeds...")
-                               (elfeed-update)))
+                                (interactive)
+                                (message "Updating RSS feeds...")
+                                (elfeed-update)))
   :config
   (setq elfeed-search-filter "@2-week-ago +unread"
         shr-max-image-proportion 0.6)
@@ -1146,17 +1206,4 @@ Disable images.
   :hook (dired-mode . all-the-icons-dired-mode)
   :custom
   (all-the-icons-dired-monochrome nil))
-#+end_src
-
-* Whitespace
-
-#+begin_src emacs-lisp :tangle yes
-(use-package whitespace
-:init
-(dolist (hook '(prog-mode-hook text-mode-hook))
-  (add-hook hook #'whitespace-mode))
-(add-hook 'before-save-hook #'whitespace-cleanup)
-:config
-(setq whitespace-line-column 120) ;; limit line length
-(setq whitespace-style '(face tabs empty trailing lines-tail)))
 #+end_src
