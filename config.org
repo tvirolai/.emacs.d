@@ -999,6 +999,7 @@ Enable =recentf-mode=.
   (setq org-log-into-drawer t)
   (setq org-cycle-emulate-tab nil)
   (setq org-startup-folded 'nofold)
+  (setq org-indent-mode t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((sql . t)
@@ -1022,7 +1023,13 @@ Enable =recentf-mode=.
            (file+headline org-default-notes-file "Tasks")
            "* TODO %i%?")))
   (global-set-key (kbd "C-c c") 'org-capture)
-  :hook (org-mode . visual-line-mode))
+  :hook ((org-mode . visual-line-mode)
+         (org-mode . org-modern-mode)))
+
+(use-package org-modern
+  :defer
+  :ensure t
+  :after org)
 
 (use-package hl-todo
   :ensure t
