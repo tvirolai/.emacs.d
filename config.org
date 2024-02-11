@@ -248,7 +248,7 @@ Setup =doom-modeline=.
   (doom-modeline-vcs-max-length 50))
 #+end_src
 
-Show the buffer name in orange if the buffer contents have been modified.
+Show the buffer name in orange if the buffer contains unsaved changes.
 
 #+begin_src emacs-lisp :tangle yes
 (custom-set-faces
@@ -379,21 +379,21 @@ This maybe fixes some indentation issues in org mode.
     (kill-buffer magit-diff-buffer-in-current-repo)))
 
 (defun mu-magit-kill-buffers ()
-    "Restore window configuration and kill all Magit buffers."
-    (interactive)
-    (let ((buffers (magit-mode-get-buffers)))
-      (magit-restore-window-configuration)
-      (mapc #'kill-buffer buffers)))
+  "Restore window configuration and kill all Magit buffers."
+  (interactive)
+  (let ((buffers (magit-mode-get-buffers)))
+    (magit-restore-window-configuration)
+    (mapc #'kill-buffer buffers)))
 
 (use-package magit
   :defer
   :ensure t
   :config
   (add-hook 'git-commit-setup-hook
-          (lambda ()
-            (add-hook 'with-editor-post-finish-hook
-                      #'kill-magit-diff-buffer-in-current-repo
-                      nil t)))
+            (lambda ()
+              (add-hook 'with-editor-post-finish-hook
+                        #'kill-magit-diff-buffer-in-current-repo
+                        nil t)))
   (evil-define-key 'normal magit-status-mode-map
     "q" #'mu-magit-kill-buffers))
 
@@ -569,6 +569,14 @@ Configure the necessary packages.
 (add-hook 'clojurescript-mode-hook #'electric-pair-mode)
 (add-hook 'clojure-mode-hook #'eglot-ensure)
 (add-hook 'clojurescript-mode-hook #'eglot-ensure)
+#+end_src
+
+Configure [[https://github.com/ericdallo/jet.el][jet.el]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package jet
+  :ensure t
+  :defer)
 #+end_src
 
 Set keybindings.
@@ -891,22 +899,6 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 
 * History
 
-** Savehist-mode
-
-#+begin_src emacs-lisp :tangle yes
-(use-package savehist
-  :config
-  (setq savehist-additional-variables
-        ;; search entries
-        '(search-ring regexp-search-ring)
-        ;; save every minute
-        savehist-autosave-interval 60
-        ;; keep the home clean
-        history-length 25
-        savehist-file (expand-file-name "savehist" tv-savefile-dir))
-  (savehist-mode +1))
-#+end_src
-
 ** Save-place-mode
 
 Remember and restore the last cursor location of opened files.
@@ -922,14 +914,18 @@ Remember and restore the last cursor location of opened files.
 ** Savehist-mode
 
 #+begin_src emacs-lisp :tangle yes
-(savehist-mode 1)
-(setq history-length t)
-(setq history-delete-duplicates t)
-(setq savehist-save-minibuffer-history 1)
-(setq savehist-additional-variables
-      '(kill-ring
-	search-ring
-	regexp-search-ring))
+(use-package savehist
+  :config
+  (setq savehist-additional-variables
+        ;; search entries
+        '(search-ring regexp-search-ring kill-ring)
+        ;; save every minute
+        savehist-autosave-interval 60
+        ;; keep the home clean
+        history-length 25
+        savehist-save-minibuffer-history 1
+        savehist-file (expand-file-name "savehist" tv-savefile-dir))
+  (savehist-mode +1))
 #+end_src
 
 ** Recentf-mode
@@ -1031,7 +1027,8 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   (setq elfeed-search-filter "@2-week-ago +unread"
         shr-max-image-proportion 0.6)
   (evil-define-key 'normal elfeed-search-mode-map
-    (kbd "M-RET") #'elfeed-search-browse-url))
+    (kbd "M-RET") #'elfeed-search-browse-url
+    "§" #'elfeed-update))
 
 (use-package elfeed-org
   :defer
@@ -1155,11 +1152,11 @@ Disable images.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package whitespace
-  :init
-  (dolist (hook '(prog-mode-hook text-mode-hook))
-    (add-hook hook #'whitespace-mode))
-  (add-hook 'before-save-hook #'whitespace-cleanup)
-  :config
-  (setq whitespace-line-column 120) ;; limit line length
-  (setq whitespace-style '(face tabs empty trailing lines-tail)))
+:init
+(dolist (hook '(prog-mode-hook text-mode-hook))
+  (add-hook hook #'whitespace-mode))
+(add-hook 'before-save-hook #'whitespace-cleanup)
+:config
+(setq whitespace-line-column 120) ;; limit line length
+(setq whitespace-style '(face tabs empty trailing lines-tail)))
 #+end_src
