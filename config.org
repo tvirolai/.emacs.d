@@ -7,13 +7,7 @@
 This is my personal Emacs configuration. After years of using configurations based on
 [[https://github.com/bbatsov/prelude][Prelude]], [[https://github.com/purcell/emacs.d][Purcell Emacs]] and [[https://github.com/doomemacs/doomemacs][Doom Emacs]]
 I decided to wipe the table clean and roll my own. While Doom Emacs is great,
-I wanted to try something more light-weight and less bloated, and to level-up my
-Elisp.
-
-For this config, I have used ideas and snippets from for example
-[[https://github.com/bbatsov/][Bozhidar]], [[https://github.com/elken/doom][Ellis Kenyo]], [[https://github.com/tecosaur/emacs-config][Tecosaur]], [[https://github.com/sachac/.emacs.d][Sacha Chua]] and [[https://github.com/gopar/.emacs.d][Gopar]].
-
-This is a work in progress (what Emacs config isn't?).
+I wanted to try something more light-weight and less bloated, and to level-up my Elisp.
 
 * General setup
 
