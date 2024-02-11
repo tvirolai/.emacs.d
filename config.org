@@ -7,7 +7,12 @@
 This is my personal Emacs configuration. After years of using configurations based on
 [[https://github.com/bbatsov/prelude][Prelude]], [[https://github.com/purcell/emacs.d][Purcell Emacs]] and [[https://github.com/doomemacs/doomemacs][Doom Emacs]]
 I decided to wipe the table clean and roll my own. While Doom Emacs is great,
-I wanted to try something more light-weight and less bloated, and to level-up my Elisp.
+I wanted to try something more lightweight and minimalist, and to level-up my Elisp.
+
+The way this works is that upon Emacs startup:
+1. The two-liner =init.el= config file is loaded, which in turns calls the =org-babel-load-file= function with this file.
+2. The org file is processed and the code blocks are tangled into a =config.el= file.
+3. The generated configuration file is then loaded. As the =config.el= file is basically a function of this one, I've omitted it from version control.
 
 * General setup
 
@@ -526,7 +531,6 @@ Configure the necessary packages.
   (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
   ;; enable in the *scratch* buffer
   (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-  (add-hook 'ielm-mode-hook #'paredit-mode)
   (add-hook 'lisp-mode-hook #'paredit-mode))
 
 (defun initialize-kondo ()
