@@ -984,22 +984,26 @@ Enable =recentf-mode=.
   :hook (yaml-mode . display-line-numbers-mode))
 #+end_src
 
-** Org-mode
+* Org-mode
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org
   :defer
+  :custom
+  (fill-column 100)
+  (org-pretty-entities t)
+  (org-log-done 'time)
+  (org-log-into-drawer t)
+  (org-startup-folded 'nofold)
+  (org-todo-keywords
+   '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(i!)" "WAITING(w!)" "|" "DONE(d!)" "CANCELED(c!)" "DELEGATED(p!)")))
   :config
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "/inbox.org"))
   (setq org-ellipsis " ▾")
   (setq org-superstar-headline-bullets-list '("› "))
   (setq org-agenda-start-with-log-mode t)
-  (setq org-log-done 'time)
-  (setq org-log-into-drawer t)
   (setq org-cycle-emulate-tab nil)
-  (setq org-startup-folded 'nofold)
-  (setq org-indent-mode t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((sql . t)
@@ -1024,6 +1028,7 @@ Enable =recentf-mode=.
            "* TODO %i%?")))
   (global-set-key (kbd "C-c c") 'org-capture)
   :hook ((org-mode . visual-line-mode)
+         (org-mode . org-indent-mode)
          (org-mode . org-modern-mode)))
 
 (use-package org-modern
@@ -1080,6 +1085,94 @@ Enable =recentf-mode=.
            :unnarrowed t))))
 #+end_src
 
+** Org Agenda
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-agenda
+  :after org
+  :ensure nil
+  :bind (("C-c a" . org-agenda))
+  ;; :hook (org-agenda-finalize . org-agenda-entry-text-mode)
+  :custom
+  (org-agenda-current-time-string (if (and (display-graphic-p)
+           (char-displayable-p ?←)
+           (char-displayable-p ?─))
+      "⬅️ now"
+    "now - - - - - - - - - - - - - - - - - - - - - - - - -"))
+  (org-agenda-timegrid-use-ampm t)
+  (org-agenda-tags-column 0)
+  (org-agenda-window-setup 'only-window)
+  (org-agenda-restore-windows-after-quit t)
+  (org-agenda-log-mode-items '(closed clock state))
+  (org-agenda-time-grid '((daily today require-timed)
+                          (600 800 1000 1200 1400 1600 1800 2000)
+                          " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+  ;; (org-agenda-start-with-log-mode '(closed clock state))
+  (org-agenda-files "~/Dropbox/org/agenda-files.org")
+  ;; (org-agenda-todo-ignore-scheduled 'future)
+  ;; TODO entries that can't be marked as done b/c of children are shown as dimmed in agenda view
+  (org-agenda-dim-blocked-tasks 'invisible)
+  ;; Start the week view on whatever day im on
+  (org-agenda-start-on-weekday nil)
+  ;; How to identify stuck/non-stuck projects
+  ;; Projects are identified by the 'project' tag and its always the first level
+  ;; Next any of these todo keywords means it's not a stuck project
+  ;; 3rd, theres no tags that I use to identify a stuck Project
+  ;; Finally, theres no special text that signify a non-stuck project
+  (org-stuck-projects
+   '("+project+LEVEL=1"
+     ("IN-PROGRESS" "WAITING" "DONE" "CANCELED" "DELEGATED")
+     nil
+     ""))
+  (org-agenda-prefix-format
+   '((agenda . " %-4e %i %-12:c%?-12t% s ")
+     (todo . " %i %-10:c %-5e %(gopar/get-schedule-or-deadline-if-available)")
+     (tags . " %i %-12:c")
+     (search . " %i %-12:c")))
+  ;; Lets define some custom cmds in agenda menu
+  (org-agenda-custom-commands
+   '(("h" "Agenda and Home tasks"
+      ((agenda "" ((org-agenda-span 2)))
+       (todo "WAITING|IN-PROGRESS")
+       (tags-todo "inbox|break")
+       (todo "NEXT"))
+      ((org-agenda-sorting-strategy '(time-up habit-up priority-down category-up))))
+
+     ("w" "Agenda and break|inbox tasks"
+      ((agenda "" ((org-agenda-span 1)))
+       (tags-todo "inbox|break"))
+      ((org-agenda-sorting-strategy '(time-up habit-up priority-down category-up))))
+
+     ("i" "In-Progress Tasks"
+      ((todo "IN-PROGRESS|WAITING")
+       (agenda ""))
+      ((org-agenda-sorting-strategy '(time-up habit-up priority-down category-up))))
+
+     ("g" "Goals: 12 Week Year"
+      ((agenda "")
+       (todo "IN-PROGRESS|WAITING"))
+      ((org-agenda-sorting-strategy '(time-up habit-up priority-down category-up))
+       (org-agenda-tag-filter-preset '("+12WY"))
+       (org-agenda-start-with-log-mode '(closed clock state))
+       (org-agenda-archives-mode t)
+       ))
+
+     ("r" "Weekly Review"
+      ((agenda "")
+       (todo))
+      ((org-agenda-sorting-strategy '(time-up habit-up category-up priority-down ))
+       (org-agenda-files "~/Dropbox/org/weekly-reivew-agenda-files.org")
+       (org-agenda-include-diary nil)))))
+  :init
+  ;; Originally from here: https://stackoverflow.com/a/59001859/2178312
+  (defun gopar/get-schedule-or-deadline-if-available ()
+    (let ((scheduled (org-get-scheduled-time (point)))
+          (deadline (org-get-deadline-time (point))))
+      (if (not (or scheduled deadline))
+          (format "🗓️ ")
+          ;; (format " ")
+        "   "))))
+#+end_src
 * Elfeed
 
 RSS feeds are a convenient way to consume information on a pull-basis from different sources. I can't be bothered to tweak the stock elfeed experience too much.
@@ -1170,8 +1263,12 @@ Use syntax highlighting in =eshell=.
 #+begin_src emacs-lisp :tangle yes
 (use-package pass
   :ensure t
-  :defer)
+  :defer
+  :config
+  (require 'auth-source-pass)
+  (auth-source-pass-enable))
 #+end_src
+
 
 * File info
 
@@ -1218,3 +1315,4 @@ Disable images.
   :custom
   (all-the-icons-dired-monochrome nil))
 #+end_src
+
