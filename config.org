@@ -498,10 +498,10 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
 (evil-define-key 'normal 'global (kbd "å") 'yank-from-kill-ring)
 (evil-define-key 'normal 'global (kbd "¨") 'evil-ex-search-forward)
-(evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
-(evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
-(evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
-(evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
+;; (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
+;; (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
+;; (evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
+;; (evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
@@ -540,7 +540,6 @@ Configure the necessary packages.
     (setq flycheck-checkers (cons checker (delq checker flycheck-checkers)))))
 
 (defun my-clojure-mode-hook ()
-  (message "clojure mode hook runs")
   (let ((modes (list #'paredit-mode #'subword-mode #'electric-pairs-mode
                      #'rainbow-delimiters-mode #'flycheck-mode
                      #'subword-mode)))
@@ -1338,3 +1337,104 @@ Disable images.
   (all-the-icons-dired-monochrome nil))
 #+end_src
 
+* Transient
+
+Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package transient
+  :ensure t
+  :defer
+  :bind ("C-M-o" . windows-transient-window)
+  :init
+  (transient-define-prefix windows-transient-window ()
+   "Display a transient buffer showing useful window manipulation bindings."
+    [["Resize"
+     ("}" "h+" enlarge-window-horizontally :transient t)
+     ("{" "h-" shrink-window-horizontally :transient t)
+     ("^" "v+" enlarge-window :transient t)
+     ("V" "v-" shrink-window :transient t)]
+     ["Split"
+    ("v" "vertical" (lambda ()
+       (interactive)
+       (split-window-right)
+       (windmove-right)) :transient t)
+    ("x" "horizontal" (lambda ()
+       (interactive)
+       (split-window-below)
+       (windmove-down)) :transient t)
+    ("wv" "win-vertical" (lambda ()
+       (interactive)
+       (select-window (split-window-right))
+       (windows-transient-window)) :transient nil)
+    ("wx" "win-horizontal" (lambda ()
+       (interactive)
+       (select-window (split-window-below))
+       (windows-transient-window)) :transient nil)]
+    ["Misc"
+     ("B" "switch buffer" (lambda ()
+                            (interactive)
+                            (consult-buffer)
+                            (windows-transient-window)))
+     ("z" "undo" (lambda ()
+                  (interactive)
+                  (winner-undo)
+                  (setq this-command 'winner-undo)) :transient t)
+    ("Z" "redo" winner-redo :transient t)]]
+    [["Move"
+    ("h" "←" windmove-left :transient t)
+    ("j" "↓" windmove-down :transient t)
+    ("l" "→" windmove-right :transient t)
+    ("k" "↑" windmove-up :transient t)]
+    ["Swap"
+    ("sh" "←" windmove-swap-states-left :transient t)
+    ("sj" "↓" windmove-swap-states-down :transient t)
+    ("sl" "→" windmove-swap-states-right :transient t)
+    ("sk" "↑" windmove-swap-states-up :transient t)]
+    ["Delete"
+    ("dh" "←" windmove-delete-left :transient t)
+    ("dj" "↓" windmove-delete-down :transient t)
+    ("dl" "→" windmove-delete-right :transient t)
+    ("dk" "↑" windmove-delete-up :transient t)
+    ("D" "This" delete-window :transient t)]
+    ["Transpose"
+    ("tt" "↜" (lambda ()
+                (interactive)
+                (transpose-frame)
+                (windows-transient-window)) :transient nil)
+    ("ti" "↕" (lambda ()
+                (interactive)
+                (flip-frame)
+                (windows-transient-window)) :transient nil)
+    ("to" "⟷" (lambda ()
+                (interactive)
+                (flop-frame)
+                (windows-transient-window)) :transient nil)
+    ("tc" "⟳" (lambda ()
+                (interactive)
+                (rotate-frame-clockwise)
+                (windows-transient-window)) :transient nil)
+    ("ta" "⟲" (lambda ()
+                (interactive)
+                (rotate-frame-anticlockwise)
+                (windows-transient-window)) :transient nil)]
+    ["Exit"
+     ("<escape>" "exit menu" (lambda ()
+                               (interactive)
+                               (transient-quit-one)) :transient nil)
+     ("q" "exit menu" (lambda ()
+                        (interactive)
+                        (transient-quit-one)) :transient nil)]]))
+#+end_src
+
+* Winner
+
+#+begin_src emacs-lisp :tangle yes
+(use-package winner
+  :ensure nil
+  :hook after-init
+  :commands (winner-undo winnner-redo)
+  :custom
+  (winner-boring-buffers '("*Completions*" "*Help*" "*Apropos*"
+                           "*Buffer List*" "*info*" "*Compile-Log*")))
+#+end_src
