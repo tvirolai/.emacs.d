@@ -23,10 +23,6 @@ Add personal details.
       user-mail-address "tuomo.virolainen@siili.com")
 #+end_src
 
-#+begin_src emacs-lisp :tangle yes
-(setq load-prefer-newer t)
-#+end_src
-
 Configure path.
 
 #+begin_src emacs-lisp :tangle yes
@@ -100,6 +96,12 @@ Warn when opening files bigger than 100MB.
 
 #+begin_src emacs-lisp :tangle yes
 (setq large-file-warning-threshold 100000000)
+#+end_src
+
+Prefer latest bytecode.
+
+#+begin_src emacs-lisp :tangle yes
+(setq load-prefer-newer t)
 #+end_src
 
 Increase kill-ring capacity.
@@ -727,6 +729,24 @@ Restclient is essential.
   (require 'gnutls))
 #+end_src
 
+* Counsel-etags
+
+This makes etags work, i.e. allows us to jump to definitions.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package counsel-etags
+  :ensure t
+  :bind (("C-]" . counsel-etags-find-tag-at-point))
+  :init
+  (add-hook 'prog-mode-hook
+        (lambda ()
+          (add-hook 'after-save-hook
+            'counsel-etags-virtual-update-tags 'append 'local)))
+  :config
+  (setq counsel-etags-update-interval 60)
+  (push "build" counsel-etags-ignore-directories))
+#+end_src
+
 * Projectile
 
 #+begin_src emacs-lisp :tangle yes
@@ -1259,6 +1279,8 @@ Use syntax highlighting in =eshell=.
 #+end_src
 
 * Pass
+
+Use the =pass= package to interact with the similarly named Linux password manager.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package pass
