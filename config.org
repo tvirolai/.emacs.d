@@ -1,13 +1,10 @@
 #+title: Config
 #+author: Tuomo Virolainen
-#+STARTUP: content
+#+STARTUP: nofold
 
 * Introduction
 
-This is my personal Emacs configuration. After years of using configurations based on
-[[https://github.com/bbatsov/prelude][Prelude]], [[https://github.com/purcell/emacs.d][Purcell Emacs]] and [[https://github.com/doomemacs/doomemacs][Doom Emacs]]
-I decided to wipe the table clean and roll my own. While Doom Emacs is great,
-I wanted to try something more lightweight and minimalist, and to level-up my Elisp.
+This is my personal Emacs configuration. After years of using configurations based on [[https://github.com/bbatsov/prelude][Prelude]], [[https://github.com/purcell/emacs.d][Purcell Emacs]] and [[https://github.com/doomemacs/doomemacs][Doom Emacs]] I decided to wipe the table clean and roll my own. While Doom Emacs is great, I wanted to try something more lightweight and minimalist, and to level-up my Elisp.
 
 The way this works is that upon Emacs startup:
 1. The two-liner =init.el= config file is loaded, which in turns calls the =org-babel-load-file= function with this file.
@@ -498,10 +495,10 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
 (evil-define-key 'normal 'global (kbd "å") 'yank-from-kill-ring)
 (evil-define-key 'normal 'global (kbd "¨") 'evil-ex-search-forward)
-;; (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
-;; (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
-;; (evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
-;; (evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
+(evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
+(evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
+(evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
+(evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
@@ -1211,6 +1208,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
         shr-max-image-proportion 0.6)
   (evil-define-key 'normal elfeed-search-mode-map
     (kbd "M-RET") #'elfeed-search-browse-url
+    (kbd "DEL") #'tv/elfeed-mark-all-as-read
     "§" #'elfeed-update))
 
 (use-package elfeed-org
@@ -1219,14 +1217,14 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   :config
   (setq rmh-elfeed-org-files (list "~/Dropbox/org/elfeed.org")))
 
-(defun elfeed-mark-all-as-read ()
+(defun tv/elfeed-mark-all-as-read ()
   "Mark all elfeed items as read."
   (interactive)
   (when (equal 'elfeed-search-mode major-mode)
     (elfeed-untag elfeed-search-entries 'unread)
     (elfeed-search-update :force)))
 
-(defun elfeed-kill-buffers ()
+(defun tv/elfeed-kill-buffers ()
   "Kill elfeed buffer and the elfeed.org feed definition buffer."
   (interactive)
   (let ((buffer (get-buffer "elfeed.org")))
@@ -1286,6 +1284,7 @@ Use the =pass= package to interact with the similarly named Linux password manag
   :ensure t
   :defer
   :config
+  (setq epg-pinentry-mode 'loopback)
   (require 'auth-source-pass)
   (auth-source-pass-enable))
 #+end_src
