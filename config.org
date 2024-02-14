@@ -166,16 +166,6 @@ Put backup files in system's temp dir and purge them occasionally.
       `((".*" . ,temporary-file-directory)))
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
-
-(message "Deleting old backup files...")
-(let ((week (* 60 60 24 7))
-      (current (float-time (current-time))))
-  (dolist (file (directory-files temporary-file-directory t))
-    (when (and (backup-file-name-p file)
-               (> (- current (float-time (fifth (file-attributes file))))
-                  week))
-      (message "%s" file)
-      (delete-file file))))
 #+end_src
 
 * Tree-sitter
@@ -1034,12 +1024,13 @@ Enable =recentf-mode=.
   (org-startup-folded 'nofold)
   (org-todo-keywords
    '((sequence "TODO(t)" "PROJ(p)" "LOOP(r)" "STRT(s)" "WAIT(w)"
-                    "HOLD(h)" "IDEA(i)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
-          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
-          (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
+               "HOLD(h)" "IDEA(i)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
+     (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
+     (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   :config
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "/inbox.org"))
+  (setq org-archive-location "archive/Archive_%s::")
   (setq org-ellipsis " ▾")
   (setq org-superstar-headline-bullets-list '("› "))
   (setq org-agenda-start-with-log-mode t)
@@ -1070,12 +1061,36 @@ Enable =recentf-mode=.
   :hook ((org-mode . visual-line-mode)
          (org-mode . org-indent-mode)))
 
+;; From elken
+
+(defun org-archive-done-tasks ()
+  "Attempt to archive all done tasks in file"
+  (interactive)
+  (org-map-entries
+   (lambda ()
+     (org-archive-subtree)
+     (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
+   "/DONE" 'file))
+
+(defun org-remove-kill-tasks ()
+  (interactive)
+  (org-map-entries
+   (lambda ()
+     (org-cut-subtree)
+     (pop kill-ring)
+     (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
+   "/KILL" 'file))
+
+(evil-define-key 'normal org-mode-map
+  (kbd "C-c DEL a") #'org-archive-done-tasks
+  (kbd "C-c DEL k") #'org-remove-kill-tasks)
+
 (use-package hl-todo
   :ensure t
   :defer
   :hook ((org-mode . hl-todo-mode)
          (prog-mode . hl-todo-mode)))
-  #+end_src
+                    #+end_src
 
 ** Evil-org
 
@@ -1154,10 +1169,10 @@ Enable =recentf-mode=.
   ;; :hook (org-agenda-finalize . org-agenda-entry-text-mode)
   :custom
   (org-agenda-current-time-string (if (and (display-graphic-p)
-           (char-displayable-p ?←)
-           (char-displayable-p ?─))
-      "⬅️ now"
-    "now - - - - - - - - - - - - - - - - - - - - - - - - -"))
+                                           (char-displayable-p ?←)
+                                           (char-displayable-p ?─))
+                                      "⬅️ now"
+                                    "now - - - - - - - - - - - - - - - - - - - - - - - - -"))
   (org-agenda-timegrid-use-ampm t)
   (org-agenda-tags-column 0)
   (org-agenda-window-setup 'only-window)
@@ -1229,7 +1244,7 @@ Enable =recentf-mode=.
           (deadline (org-get-deadline-time (point))))
       (if (not (or scheduled deadline))
           (format "🗓️ ")
-          ;; (format " ")
+        ;; (format " ")
         "   "))))
 #+end_src
 
