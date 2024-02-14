@@ -159,18 +159,23 @@ Create a directory for savefiles if it doesn't exist.
   (make-directory tv-savefile-dir))
 #+end_src
 
-Configure handling of temp files. Source: [[http://xahlee.info/emacs/emacs/emacs_auto-save_backup.html][Xah Lee]].
+Put backup files in system's temp dir and purge them occasionally.
 
 #+begin_src emacs-lisp :tangle yes
-(defconst tv-savefile-dir (expand-file-name "backup" user-emacs-directory))
+(setq backup-directory-alist
+      `((".*" . ,temporary-file-directory)))
+(setq auto-save-file-name-transforms
+      `((".*" ,temporary-file-directory t)))
 
-(unless (file-exists-p tv-savefile-dir)
-  (make-directory tv-savefile-dir))
-
-(setq make-backup-files t)
-(setq version-control nil)
-(setq backup-by-copying t)
-(setq delete-old-versions t)
+(message "Deleting old backup files...")
+(let ((week (* 60 60 24 7))
+      (current (float-time (current-time))))
+  (dolist (file (directory-files temporary-file-directory t))
+    (when (and (backup-file-name-p file)
+               (> (- current (float-time (fifth (file-attributes file))))
+                  week))
+      (message "%s" file)
+      (delete-file file))))
 #+end_src
 
 * Tree-sitter
@@ -935,6 +940,7 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
   :diminish
   :config
   (evil-set-undo-system 'undo-tree)
+  (setq undo-tree-history-directory-alist '(("." . ".config/emacs/undo")))
   (global-undo-tree-mode 1))
 #+end_src
 
@@ -1161,7 +1167,7 @@ Enable =recentf-mode=.
                           (600 800 1000 1200 1400 1600 1800 2000)
                           " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
   ;; (org-agenda-start-with-log-mode '(closed clock state))
-  (org-agenda-files "~/Dropbox/org/agenda-files.org")
+  (org-agenda-files (list org-default-notes-file))
   ;; (org-agenda-todo-ignore-scheduled 'future)
   ;; TODO entries that can't be marked as done b/c of children are shown as dimmed in agenda view
   (org-agenda-dim-blocked-tasks 'invisible)
