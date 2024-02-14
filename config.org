@@ -1027,7 +1027,10 @@ Enable =recentf-mode=.
   (org-log-into-drawer t)
   (org-startup-folded 'nofold)
   (org-todo-keywords
-   '((sequence "TODO(t)" "NEXT(n)" "IN-PROGRESS(i!)" "WAITING(w!)" "|" "DONE(d!)" "CANCELED(c!)" "DELEGATED(p!)")))
+   '((sequence "TODO(t)" "PROJ(p)" "LOOP(r)" "STRT(s)" "WAIT(w)"
+                    "HOLD(h)" "IDEA(i)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
+          (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
+          (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   :config
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "/inbox.org"))
@@ -1059,13 +1062,7 @@ Enable =recentf-mode=.
            "* TODO %i%?")))
   (global-set-key (kbd "C-c c") 'org-capture)
   :hook ((org-mode . visual-line-mode)
-         (org-mode . org-indent-mode)
-         (org-mode . org-modern-mode)))
-
-(use-package org-modern
-  :defer
-  :ensure t
-  :after org)
+         (org-mode . org-indent-mode)))
 
 (use-package hl-todo
   :ensure t
@@ -1073,6 +1070,31 @@ Enable =recentf-mode=.
   :hook ((org-mode . hl-todo-mode)
          (prog-mode . hl-todo-mode)))
   #+end_src
+
+** Evil-org
+
+#+begin_src emacs-lisp :tangle yes
+(use-package evil-org
+  :ensure t
+  :after org
+  :hook (org-mode . evil-org-mode)
+  :config
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys)
+
+  (defun my-org-todo-toggle ()
+    (interactive)
+    (let ((state (org-get-todo-state))
+          post-command-hook)
+      (if (string= state "TODO")
+          (org-todo "DONE")
+        (org-todo "TODO"))
+      (run-hooks 'post-command-hook)
+      (org-flag-subtree t)))
+
+  (evil-define-key 'normal org-mode-map
+    (kbd "RET") #'my-org-todo-toggle))
+#+end_src
 
 ** Org Roam
 
