@@ -1105,16 +1105,14 @@ Enable =recentf-mode=.
 
   (defun tv/org-todo-toggle ()
     (interactive)
-    (let ((state (org-get-todo-state))
-          post-command-hook)
+    (let ((state (org-get-todo-state)))
       (cond ((string= state "[ ]") (org-todo "[X]"))
              ((string= state "[X]") (org-todo "[ ]"))
              ((string= state "TODO") (org-todo "DOING"))
              ((string= state "DOING") (org-todo "DONE"))
              ((string= state "DONE") (org-todo "TODO"))
              (t (message state))))
-      (run-hooks 'post-command-hook)
-      (org-flag-subtree t)))
+      (org-flag-subtree t))
 
   (evil-define-key 'normal org-mode-map
     (kbd "RET") #'tv/org-todo-toggle))
@@ -1266,7 +1264,8 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
         shr-max-image-proportion 0.6)
   (evil-define-key 'normal elfeed-search-mode-map
     (kbd "M-RET") #'elfeed-search-browse-url
-    (kbd "DEL") #'tv/elfeed-mark-all-as-read
+    (kbd "DEL") #'tv/elfeed-mark-read
+    (kbd "M-DEL") #'tv/elfeed-mark-all-as-read
     "§" #'elfeed-update))
 
 (use-package elfeed-org
@@ -1281,6 +1280,14 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   (when (equal 'elfeed-search-mode major-mode)
     (elfeed-untag elfeed-search-entries 'unread)
     (elfeed-search-update :force)))
+
+(defun tv/elfeed-mark-read (entry)
+  "Display the currently selected item in a buffer."
+  (interactive (list (elfeed-search-selected :ignore-region)))
+  (when (elfeed-entry-p entry)
+    (elfeed-untag entry 'unread)
+    (elfeed-search-update-entry entry)
+    (unless elfeed-search-remain-on-entry (forward-line))))
 
 (defun tv/elfeed-kill-buffers ()
   "Kill elfeed buffer and the elfeed.org feed definition buffer."
