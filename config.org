@@ -930,7 +930,7 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
   :diminish
   :config
   (evil-set-undo-system 'undo-tree)
-  (setq undo-tree-history-directory-alist '(("." . ".config/emacs/undo")))
+  (setq undo-tree-history-directory-alist '(("." . "~/.config/emacs/undo")))
   (global-undo-tree-mode 1))
 #+end_src
 
@@ -1103,18 +1103,21 @@ Enable =recentf-mode=.
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys)
 
-  (defun my-org-todo-toggle ()
+  (defun tv/org-todo-toggle ()
     (interactive)
     (let ((state (org-get-todo-state))
           post-command-hook)
-      (if (string= state "TODO")
-          (org-todo "DONE")
-        (org-todo "TODO"))
+      (cond ((string= state "[ ]") (org-todo "[X]"))
+             ((string= state "[X]") (org-todo "[ ]"))
+             ((string= state "TODO") (org-todo "DOING"))
+             ((string= state "DOING") (org-todo "DONE"))
+             ((string= state "DONE") (org-todo "TODO"))
+             (t (message state))))
       (run-hooks 'post-command-hook)
       (org-flag-subtree t)))
 
   (evil-define-key 'normal org-mode-map
-    (kbd "RET") #'my-org-todo-toggle))
+    (kbd "RET") #'tv/org-todo-toggle))
 #+end_src
 
 ** Org Roam
