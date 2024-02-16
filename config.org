@@ -299,12 +299,13 @@ Setup line numbers.
 (add-hook 'conf-mode #'display-line-numbers-mode)
 #+end_src
 
-We don't want line numbers to be shown in org-mode buffers, apart from this one.
+We don't want line numbers to be shown in org-mode buffers, apart from this one. Here, also =electric-pair-mode= should be enabled.
 
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'org-mode-hook #'(lambda ()
                              (interactive)
                              (when (cl-search "config.org" (buffer-name))
+                               (electric-pair-mode)
                                (display-line-numbers-mode))))
 #+end_src
 
@@ -1382,6 +1383,7 @@ Disable images.
   :hook ((dired-mode . dired-hide-details-mode)
          (dired-mode . hl-line-mode))
   :custom
+  (dired-kill-when-opening-new-dired-buffer t) ;; Without this, each directory level opens in its own buffer.
   (dired-do-revert-buffer t)
   (dired-auto-revert-buffer t)
   (delete-by-moving-to-trash t)
