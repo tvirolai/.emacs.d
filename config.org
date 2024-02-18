@@ -236,6 +236,12 @@ Make the titlebar transparent.
 (set-frame-parameter nil 'ns-transparent-titlebar t)
 #+end_src
 
+Remove the icon from the titlebar.
+
+#+begin_src emacs-lisp :tangle yes
+(setq ns-use-proxy-icon nil)
+#+end_src
+
 Suppress compilation warnings.
 
 #+begin_src emacs-lisp :tangle yes
@@ -262,7 +268,6 @@ Setup =doom-modeline=.
   :init (doom-modeline-mode 1)
   :config (column-number-mode 1)
   :custom
-  (doom-modeline-height 30)
   (doom-modeline-window-width-limit nil)
   (doom-modeline-buffer-file-name-style 'truncate-with-project)
   (doom-modeline-minor-modes nil)
@@ -331,6 +336,36 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
 #+begin_src emacs-lisp :tangle yes
 (use-package rainbow-delimiters
   :ensure t)
+#+end_src
+
+** Ef-themes
+
+Use ef-themes. They might be useful some day.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ef-themes
+  :ensure t
+  :defer)
+#+end_src
+
+** Modus-themes
+
+Install modus-themes. They too might be useful some day.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package modus-themes
+  :ensure t
+  :defer)
+#+end_src
+
+** Olivetti mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package olivetti
+  :defer
+  :ensure t
+  :custom
+  (olivetti-body-width 94))
 #+end_src
 
 * Evil mode
@@ -422,7 +457,9 @@ This maybe fixes some indentation issues in org mode.
                         #'kill-magit-diff-buffer-in-current-repo
                         nil t)))
   (evil-define-key 'normal magit-status-mode-map
-    "q" #'mu-magit-kill-buffers))
+    "q" #'mu-magit-kill-buffers)
+  (add-hook 'magit-post-refresh-hook
+            #'git-gutter:update-all-windows))
 
 (use-package git-gutter
   :ensure t
@@ -503,7 +540,6 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 #+end_src
-
 
 * Flycheck
 #+begin_src emacs-lisp :tangle yes
@@ -676,7 +712,7 @@ to this hack to run the indentation for the whole buffer."
   "ö" #'(lambda ()
           (interactive)
           (when (< (buffer-size) 4000)
-            (format-sql-buffer))
+            (tv/format-sql-buffer))
           (save-buffer)))
 #+end_src
 
