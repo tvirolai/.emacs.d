@@ -159,7 +159,7 @@ Create a directory for savefiles if it doesn't exist.
   (make-directory tv-savefile-dir))
 #+end_src
 
-Put backup files in system's temp dir and purge them occasionally.
+Put backup files in system's temp dir.
 
 #+begin_src emacs-lisp :tangle yes
 (setq backup-directory-alist
@@ -169,6 +169,8 @@ Put backup files in system's temp dir and purge them occasionally.
 #+end_src
 
 * Tree-sitter
+
+Tree-sitter is the future of language parsing in Emacs. Tree-sitter-based major modes should generally be preferred.
 
 #+begin_src emacs-lisp :tangle yes
 (setq treesit-extra-load-path `(,(concat user-emacs-directory "var/tree-sitter-dist/")
@@ -225,10 +227,10 @@ Setup font.
                     :height 140)
 #+end_src
 
-Configure tab width.
+Tabs should never ever be used for indentation. If they are, they should look as stupid as they are.
 
 #+begin_src emacs-lisp :tangle yes
-(setq-default tab-width 2)
+(setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 #+end_src
 
@@ -244,7 +246,7 @@ Maximize the frame on startup.
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 #+end_src
 
-Wrap lines by default.
+Wrap lines by default. I hate horizontal scrolling.
 
 #+begin_src emacs-lisp :tangle yes
 (setq global-visual-line-mode t)
@@ -268,13 +270,13 @@ Suppress compilation warnings.
 (setq native-comp-async-report-warnings-errors nil)
 #+end_src
 
-Display time on modeline.
+Display current time on modeline.
 
 #+begin_src emacs-lisp :tangle yes
 (display-time-mode 1)
 #+end_src
 
-Scroll smoothly.
+Scroll smoothly when using a mouse or trackpad. Which is basically never, but anyway...
 
 #+begin_src emacs-lisp :tangle yes
 (pixel-scroll-precision-mode)
@@ -336,6 +338,8 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
 
 ** Presentation-mode
 
+Presentation mode scales font sizes up, which is very useful when showing things in meetings etc.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package presentation
   :defer
@@ -343,6 +347,8 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
 #+end_src
 
 ** Rainbow-mode
+
+Rainbow mode shows color codes as well as some other values (like the value `red' in CSS) in color.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package rainbow-mode
@@ -352,6 +358,8 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
 #+end_src
 
 ** Rainbow delimiters-mode
+
+Rainbow-delimiters are useful in lisps.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package rainbow-delimiters
@@ -380,6 +388,8 @@ Install modus-themes. They too might be useful some day.
 
 ** Olivetti mode
 
+Olivetti mode squeezes the buffer into a column of limited width. This helps readability.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package olivetti
   :defer
@@ -389,6 +399,8 @@ Install modus-themes. They too might be useful some day.
 #+end_src
 
 * Evil mode
+
+Vim keybindings here.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package evil
@@ -452,6 +464,8 @@ This maybe fixes some indentation issues in org mode.
 #+end_src
 
 * Version control
+
+Magit is the definitive Git porcelain.
 
 #+begin_src emacs-lisp :tangle yes
 (defun kill-magit-diff-buffer-in-current-repo (&rest _)
@@ -1538,10 +1552,10 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
                   (setq this-command 'winner-undo)) :transient t)
     ("Z" "redo" winner-redo :transient t)]]
     [["Move"
-    ("h" "←" windmove-left :transient t)
-    ("j" "↓" windmove-down :transient t)
-    ("l" "→" windmove-right :transient t)
-    ("k" "↑" windmove-up :transient t)]
+    ("h" "←" windmove-left :transient nil)
+    ("j" "↓" windmove-down :transient nil)
+    ("l" "→" windmove-right :transient nil)
+    ("k" "↑" windmove-up :transient nil)]
     ["Swap"
     ("sh" "←" windmove-swap-states-left :transient t)
     ("sj" "↓" windmove-swap-states-down :transient t)
