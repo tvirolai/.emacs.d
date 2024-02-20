@@ -197,18 +197,32 @@ Use =doom-dracula= theme.
   (load-theme 'doom-dracula t))
 #+end_src
 
+Add helpers to switch between themes.
+
+#+begin_src emacs-lisp :tangle yes
+(defun disable-all-themes ()
+  "Disable all enabled custom themes."
+  (mapc #'disable-theme custom-enabled-themes))
+
+(defun load-light-theme ()
+  "Load light theme."
+  (interactive)
+  (disable-all-themes)
+  (load-theme 'leuven t))
+
+(defun load-dark-theme ()
+  "Load dark theme."
+  (interactive)
+  (disable-all-themes)
+  (load-theme 'doom-dracula t))
+#+end_src
+
 Setup font.
 
 #+begin_src emacs-lisp :tangle yes
-(cond
- ((find-font (font-spec :name "SF Mono"))
-  (set-frame-font "SF Mono-13"))
- ((find-font (font-spec :name "Menlo"))
-  (set-frame-font "Menlo-13"))
- ((find-font (font-spec :name "DejaVu Sans Mono"))
-  (set-frame-font "DejaVu Sans Mono-13"))
- ((find-font (font-spec :name "Inconsolata"))
-  (set-frame-font "Inconsolata-13")))
+(set-face-attribute 'default nil
+                    :family "SF Mono"
+                    :height 140)
 #+end_src
 
 Configure tab width.
@@ -216,6 +230,12 @@ Configure tab width.
 #+begin_src emacs-lisp :tangle yes
 (setq-default tab-width 2)
 (setq-default indent-tabs-mode nil)
+#+end_src
+
+Require a newline at the end.
+
+#+begin_src emacs-lisp :tangle yes
+(setq require-final-newline t)
 #+end_src
 
 Maximize the frame on startup.
@@ -760,6 +780,12 @@ Restclient is essential.
   (require 'gnutls))
 #+end_src
 
+Make it work with =org-mode=.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ob-restclient)
+#+end_src
+
 * Counsel-etags
 
 This makes etags work, i.e. allows us to jump to definitions.
@@ -985,6 +1011,8 @@ Remember and restore the last cursor location of opened files.
 
 ** Savehist-mode
 
+Remember where we were in the minibuffer.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package savehist
   :config
@@ -1069,6 +1097,7 @@ Enable =recentf-mode=.
   (setq org-default-notes-file (concat org-directory "/inbox.org"))
   (setq org-archive-location "archive/Archive_%s::")
   (setq org-ellipsis " ▾")
+  (setq org-src-fontify-natively t)
   (setq org-superstar-headline-bullets-list '("› "))
   (setq org-agenda-start-with-log-mode t)
   (setq org-cycle-emulate-tab nil)
@@ -1209,7 +1238,7 @@ Enable =recentf-mode=.
   (org-agenda-current-time-string (if (and (display-graphic-p)
                                            (char-displayable-p ?←)
                                            (char-displayable-p ?─))
-                                      "⬅️ now"
+                                      "← now"
                                     "now - - - - - - - - - - - - - - - - - - - - - - - - -"))
   (org-agenda-timegrid-use-ampm t)
   (org-agenda-tags-column 0)
@@ -1339,7 +1368,14 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
 ** Eshell
 
 #+begin_src emacs-lisp :tangle yes
-(setq eshell-prefer-lisp-functions t)
+(use-package eshell
+  :init
+  (setq eshell-scroll-to-bottom-on-input 'all
+        eshell-error-if-no-glob t
+        eshell-hist-ignoredups t
+        eshell-save-history-on-exit t
+        eshell-prefer-lisp-functions nil
+        eshell-destroy-buffer-when-process-dies t))
 #+end_src
 
 Use syntax highlighting in =eshell=.
@@ -1354,6 +1390,24 @@ Use syntax highlighting in =eshell=.
     '((t :inherit diff-error))
     "Face used for invalid Eshell commands."
     :group 'eshell-syntax-highlighting))
+#+end_src
+
+Copied from [[https://github.com/abrochard/emacs-config/blob/master/configuration.org][abrochard]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun eshell-here ()
+  "Opens up a new shell in the directory associated with the
+    current buffer's file. The eshell is renamed to match that
+    directory to make multiple eshell windows easier."
+  (interactive)
+  (let* ((height (/ (window-total-height) 3)))
+    (split-window-vertically (- height))
+    (other-window 1)
+    (eshell "new")
+    (insert (concat "ls"))
+    (eshell-send-input)))
+
+(bind-key "C-!" 'eshell-here)
 #+end_src
 
 ** Vterm
