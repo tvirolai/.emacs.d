@@ -1093,6 +1093,26 @@ Enable =recentf-mode=.
                "HOLD(h)" "IDEA(i)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
+  (org-done ((t (:foreground "PaleGreen"
+                             :strike-through t))))
+  (org-tags-column 0)
+  (org-todo-keyword-faces
+   '(("AREA"         . "DarkOrchid1")
+     ("[AREA]"       . "DarkOrchid1")
+     ("PROJECT"      . "DarkOrchid1")
+     ("[PROJECT]"    . "DarkOrchid1")
+     ("INBOX"        . "cyan")
+     ("[INBOX]"      . "cyan")
+     ("PROPOSAL"     . "orange")
+     ("[PROPOSAL]"   . "orange")
+     ("DRAFT"        . "yellow3")
+     ("[DRAFT]"      . "yellow3")
+     ("INPROGRESS"   . "yellow4")
+     ("[INPROGRESS]" . "yellow4")
+     ("MEETING"      . "purple")
+     ("[MEETING]"    . "purple")
+     ("CANCELED"     . "blue")
+     ("[CANCELED]"   . "blue")))
   :config
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "/inbox.org"))
@@ -1149,6 +1169,7 @@ Enable =recentf-mode=.
      `(org-headline-done  ((t (,@headline ,@variable-tuple :strike-through t))))
      `(org-document-title ((t (,@headline ,@variable-tuple
                                           :height 2.0 :underline nil))))))
+  
   :hook ((org-mode . visual-line-mode)
          (org-mode . org-modern-mode)
          (org-mode . org-indent-mode)))
