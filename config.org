@@ -282,30 +282,21 @@ Scroll smoothly when using a mouse or trackpad. Which is basically never, but an
 (pixel-scroll-precision-mode)
 #+end_src
 
-Setup =doom-modeline=.
+Setup =mood-line=. It's more minimalist than =doom-modeline=, which is what I need right now.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package doom-modeline
-  :ensure t
-  :init (doom-modeline-mode 1)
-  :config (column-number-mode 1)
+(use-package mood-line
+  ;; Enable mood-line
+  :config
+  (mood-line-mode)
+  ;; Use pretty Fira Code-compatible glyphs
   :custom
-  (doom-modeline-window-width-limit nil)
-  (doom-modeline-buffer-file-name-style 'truncate-with-project)
-  (doom-modeline-minor-modes nil)
-  (doom-modeline-enable-word-count nil)
-  (doom-modeline-buffer-encoding nil)
-  (doom-modeline-buffer-modification-icon t)
-  ;; needs display-time-mode to be one
-  (doom-modeline-time t)
-  (doom-modeline-vcs-max-length 50))
+  (mood-line-glyph-alist mood-line-glyphs-fira-code))
 #+end_src
 
-Show the buffer name in orange if the buffer contains unsaved changes.
-
 #+begin_src emacs-lisp :tangle yes
-(custom-set-faces
- '(doom-modeline-buffer-modified ((t (:foreground "orange")))))
+(use-package hide-mode-line
+  :ensure t)
 #+end_src
 
 Use =spacious-padding=.
@@ -503,14 +494,16 @@ Magit is the definitive Git porcelain.
 
 * Keybindings
 
-Use =which-key=.
+Use =which-key=, in minibuffer.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package which-key
   :ensure t
   :hook (after-init . which-key-mode)
   :custom
-  (which-key-idle-delay 0.5))
+  (which-key-idle-delay 0.5)
+  :config
+  (which-key-setup-minibuffer))
 #+end_src
 
 Make =ESC= quit wherever possible.
@@ -541,17 +534,11 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (defvar my-leader-map (make-sparse-keymap)
   "Keymap for \"leader key\" shortcuts.")
 
-(defvar my-magit-map (make-sparse-keymap)
-  "Keymap for \"leader key\" shortcuts.")
-
 (define-key evil-normal-state-map (kbd "SPC") my-leader-map)
 (define-key my-leader-map "b" 'list-buffers)
 (define-key my-leader-map (kbd "RET") 'consult-bookmark)
 (define-key my-leader-map "<" 'consult-buffer)
 (define-key my-leader-map "z" 'consult-recent-file)
-
-(define-key evil-normal-state-map (kbd "SPC g") my-magit-map)
-(define-key my-magit-map "g" 'magit-status)
 #+end_src
 
 A handful of must-have keybindings for me.
@@ -1127,7 +1114,6 @@ Enable =recentf-mode=.
      (shell . t)))
   (setq org-src-preserve-indentation nil
         org-edit-src-content-indentation 0
-        doom-modeline-enable-word-count t
         org-indent-mode t)
   (setq org-capture-templates
         '(("f" "Fleeting note" item
@@ -1138,7 +1124,33 @@ Enable =recentf-mode=.
            (file+headline org-default-notes-file "Tasks")
            "* TODO %i%?")))
   (global-set-key (kbd "C-c c") 'org-capture)
+  ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
+  (let* ((variable-tuple
+          (cond ((x-list-fonts   "ETBembo")         '(:font   "ETBembo"))
+                ((x-list-fonts   "Source Sans Pro") '(:font   "Source Sans Pro"))
+                ((x-list-fonts   "Lucida Grande")   '(:font   "Lucida Grande"))
+                ((x-list-fonts   "Verdana")         '(:font   "Verdana"))
+                ((x-family-fonts "Sans Serif")      '(:family "Sans Serif"))
+                (nil (warn "Cannot find a Sans Serif Font."))))
+         (base-font-color (face-foreground 'default nil 'default))
+         (headline `(:inherit default :weight bold
+                              :foreground ,base-font-color)))
+
+    (custom-theme-set-faces
+     'user
+     `(org-level-8        ((t (,@headline ,@variable-tuple))))
+     `(org-level-7        ((t (,@headline ,@variable-tuple))))
+     `(org-level-6        ((t (,@headline ,@variable-tuple))))
+     `(org-level-5        ((t (,@headline ,@variable-tuple))))
+     `(org-level-4        ((t (,@headline ,@variable-tuple :height 1.1))))
+     `(org-level-3        ((t (,@headline ,@variable-tuple :height 1.25))))
+     `(org-level-2        ((t (,@headline ,@variable-tuple :height 1.5))))
+     `(org-level-1        ((t (,@headline ,@variable-tuple :height 1.75))))
+     `(org-headline-done  ((t (,@headline ,@variable-tuple :strike-through t))))
+     `(org-document-title ((t (,@headline ,@variable-tuple
+                                          :height 2.0 :underline nil))))))
   :hook ((org-mode . visual-line-mode)
+         (org-mode . org-modern-mode)
          (org-mode . org-indent-mode)))
 
 ;; From elken
@@ -1383,6 +1395,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
 
 #+begin_src emacs-lisp :tangle yes
 (use-package eshell
+  :hook (eshell-mode . hide-mode-line-mode)
   :init
   (setq eshell-scroll-to-bottom-on-input 'all
         eshell-error-if-no-glob t
@@ -1607,4 +1620,13 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
   :custom
   (winner-boring-buffers '("*Completions*" "*Help*" "*Apropos*"
                            "*Buffer List*" "*info*" "*Compile-Log*")))
+#+end_src
+
+* Notmuch
+
+Email in Emacs.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package notmuch
+  :ensure t)
 #+end_src
