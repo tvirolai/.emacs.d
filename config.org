@@ -842,6 +842,17 @@ This makes etags work, i.e. allows us to jump to definitions.
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+end_src
 
+* Editorconfig
+
+Pick up formatting settings from =.editorconfig= files.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
+#+end_src
+
 * Ripgrep
 
 Ripgrep package is needed for =projectile-ripgrep= to be usable.
