@@ -389,6 +389,31 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
   (olivetti-body-width 94))
 #+end_src
 
+** Pulse
+
+#+begin_src emacs-lisp :tangle yes
+(use-package pulse
+  :ensure nil
+  :defer
+  :init
+  (defun pulse-line (&rest _)
+    "Pulse the current line."
+    (pulse-momentary-highlight-one-line (point)))
+
+  (dolist (command '(scroll-up-command
+                     scroll-down-command
+                     evil-scroll-up
+                     evil-scroll-down
+                     windmove-left
+                     windmove-right
+                     windmove-up
+                     windmove-down
+                     move-to-window-line-top-bottom
+                     recenter-top-bottom
+                     other-window))
+    (advice-add command :after #'pulse-line)))
+#+end_src
+
 * Evil mode
 
 Vim keybindings here.
@@ -1152,9 +1177,7 @@ Enable =recentf-mode=.
                 ((x-list-fonts   "Verdana")         '(:font   "Verdana"))
                 ((x-family-fonts "Sans Serif")      '(:family "Sans Serif"))
                 (nil (warn "Cannot find a Sans Serif Font."))))
-         (base-font-color (face-foreground 'default nil 'default))
-         (headline `(:inherit default :weight bold
-                              :foreground ,base-font-color)))
+         (headline `(:inherit default :weight bold)))
 
     (custom-theme-set-faces
      'user
@@ -1362,6 +1385,12 @@ Enable =recentf-mode=.
         "   "))))
 #+end_src
 
+#+begin_src emacs-lisp :tangle yes
+(use-package org-present
+  :ensure t
+  :defer)
+#+end_src
+
 * Elfeed
 
 RSS feeds are a convenient way to consume information on a pull-basis from different sources. I can't be bothered to tweak the stock elfeed experience too much.
@@ -1411,6 +1440,14 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
 #+end_src
 
 * Shell stuff
+
+** General
+
+Use ansi-colors in shell.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+#+end_src
 
 ** Eshell
 
