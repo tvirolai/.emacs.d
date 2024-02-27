@@ -162,8 +162,12 @@ Create a directory for savefiles if it doesn't exist.
 Put backup files in system's temp dir.
 
 #+begin_src emacs-lisp :tangle yes
-(setq backup-directory-alist
-      `((".*" . ,temporary-file-directory)))
+(setq backup-directory-alist `(("." . ,(expand-file-name ".tmp/backups/"
+                                                         user-emacs-directory))))
+(setq backup-by-copying t)
+
+(setq delete-by-moving-to-trash t)
+
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 #+end_src
@@ -187,6 +191,42 @@ Tree-sitter is the future of language parsing in Emacs. Tree-sitter-based major 
 (use-package tree-sitter-langs
   :ensure t
   :after tree-sitter)
+
+(setq treesit-language-source-alist
+      '((bash "https://github.com/tree-sitter/tree-sitter-bash")
+        ;; (clojure "https://github.com/clojure-emacs/clojure-ts-mode")
+        (cmake "https://github.com/uyha/tree-sitter-cmake")
+        (css "https://github.com/tree-sitter/tree-sitter-css")
+        (elisp "https://github.com/Wilfred/tree-sitter-elisp")
+        (go "https://github.com/tree-sitter/tree-sitter-go")
+        (html "https://github.com/tree-sitter/tree-sitter-html")
+        (javascript "https://github.com/tree-sitter/tree-sitter-javascript" "master" "src")
+        (json "https://github.com/tree-sitter/tree-sitter-json")
+        (make "https://github.com/alemuller/tree-sitter-make")
+        (markdown "https://github.com/ikatyang/tree-sitter-markdown")
+        (python "https://github.com/tree-sitter/tree-sitter-python")
+        (toml "https://github.com/tree-sitter/tree-sitter-toml")
+        (tsx "https://github.com/tree-sitter/tree-sitter-typescript" "master" "tsx/src")
+        (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
+        (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
+
+(setq major-mode-remap-alist
+      '((yaml-mode . yaml-ts-mode)
+        (sh-mode . bash-ts-mode)
+        ;; (clojure-ts-mode . clojure-mode)
+        ;; (clojurescript-ts-mode . clojurescript-mode)
+        (js2-mode . js-ts-mode)
+        (typescript-mode . typescript-ts-mode)
+        (json-mode . json-ts-mode)
+        (css-mode . css-ts-mode)
+        ;; (markdown-mode . markdown-ts-mode)
+        ;; (gfm-mode . markdown-ts-mode)
+        ;; (web-mode . html-ts-mode)
+        (python-mode . python-ts-mode)))
+
+(defun treesit-install-grammars ()
+  (interactive)
+  (mapc #'treesit-install-language-grammar (mapcar #'car treesit-language-source-alist)))
 #+end_src
 
 * Appearance
@@ -414,6 +454,14 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
     (advice-add command :after #'pulse-line)))
 #+end_src
 
+** Whitespace
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'before-save-hook #'whitespace-cleanup)
+
+(setq-default sentence-end-double-space nil)
+#+end_src
+
 * Evil mode
 
 Vim keybindings here.
@@ -577,10 +625,10 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
 (evil-define-key 'normal 'global (kbd "å") 'yank-from-kill-ring)
 (evil-define-key 'normal 'global (kbd "¨") 'evil-ex-search-forward)
-(evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
-(evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
-(evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
-(evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
+(evil-define-key 'normal 'global (kbd "M-j") 'evil-window-next)
+(evil-define-key 'normal 'global (kbd "M-k") 'evil-window-prev)
+(evil-define-key 'normal 'global (kbd "M-h") 'evil-window-left)
+(evil-define-key 'normal 'global (kbd "M-l") 'evil-window-right)
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
@@ -842,6 +890,19 @@ This makes etags work, i.e. allows us to jump to definitions.
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
 #+end_src
 
+=ibuffer-projectile= groups the open buffers in ibuffer by project.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ibuffer-projectile
+  :ensure t)
+
+(add-hook 'ibuffer-hook
+    (lambda ()
+      (ibuffer-projectile-set-filter-groups)
+      (unless (eq ibuffer-sorting-mode 'alphabetic)
+        (ibuffer-do-sort-by-alphabetic))))
+#+end_src
+
 * Editorconfig
 
 Pick up formatting settings from =.editorconfig= files.
@@ -923,7 +984,7 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
                 (eq (current-local-map) read-passwd-map))
       ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
       (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-		  corfu-popupinfo-delay nil)
+          corfu-popupinfo-delay nil)
       (corfu-mode 1)))
 
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
@@ -938,8 +999,8 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
   :ensure t
   :init
   (setq completion-styles '(orderless basic)
-	completion-category-defaults nil
-	completion-category-overrides '((file (styles partial-completion)))))
+    completion-category-defaults nil
+    completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
 
 ** Consult
@@ -949,23 +1010,23 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
   :ensure
   :after projectile
   :bind (("C-s" . consult-line)
-	 ("C-c M-x" . consult-mode-command)
-	 ("C-x b" . consult-buffer)
-	 ("C-x r b" . consult-bookmark)
-	 ("M-y" . consult-yank-pop)
-	 ;; M-g bindings (goto-map)
-	 ("M-g M-g" . consult-goto-line)
-	 ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-	 ("M-g m" . consult-mark)
-	 ("M-g k" . consult-global-mark)
-	 ("C-z" . consult-theme)
-	 :map minibuffer-local-map
-	 ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-	 ("M-r" . consult-history)
-	 :map projectile-command-map
-	 ("b" . consult-project-buffer)
-	 :map prog-mode-map
-	 ("M-g o" . consult-imenu))
+     ("C-c M-x" . consult-mode-command)
+     ("C-x b" . consult-buffer)
+     ("C-x r b" . consult-bookmark)
+     ("M-y" . consult-yank-pop)
+     ;; M-g bindings (goto-map)
+     ("M-g M-g" . consult-goto-line)
+     ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+     ("M-g m" . consult-mark)
+     ("M-g k" . consult-global-mark)
+     ("C-z" . consult-theme)
+     :map minibuffer-local-map
+     ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+     ("M-r" . consult-history)
+     :map projectile-command-map
+     ("b" . consult-project-buffer)
+     :map prog-mode-map
+     ("M-g o" . consult-imenu))
 
   :init
   (defun remove-items (x y)
@@ -975,7 +1036,7 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
   ;; Any themes that are incomplete/lacking don't work with centaur tabs/solair mode
   (setq consult-project-function (lambda (_) (projectile-project-root)))
   (setq xref-show-xrefs-function #'consult-xref
-	xref-show-definitions-function #'consult-xref)
+    xref-show-definitions-function #'consult-xref)
   (setq consult-narrow-key "<")
   (setq consult-line-start-from-top nil))
 
@@ -983,8 +1044,8 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
   :ensure
   :defer
   :bind (:map projectile-command-map
-	      ("s s" . consult-ag)
-	      ("s g" . consult-grep)))
+          ("s s" . consult-ag)
+          ("s g" . consult-grep)))
 #+end_src
 
 ** Marginalia
@@ -1031,6 +1092,13 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
   :config
   (evil-set-undo-system 'undo-tree)
   (setq undo-tree-history-directory-alist '(("." . "~/.config/emacs/undo")))
+  (setq undo-tree-visualizer-diff       t
+        undo-tree-visualizer-timestamps t
+        undo-tree-auto-save-history     t
+        undo-tree-enable-undo-in-region t
+        undo-limit        (* 800 1024)
+        undo-strong-limit (* 12 1024 1024)
+        undo-outer-limit  (* 128 1024 1024))
   (global-undo-tree-mode 1))
 #+end_src
 
@@ -1107,10 +1175,12 @@ Enable =recentf-mode=.
 ** YAML
 
 #+begin_src emacs-lisp :tangle yes
-(use-package yaml-mode
-  :ensure t
-  :defer
-  :hook (yaml-mode . display-line-numbers-mode))
+(use-package yaml-ts-mode
+  :ensure nil
+  :hook (yaml-ts-mode . display-line-numbers-mode)
+  :mode
+  ("\\.yml\\'" . yaml-ts-mode)
+  ("\\.yaml\\'" . yaml-ts-mode))
 #+end_src
 
 * Org-mode
@@ -1203,7 +1273,7 @@ Enable =recentf-mode=.
      `(org-headline-done  ((t (,@headline ,@variable-tuple :strike-through t))))
      `(org-document-title ((t (,@headline ,@variable-tuple
                                           :height 2.0 :underline nil))))))
-  
+
   :hook ((org-mode . visual-line-mode)
          (org-mode . org-modern-mode)
          (org-mode . org-indent-mode)))
