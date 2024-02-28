@@ -625,10 +625,10 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
 (evil-define-key 'normal 'global (kbd "å") 'yank-from-kill-ring)
 (evil-define-key 'normal 'global (kbd "¨") 'evil-ex-search-forward)
-(evil-define-key 'normal 'global (kbd "M-j") 'evil-window-next)
-(evil-define-key 'normal 'global (kbd "M-k") 'evil-window-prev)
-(evil-define-key 'normal 'global (kbd "M-h") 'evil-window-left)
-(evil-define-key 'normal 'global (kbd "M-l") 'evil-window-right)
+(evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
+(evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
+(evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
+(evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
@@ -1307,7 +1307,17 @@ Enable =recentf-mode=.
   :defer
   :hook ((org-mode . hl-todo-mode)
          (prog-mode . hl-todo-mode)))
-                    #+end_src
+
+(use-package org-appear
+  :ensure t
+  :defer
+  :after org
+  :custom
+  (org-appear-autoemphasis t)
+  (org-appear-autolinks t)
+  (org-appear-autosubmarkers t)
+  :hook (org-mode . org-appear-mode))
+#+end_src
 
 ** Evil-org
 
@@ -1766,4 +1776,13 @@ Email in Emacs.
 #+begin_src emacs-lisp :tangle yes
 (use-package notmuch
   :ensure t)
+#+end_src
+
+* Tetris
+
+Yes, sometimes a game of Tetris is in order.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package tetris
+  :hook (tetris-mode . turn-off-evil-mode))
 #+end_src
