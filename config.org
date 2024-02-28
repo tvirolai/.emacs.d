@@ -274,10 +274,10 @@ Tabs should never ever be used for indentation. If they are, they should look as
 (setq-default indent-tabs-mode nil)
 #+end_src
 
-Require a newline at the end.
+Don't require a newline at the end.
 
 #+begin_src emacs-lisp :tangle yes
-(setq require-final-newline t)
+(setq require-final-newline nil)
 #+end_src
 
 Maximize the frame on startup.
@@ -1349,12 +1349,11 @@ Enable =recentf-mode=.
   :bind (:map global-map
               (("C-c n i" . org-roam-node-insert)
                ("C-c n f" . org-roam-node-find)
-               ("C-c n g" . org-roam-graph)
                ("C-c n n" . org-roam-capture)
                ("C-c n d" . org-roam-dailies-capture-today)
                ("C-c n s" . consult-org-roam-search)))
   :config
-  (setq org-roam-node-display-template (concat "${title:50} " (propertize "${tags:10}" 'face 'org-tag)))
+  (setq org-roam-node-display-template (concat "${title:50} " (propertize "${tags:30}" 'face 'org-tag)))
   (setq org-roam-directory "~/Dropbox/org/roam")
   (setq org-roam-capture-templates
         `(("n" "default note" plain "%?"
@@ -1483,8 +1482,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   :init
   (elfeed-org)
   :config
-  (setq elfeed-search-filter "@2-week-ago +unread"
-        shr-max-image-proportion 0.6)
+  (setq elfeed-search-filter "@2-week-ago +unread")
   (evil-define-key 'normal elfeed-search-mode-map
     (kbd "M-RET") #'elfeed-search-browse-url
     (kbd "DEL") #'tv/elfeed-mark-read
@@ -1679,7 +1677,7 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
      ["Split"
     ("v" "vertical" (lambda ()
        (interactive)
-       (split-window-right)
+      (split-window-right)
        (windmove-right)) :transient t)
     ("x" "horizontal" (lambda ()
        (interactive)
