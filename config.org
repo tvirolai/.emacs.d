@@ -41,6 +41,9 @@ Configure repos.
                          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
                          ("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")))
+
+(use-package quelpa :ensure t)
+(use-package quelpa-use-package :ensure t)
 #+end_src
 
 Enable =straight.el=.
@@ -354,7 +357,7 @@ Setup line numbers.
 (setq display-line-numbers-type 'relative)
 
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
-(add-hook 'conf-mode #'display-line-numbers-mode)
+(add-hook 'conf-mode-hook #'display-line-numbers-mode)
 #+end_src
 
 We don't want line numbers to be shown in org-mode buffers, apart from this one. Here, also =electric-pair-mode= should be enabled.
@@ -963,11 +966,14 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
+  (corfu-auto-prefix 2)
+  (corfu-auto-delay 0.2)
   (corfu-on-exact-match 'insert) ;; Insert when there's only one match
-  (corfu-quit-no-match t)        ;; Quit when ther is no match
+  (corfu-quit-no-match t)        ;; Quit when there is no match
   :init
   (setq corfu-exclude-modes '(eshell-mode))
-  (global-corfu-mode))
+  (global-corfu-mode)
+  (corfu-history-mode))
 
 (use-package cape
   :ensure t
@@ -990,6 +996,19 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
   :bind ("C-c SPC" . cape-dabbrev))
 
+(use-package emacs
+  :init
+  ;; TAB cycle if there are only few candidates
+  (setq completion-cycle-threshold 3)
+
+  ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
+  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+  ;; (setq read-extended-command-predicate
+  ;;       #'command-completion-default-include-p)
+
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete))
 #+end_src
 
 ** Orderless
@@ -1769,15 +1788,6 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
                            "*Buffer List*" "*info*" "*Compile-Log*")))
 #+end_src
 
-* Notmuch
-
-Email in Emacs.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package notmuch
-  :ensure t)
-#+end_src
-
 * Tetris
 
 Yes, sometimes a game of Tetris is in order.
@@ -1786,3 +1796,10 @@ Yes, sometimes a game of Tetris is in order.
 (use-package tetris
   :hook (tetris-mode . turn-off-evil-mode))
 #+end_src
+
+# * No-littering
+
+# #+begin_src emacs-lisp :tangle yes
+# (use-package no-littering
+#   :ensure t)
+# #+end_src
