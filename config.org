@@ -638,6 +638,14 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 #+end_src
 
+Frame management.
+
+#+begin_src emacs-lisp :tangle yes
+(evil-define-key 'normal 'global (kbd "M-§") 'other-frame)
+(evil-define-key 'normal 'global (kbd "M-n") 'make-frame)
+(evil-define-key 'normal 'global (kbd "M-°") 'delete-frame)
+#+end_src
+
 * Flycheck
 #+begin_src emacs-lisp :tangle yes
 (use-package flycheck
@@ -1571,6 +1579,23 @@ Use ansi-colors in shell.
         eshell-destroy-buffer-when-process-dies t))
 #+end_src
 
+Eshell aliases.
+
+#+begin_src emacs-lisp :tangle yes
+(setq tv/eshell-aliases
+      '((g  . magit)
+        (gl . magit-log)
+        (d  . dired)
+        (o  . find-file)
+        (oo . find-file-other-window)
+        (l  . (lambda () (eshell/ls '-la)))
+        (eshell/clear . eshell/clear-scrollback)))
+
+(mapc (lambda (alias)
+        (defalias (car alias) (cdr alias)))
+      tv/eshell-aliases)
+#+end_src
+
 Use syntax highlighting in =eshell=.
 
 #+begin_src emacs-lisp :tangle yes
@@ -1796,10 +1821,3 @@ Yes, sometimes a game of Tetris is in order.
 (use-package tetris
   :hook (tetris-mode . turn-off-evil-mode))
 #+end_src
-
-# * No-littering
-
-# #+begin_src emacs-lisp :tangle yes
-# (use-package no-littering
-#   :ensure t)
-# #+end_src
