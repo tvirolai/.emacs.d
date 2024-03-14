@@ -28,7 +28,7 @@ Configure path.
   :init
   (when (memq window-system '(mac ns x))
     (require 'exec-path-from-shell)
-    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "MAVEN_OPTS"))
+    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS"))
       (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
 #+end_src
@@ -772,7 +772,7 @@ working with."
 
 #+begin_src emacs-lisp :tangle yes
 (use-package sql
-  :hook ((sql-mode . sqlint-minor-mode))
+  :hook ((sql-mode . sqlind-minor-mode))
   :ensure t
   :defer
   :config
@@ -816,7 +816,7 @@ to this hack to run the indentation for the whole buffer."
 (evil-define-key 'normal sql-mode-map
   "ö" #'(lambda ()
           (interactive)
-          (when (< (buffer-size) 4000)
+          (when (< (buffer-size) 10000)
             (tv/format-sql-buffer))
           (save-buffer)))
 #+end_src
@@ -1586,6 +1586,7 @@ Eshell aliases.
       '((g  . magit)
         (gl . magit-log)
         (d  . dired)
+        (c  . clear)
         (o  . find-file)
         (oo . find-file-other-window)
         (l  . (lambda () (eshell/ls '-la)))
