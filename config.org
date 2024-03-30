@@ -4,9 +4,8 @@
 
 * Introduction
 
-This is my personal Emacs configuration. After years of using configurations based on [[https://github.com/bbatsov/prelude][Prelude]], [[https://github.com/purcell/emacs.d][Purcell Emacs]] and [[https://github.com/doomemacs/doomemacs][Doom Emacs]] I decided to wipe the table clean and roll my own. While Doom Emacs is great, I wanted to try something more lightweight and minimalist, and to level-up my Elisp.
+This is my personal Emacs configuration. The way this works is that upon Emacs startup:
 
-The way this works is that upon Emacs startup:
 1. The two-liner =init.el= config file is loaded, which in turns calls the =org-babel-load-file= function with this file.
 2. The org file is processed and the code blocks are tangled into a =config.el= file.
 3. The generated configuration file is then loaded. As the =config.el= file is basically a function of this one, I've omitted it from version control.
@@ -277,10 +276,10 @@ Setup font.
                     :height 140)
 #+end_src
 
-Tabs should never ever be used for indentation. If they are, they should look as stupid as they are.
+Tabs should never ever be used for indentation. If they are, they should look silly.
 
 #+begin_src emacs-lisp :tangle yes
-(setq-default tab-width 4)
+(setq-default tab-width 8)
 (setq-default indent-tabs-mode nil)
 #+end_src
 
@@ -856,6 +855,16 @@ Elisp keybindings.
   (typescript-indent-level 2))
 #+end_src
 
+** Java
+
+#+begin_src emacs-lisp :tangle yes
+(use-package lsp-mode :hook ((lsp-mode . lsp-enable-which-key-integration))
+  :config (setq lsp-completion-enable-additional-text-edit nil))
+(use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
+(use-package dap-mode :after lsp-mode :config (dap-auto-configure-mode))
+(use-package dap-java :ensure nil)
+#+end_src
+
 * Restclient
 
 Restclient is essential.
@@ -1326,7 +1335,6 @@ Enable =recentf-mode=.
   (global-set-key (kbd "C-c c") 'org-capture)
   ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
   :hook ((org-mode . visual-line-mode)
-         (org-mode . org-modern-mode)
          (org-mode . org-indent-mode)))
 
 ;; From elken
