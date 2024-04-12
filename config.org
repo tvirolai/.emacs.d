@@ -15,8 +15,8 @@ This is my personal Emacs configuration. The way this works is that upon Emacs s
 Add personal details.
 
 #+begin_src emacs-lisp :tangle yes
-(setq user-full-name "Tuomo Virolainen"
-      user-mail-address "tuomo.virolainen@siili.com")
+(setq user-full-name (base64-decode-string "VHVvbW8gVmlyb2xhaW5lbg==")
+      user-mail-address (base64-decode-string "dHVvbW8udmlyb2xhaW5lbkBzaWlsaS5jb20="))
 #+end_src
 
 Configure path.
@@ -907,7 +907,7 @@ Elisp keybindings.
   (setq lsp-ui-doc-include-signature t)
   (setq lsp-ui-doc-border "#e06c75")
   (setq lsp-ui-doc-show-with-cursor t)
-  (setq lsp-ui-doc-position 'at-point)
+  (setq lsp-ui-doc-position 'bottom)
   (setq lsp-ui-sideline-show-symbol t))
 #+end_src
 
@@ -1952,7 +1952,6 @@ Yes, sometimes a game of Tetris is in order.
 (defun kill-other-buffers ()
   "Keep only the current buffer and scratch buffer, kill all others."
   (interactive)
-  (httpd-stop)
   (let ((buffers-to-keep '("*scratch*"))
         (current-buffer-name (buffer-name)))
     (mapc (lambda (buffer)
