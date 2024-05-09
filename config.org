@@ -27,7 +27,7 @@ Configure path.
   :init
   (when (memq window-system '(mac ns x))
     (require 'exec-path-from-shell)
-    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS"))
+    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS" "VARMA_GPG_SYMMETRIC_PASSPHRASE" "VARMA_ARTIFACTORY_USERNAME" "VARMA_ARTIFACTORY_PASSWORD" "VARMA_ELAMA_BOT_USERNAME" "VARMA_ELAMA_BOT_PASSWORD"))
       (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
 #+end_src
@@ -425,26 +425,6 @@ Rainbow-delimiters are useful in lisps.
 (use-package rainbow-delimiters
   :ensure t
   :hook (prog-mode . rainbow-delimiters-mode))
-#+end_src
-
-** Ef-themes
-
-Use ef-themes. They might be useful some day.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package ef-themes
-  :ensure t
-  :defer)
-#+end_src
-
-** Modus-themes
-
-Install modus-themes. They too might be useful some day.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package modus-themes
-  :ensure t
-  :defer)
 #+end_src
 
 ** Olivetti mode
@@ -1947,17 +1927,18 @@ Yes, sometimes a game of Tetris is in order.
 * Custom stuff
 
 #+begin_src emacs-lisp :tangle yes
-;; Source: https://themagitian.github.io/posts/emacsconfig/
 
 (defun kill-other-buffers ()
-  "Keep only the current buffer and scratch buffer, kill all others."
+  "Keep only the current buffer and scratch buffer, kill all others.
+Modified from: https://themagitian.github.io/posts/emacsconfig/"
   (interactive)
-  (let ((buffers-to-keep '("*scratch*"))
+  (let ((buffers-to-keep '("*scratch*" "*Minibuf-0*" "*Minibuf-1*" "*Echo Area 0*" "*mood-line*"))
         (current-buffer-name (buffer-name)))
     (mapc (lambda (buffer)
-            (unless (or (member (buffer-name buffer) buffers-to-keep)
-                        (equal (buffer-name buffer) current-buffer-name))
-              (kill-buffer buffer)))
+            (let ((bname (string-trim (buffer-name buffer))))
+              (unless (or (member bname buffers-to-keep)
+                          (equal bname current-buffer-name))
+                (kill-buffer buffer))))
           (buffer-list)))
   (message "Killed other buffers"))
 #+end_src
