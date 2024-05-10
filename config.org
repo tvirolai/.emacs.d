@@ -4,7 +4,7 @@
 
 * Introduction
 
-This is my personal Emacs configuration. The way this works is that upon Emacs startup:
+This is my personal Emacs configuration. It is implemented using literate programming in org-mode. The way this works is that upon Emacs startup:
 
 1. The two-liner =init.el= config file is loaded, which in turns calls the =org-babel-load-file= function with this file.
 2. The org file is processed and the code blocks are tangled into a =config.el= file.
@@ -1927,17 +1927,15 @@ Yes, sometimes a game of Tetris is in order.
 * Custom stuff
 
 #+begin_src emacs-lisp :tangle yes
-
 (defun kill-other-buffers ()
   "Keep only the current buffer and scratch buffer, kill all others.
 Modified from: https://themagitian.github.io/posts/emacsconfig/"
   (interactive)
-  (let ((buffers-to-keep '("*scratch*" "*Minibuf-0*" "*Minibuf-1*" "*Echo Area 0*" "*mood-line*"))
-        (current-buffer-name (buffer-name)))
+  (let ((buffers-to-keep (cons (buffer-name)
+                               '("*scratch*" "*Minibuf-0*" "*Minibuf-1*" "*Echo Area 0*" "*mood-line*"))))
     (mapc (lambda (buffer)
             (let ((bname (string-trim (buffer-name buffer))))
-              (unless (or (member bname buffers-to-keep)
-                          (equal bname current-buffer-name))
+              (unless (member bname buffers-to-keep)
                 (kill-buffer buffer))))
           (buffer-list)))
   (message "Killed other buffers"))
