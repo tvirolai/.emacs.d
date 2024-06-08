@@ -136,6 +136,14 @@ Mac-specific settings.
       select-enable-clipboard t)
 #+end_src
 
+[[https://lmno.lol/alvaro/hey-mouse-dont-mess-with-my-emacs-font-size][Prevent]] mouse / trackpad input from resizing fonts.
+
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "<pinch>") 'ignore)
+(global-set-key (kbd "<C-wheel-up>") 'ignore)
+(global-set-key (kbd "<C-wheel-down>") 'ignore)
+#+end_src
+
 UTF-8 should be preferred everywhere.
 
 #+begin_src emacs-lisp :tangle yes
@@ -773,6 +781,8 @@ Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mod
   :ensure t
   :defer)
 #+end_src
+
+Custom functions for formatting SQL code.
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/indent-sql-buffer ()
