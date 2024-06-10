@@ -136,7 +136,7 @@ Mac-specific settings.
       select-enable-clipboard t)
 #+end_src
 
-[[https://lmno.lol/alvaro/hey-mouse-dont-mess-with-my-emacs-font-size][Prevent]] mouse / trackpad input from resizing fonts.
+[[https://lmno.lol/alvaro/hey-mouse-dont-mess-with-my-emacs-font-size][Prevent]] mouse / trackpad input from accidentally resizing fonts.
 
 #+begin_src emacs-lisp :tangle yes
 (global-set-key (kbd "<pinch>") 'ignore)
@@ -615,7 +615,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-å") 'consult-line)
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
 (evil-define-key 'normal 'global (kbd "å") 'yank-from-kill-ring)
-(evil-define-key 'normal 'global (kbd "¨") 'evil-ex-search-forward)
+(evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
 (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
 (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
 (evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
@@ -721,8 +721,8 @@ Configure the necessary packages.
 (add-hook 'clojurescript-mode-hook #'flycheck-mode)
 (add-hook 'clojurescript-mode-hook #'rainbow-delimiters-mode)
 (add-hook 'clojurescript-mode-hook #'electric-pair-mode)
-(add-hook 'clojure-mode-hook #'eglot-ensure)
-(add-hook 'clojurescript-mode-hook #'eglot-ensure)
+(add-hook 'clojure-mode-hook #'lsp)
+(add-hook 'clojurescript-mode-hook #'lsp)
 #+end_src
 
 Configure [[https://github.com/ericdallo/jet.el][jet.el]].
