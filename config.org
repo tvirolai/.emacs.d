@@ -612,7 +612,6 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "ä") 'delete-other-windows)
 (evil-define-key 'normal 'global (kbd "C-ä") 'split-window-right)
 (evil-define-key 'normal 'global (kbd "C-ö") 'split-window-below)
-(evil-define-key 'normal 'global (kbd "C-å") 'consult-line)
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
 (evil-define-key 'normal 'global (kbd "å") 'yank-from-kill-ring)
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
@@ -723,6 +722,8 @@ Configure the necessary packages.
 (add-hook 'clojurescript-mode-hook #'electric-pair-mode)
 (add-hook 'clojure-mode-hook #'lsp)
 (add-hook 'clojurescript-mode-hook #'lsp)
+(add-hook 'clojure-mode-hook #'hs-minor-mode)
+(add-hook 'clojurescript-mode-hook #'hs-minor-mode)
 #+end_src
 
 Configure [[https://github.com/ericdallo/jet.el][jet.el]].
@@ -931,13 +932,11 @@ This makes etags work, i.e. allows us to jump to definitions.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ibuffer-projectile
+  :hook ((ibuffer . (lambda ()
+                      (ibuffer-projectile-set-filter-groups)
+                      (unless (eq ibuffer-sorting-mode 'alphabetic)
+                        (ibuffer-do-sort-by-alphabetic)))))
   :ensure t)
-
-(add-hook 'ibuffer-hook
-    (lambda ()
-      (ibuffer-projectile-set-filter-groups)
-      (unless (eq ibuffer-sorting-mode 'alphabetic)
-        (ibuffer-do-sort-by-alphabetic))))
 #+end_src
 
 * Editorconfig
@@ -1036,7 +1035,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
                 (eq (current-local-map) read-passwd-map))
       ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
       (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-          corfu-popupinfo-delay nil)
+                  corfu-popupinfo-delay nil)
       (corfu-mode 1)))
 
   (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
@@ -1064,8 +1063,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :ensure t
   :init
   (setq completion-styles '(orderless basic)
-    completion-category-defaults nil
-    completion-category-overrides '((file (styles partial-completion)))))
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
 
 ** Consult
@@ -1074,24 +1073,24 @@ Writable grep. This makes possible to use workflows for search and replace like:
 (use-package consult
   :ensure
   :after projectile
-  :bind (("C-s" . consult-line)
-     ("C-c M-x" . consult-mode-command)
-     ("C-x b" . consult-buffer)
-     ("C-x r b" . consult-bookmark)
-     ("M-y" . consult-yank-pop)
-     ;; M-g bindings (goto-map)
-     ("M-g M-g" . consult-goto-line)
-     ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
-     ("M-g m" . consult-mark)
-     ("M-g k" . consult-global-mark)
-     ("C-z" . consult-theme)
-     :map minibuffer-local-map
-     ("M-s" . consult-history)                 ;; orig. next-matching-history-element
-     ("M-r" . consult-history)
-     :map projectile-command-map
-     ("b" . consult-project-buffer)
-     :map prog-mode-map
-     ("M-g o" . consult-imenu))
+  :bind (("C-å" . consult-line)
+         ("C-c M-x" . consult-mode-command)
+         ("C-x b" . consult-buffer)
+         ("C-x r b" . consult-bookmark)
+         ("M-y" . consult-yank-pop)
+         ;; M-g bindings (goto-map)
+         ("M-g M-g" . consult-goto-line)
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("C-z" . consult-theme)
+         :map minibuffer-local-map
+         ("M-s" . consult-history)                 ;; orig. next-matching-history-element
+         ("M-r" . consult-history)
+         :map projectile-command-map
+         ("b" . consult-project-buffer)
+         :map prog-mode-map
+         ("M-g o" . consult-imenu))
 
   :init
   (defun remove-items (x y)
@@ -1101,7 +1100,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   ;; Any themes that are incomplete/lacking don't work with centaur tabs/solair mode
   (setq consult-project-function (lambda (_) (projectile-project-root)))
   (setq xref-show-xrefs-function #'consult-xref
-    xref-show-definitions-function #'consult-xref)
+        xref-show-definitions-function #'consult-xref)
   (setq consult-narrow-key "<")
   (setq consult-line-start-from-top nil))
 
@@ -1109,8 +1108,15 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :ensure
   :defer
   :bind (:map projectile-command-map
-          ("s s" . consult-ag)
-          ("s g" . consult-grep)))
+              ("s s" . consult-ag)
+              ("s g" . consult-grep)))
+#+end_src
+
+** Avy
+
+#+begin_src emacs-lisp :tangle yes
+(use-package avy
+  :bind (("C-s" . avy-goto-char-timer)))
 #+end_src
 
 ** Marginalia
@@ -1215,7 +1221,7 @@ Remember where we were in the minibuffer.
         history-length 25
         savehist-save-minibuffer-history 1
         savehist-file (expand-file-name "savehist" tv-savefile-dir))
-   (savehist-mode +1))
+  (savehist-mode +1))
 #+end_src
 
 ** Recentf-mode
@@ -1791,83 +1797,83 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
   :bind ("C-M-o" . windows-transient-window)
   :init
   (transient-define-prefix windows-transient-window ()
-   "Display a transient buffer showing useful window manipulation bindings."
+    "Display a transient buffer showing useful window manipulation bindings."
     [["Resize"
-     ("}" "h+" enlarge-window-horizontally :transient t)
-     ("{" "h-" shrink-window-horizontally :transient t)
-     ("^" "v+" enlarge-window :transient t)
-     ("V" "v-" shrink-window :transient t)]
+      ("}" "h+" enlarge-window-horizontally :transient t)
+      ("{" "h-" shrink-window-horizontally :transient t)
+      ("^" "v+" enlarge-window :transient t)
+      ("V" "v-" shrink-window :transient t)]
      ["Split"
-    ("v" "vertical" (lambda ()
-       (interactive)
-      (split-window-right)
-       (windmove-right)) :transient t)
-    ("x" "horizontal" (lambda ()
-       (interactive)
-       (split-window-below)
-       (windmove-down)) :transient t)
-    ("wv" "win-vertical" (lambda ()
-       (interactive)
-       (select-window (split-window-right))
-       (windows-transient-window)) :transient nil)
-    ("wx" "win-horizontal" (lambda ()
-       (interactive)
-       (select-window (split-window-below))
-       (windows-transient-window)) :transient nil)]
-    ["Misc"
-     ("B" "switch buffer" (lambda ()
-                            (interactive)
-                            (consult-buffer)
-                            (windows-transient-window)))
-     ("z" "undo" (lambda ()
-                  (interactive)
-                  (winner-undo)
-                  (setq this-command 'winner-undo)) :transient t)
-    ("Z" "redo" winner-redo :transient t)]]
-    [["Move"
-    ("h" "←" windmove-left :transient nil)
-    ("j" "↓" windmove-down :transient nil)
-    ("l" "→" windmove-right :transient nil)
-    ("k" "↑" windmove-up :transient nil)]
-    ["Swap"
-    ("sh" "←" windmove-swap-states-left :transient t)
-    ("sj" "↓" windmove-swap-states-down :transient t)
-    ("sl" "→" windmove-swap-states-right :transient t)
-    ("sk" "↑" windmove-swap-states-up :transient t)]
-    ["Delete"
-    ("dh" "←" windmove-delete-left :transient t)
-    ("dj" "↓" windmove-delete-down :transient t)
-    ("dl" "→" windmove-delete-right :transient t)
-    ("dk" "↑" windmove-delete-up :transient t)
-    ("D" "This" delete-window :transient t)]
-    ["Transpose"
-    ("tt" "↜" (lambda ()
-                (interactive)
-                (transpose-frame)
-                (windows-transient-window)) :transient nil)
-    ("ti" "↕" (lambda ()
-                (interactive)
-                (flip-frame)
-                (windows-transient-window)) :transient nil)
-    ("to" "⟷" (lambda ()
-                (interactive)
-                (flop-frame)
-                (windows-transient-window)) :transient nil)
-    ("tc" "⟳" (lambda ()
-                (interactive)
-                (rotate-frame-clockwise)
-                (windows-transient-window)) :transient nil)
-    ("ta" "⟲" (lambda ()
-                (interactive)
-                (rotate-frame-anticlockwise)
-                (windows-transient-window)) :transient nil)]
-    ["Exit"
-     ("<escape>" "exit menu" (lambda ()
-                               (interactive)
-                               (transient-quit-one)) :transient nil)
-     ("q" "exit menu" (lambda ()
+      ("v" "vertical" (lambda ()
                         (interactive)
-                        (transient-quit-one)) :transient nil)]]))
+                        (split-window-right)
+                        (windmove-right)) :transient t)
+      ("x" "horizontal" (lambda ()
+                          (interactive)
+                          (split-window-below)
+                          (windmove-down)) :transient t)
+      ("wv" "win-vertical" (lambda ()
+                             (interactive)
+                             (select-window (split-window-right))
+                             (windows-transient-window)) :transient nil)
+      ("wx" "win-horizontal" (lambda ()
+                               (interactive)
+                               (select-window (split-window-below))
+                               (windows-transient-window)) :transient nil)]
+     ["Misc"
+      ("B" "switch buffer" (lambda ()
+                             (interactive)
+                             (consult-buffer)
+                             (windows-transient-window)))
+      ("z" "undo" (lambda ()
+                    (interactive)
+                    (winner-undo)
+                    (setq this-command 'winner-undo)) :transient t)
+      ("Z" "redo" winner-redo :transient t)]]
+    [["Move"
+      ("h" "←" windmove-left :transient nil)
+      ("j" "↓" windmove-down :transient nil)
+      ("l" "→" windmove-right :transient nil)
+      ("k" "↑" windmove-up :transient nil)]
+     ["Swap"
+      ("sh" "←" windmove-swap-states-left :transient t)
+      ("sj" "↓" windmove-swap-states-down :transient t)
+      ("sl" "→" windmove-swap-states-right :transient t)
+      ("sk" "↑" windmove-swap-states-up :transient t)]
+     ["Delete"
+      ("dh" "←" windmove-delete-left :transient t)
+      ("dj" "↓" windmove-delete-down :transient t)
+      ("dl" "→" windmove-delete-right :transient t)
+      ("dk" "↑" windmove-delete-up :transient t)
+      ("D" "This" delete-window :transient t)]
+     ["Transpose"
+      ("tt" "↜" (lambda ()
+                  (interactive)
+                  (transpose-frame)
+                  (windows-transient-window)) :transient nil)
+      ("ti" "↕" (lambda ()
+                  (interactive)
+                  (flip-frame)
+                  (windows-transient-window)) :transient nil)
+      ("to" "⟷" (lambda ()
+                  (interactive)
+                  (flop-frame)
+                  (windows-transient-window)) :transient nil)
+      ("tc" "⟳" (lambda ()
+                  (interactive)
+                  (rotate-frame-clockwise)
+                  (windows-transient-window)) :transient nil)
+      ("ta" "⟲" (lambda ()
+                  (interactive)
+                  (rotate-frame-anticlockwise)
+                  (windows-transient-window)) :transient nil)]
+     ["Exit"
+      ("<escape>" "exit menu" (lambda ()
+                                (interactive)
+                                (transient-quit-one)) :transient nil)
+      ("q" "exit menu" (lambda ()
+                         (interactive)
+                         (transient-quit-one)) :transient nil)]]))
 #+end_src
 
 * Winner
