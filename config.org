@@ -324,13 +324,13 @@ Display current time on modeline.
 (display-time-mode 1)
 #+end_src
 
-Scroll smoothly when using a mouse or trackpad. Which is basically never, but anyway...
+Scroll smoothly when using a mouse or trackpad. Which is basically never.
 
 #+begin_src emacs-lisp :tangle yes
 (pixel-scroll-precision-mode)
 #+end_src
 
-Setup =mood-line=. It's more minimalist than =doom-modeline=, which is what I need right now.
+Setup =mood-line=.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package mood-line
@@ -478,12 +478,20 @@ Vim keybindings here.
   :config
   (setq evil-want-integration t)
   (evil-collection-init))
+#+end_src
 
+Comment out / in stuff easily.
+
+#+begin_src emacs-lisp :tangle yes
 (use-package evil-commentary
   :after evil
   :config
   (evil-commentary-mode))
+#+end_src
 
+=evil-owl= provides a view to register contents.
+
+#+begin_src emacs-lisp :tangle yes
 (use-package evil-owl
   :config
   (setq evil-owl-max-string-length 500)
@@ -520,7 +528,7 @@ This maybe fixes some indentation issues in org mode.
 
 * Version control
 
-Magit is the how Git must be used.
+Magit is the Git package.
 
 #+begin_src emacs-lisp :tangle yes
 (defun kill-magit-diff-buffer-in-current-repo (&rest _)
@@ -634,6 +642,7 @@ Frame management.
 #+end_src
 
 * Flycheck
+
 #+begin_src emacs-lisp :tangle yes
 (use-package flycheck
   :ensure
@@ -694,8 +703,6 @@ Configure the necessary packages.
   (setq nrepl-log-messages t)
   (add-hook 'cider-repl-mode-hook #'paredit-mode)
   (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
-
-;; (add-hook 'clojure-mode-hook #'eglot)
 
 (defun my-cider-repl-mode-hook ()
   (paredit-mode 1)
@@ -878,7 +885,7 @@ Elisp keybindings.
 
 * Restclient
 
-Restclient is essential.
+Restclient is essential. But it's deprecated - TODO: look for maintained alternatives.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package restclient
