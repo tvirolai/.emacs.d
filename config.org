@@ -1,4 +1,4 @@
-+title: Config
+#+title: Config
 #+author: Tuomo Virolainen
 #+STARTUP: nofold
 
