@@ -641,6 +641,13 @@ Frame management.
 (evil-define-key 'normal 'global (kbd "M-°") 'delete-frame)
 #+end_src
 
+Easy buffer switching.
+
+#+begin_src emacs-lisp :tangle yes
+(evil-define-key 'normal 'global (kbd "C-M-l") 'next-buffer)
+(evil-define-key 'normal 'global (kbd "C-M-h") 'previous-buffer)
+#+end_src
+
 * Flycheck
 
 #+begin_src emacs-lisp :tangle yes
