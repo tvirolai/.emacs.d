@@ -1437,16 +1437,18 @@ Enable =recentf-mode=.
   (defun tv/org-todo-toggle-or-open-link ()
     "Open link or toggle a TODO, depending on which one is under point."
     (interactive)
-    (if-let ((state (org-get-todo-state)))
+    (let ((type (car (org-element-context))))
+      (if (eq 'link type)
+          (org-open-at-point)
         (progn
-          (cond ((string= state "[ ]") (org-todo "[X]"))
-                ((string= state "[X]") (org-todo "[ ]"))
-                ((string= state "TODO") (org-todo "DOING"))
-                ((string= state "DOING") (org-todo "DONE"))
-                ((string= state "DONE") (org-todo "TODO"))
-                (t (message state)))
-          (org-flag-subtree t))
-      (org-open-at-point)))
+          (let ((state (org-get-todo-state)))
+            (cond ((string= state "[ ]") (org-todo "[X]"))
+                  ((string= state "[X]") (org-todo "[ ]"))
+                  ((string= state "TODO") (org-todo "DOING"))
+                  ((string= state "DOING") (org-todo "DONE"))
+                  ((string= state "DONE") (org-todo "TODO"))
+                  (t (message state)))
+            (org-flag-subtree t)))))
 
   (evil-define-key 'normal org-mode-map
     (kbd "RET") #'tv/org-todo-toggle-or-open-link))
