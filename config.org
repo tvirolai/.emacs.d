@@ -1448,7 +1448,7 @@ Enable =recentf-mode=.
                   ((string= state "DOING") (org-todo "DONE"))
                   ((string= state "DONE") (org-todo "TODO"))
                   (t (message state)))
-            (org-flag-subtree t)))))
+            (org-flag-subtree t))))))
 
   (evil-define-key 'normal org-mode-map
     (kbd "RET") #'tv/org-todo-toggle-or-open-link))
