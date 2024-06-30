@@ -85,7 +85,6 @@ Disable unnecessary stuff.
 (setq ring-bell-function 'ignore)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(fset 'yes-or-no-p 'y-or-n-p)
 (setq use-short-answers t)
 #+end_src
 
@@ -1941,12 +1940,12 @@ Modified from: https://themagitian.github.io/posts/emacsconfig/"
 
 (defun config-visit ()
   (interactive)
-  (find-file "~/.config/emacs/config.org"))
+  (find-file (expand-file-name "config.org" user-emacs-directory)))
 
 (defun config-reload ()
   "Reloads the config.org at runtime"
   (interactive)
-  (org-babel-load-file (expand-file-name "~/.config/emacs/config.org")))
+  (org-babel-load-file (expand-file-name "config.org" user-emacs-directory)))
 
 (global-set-key (kbd "C-c e") 'config-visit)
 (global-set-key (kbd "C-c r") 'config-reload)
