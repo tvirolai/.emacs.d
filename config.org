@@ -450,6 +450,16 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
 (setq-default sentence-end-double-space nil)
 #+end_src
 
+** Sudo edit
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sudo-edit
+  :ensure t
+  :defer
+  :config
+  (global-set-key (kbd "C-c C-r") 'sudo-edit))
+#+end_src
+
 * Evil mode
 
 Vim keybindings here.
@@ -523,6 +533,15 @@ This maybe fixes some indentation issues in org mode.
   (advice-add fn
               :after
               #'(lambda (&rest _args) (balance-windows))))
+#+end_src
+
+* Evil-multiedit
+
+#+begin_src emacs-lisp :tangle yes
+(use-package evil-multiedit
+  :ensure
+  :defer
+  :config (evil-multiedit-default-keybinds))
 #+end_src
 
 * Version control
@@ -866,9 +885,11 @@ Elisp keybindings.
 (use-package python-black
   :demand t
   :after python
-  :hook (python-mode . python-black-on-save-mode-enable-dwim))
+  :hook ((python-mode . python-black-on-save-mode-enable-dwim))
+         (python-ts-mode . python-black-on-save-mode-enable-dwim))
 
 (add-hook 'python-mode-hook #'eglot-ensure)
+(add-hook 'python-ts-mode-hook #'eglot-ensure)
 #+end_src
 
 * LSP-mode
@@ -893,6 +914,8 @@ Elisp keybindings.
 
 Restclient is essential. But it's deprecated - TODO: look for maintained alternatives.
 
+[[https://github.com/federicotdn/verb][Verb]] seems like a potential replacement.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package restclient
   :ensure t
@@ -909,6 +932,14 @@ Make it work with =org-mode=.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ob-restclient)
+#+end_src
+
+* Verb
+
+#+begin_src emacs-lisp :tangle yes
+(use-package verb
+  :ensure t
+  :defer)
 #+end_src
 
 * Counsel-etags
@@ -1339,6 +1370,7 @@ Enable =recentf-mode=.
      ("CANCELED"     . "blue")
      ("[CANCELED]"   . "blue")))
   :config
+  (define-key org-mode-map (kbd "C-c C-r") verb-command-map)
   (evil-define-key 'normal org-mode-map
     (kbd "M-l") #'org-metaright
     (kbd "M-h") #'org-metaleft
@@ -1347,7 +1379,8 @@ Enable =recentf-mode=.
     (kbd "M-L") #'org-shiftmetaright
     (kbd "M-H") #'org-shiftmetaleft
     (kbd "M-K") #'org-shiftmetaup
-    (kbd "M-J") #'org-shiftmetadown)
+    (kbd "M-J") #'org-shiftmetadown
+    (kbd "§") #'verb-send-request-on-point-other-window-stay)
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "/inbox.org"))
   (setq org-archive-location "archive/Archive_%s::")
