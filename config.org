@@ -916,31 +916,7 @@ Elisp keybindings.
 * Eldoc
 
 #+begin_src emacs-lisp :tangle yes
-;; (setq eldoc-echo-area-use-multiline-p nil)
-#+end_src
-
-* Restclient
-
-Restclient is essential. But it's deprecated - TODO: look for maintained alternatives.
-
-[[https://github.com/federicotdn/verb][Verb]] seems like a potential replacement.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package restclient
-  :ensure t
-  :defer
-  :mode ("\\.http\\'" . restclient-mode)
-  :init
-  (evil-define-key 'normal restclient-mode-map
-    "§" 'restclient-http-send-current)
-  ;; https://github.com/doomemacs/doomemacs/issues/6073
-  (require 'gnutls))
-#+end_src
-
-Make it work with =org-mode=.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package ob-restclient)
+(setq eldoc-echo-area-use-multiline-p nil)
 #+end_src
 
 * Verb
@@ -1398,7 +1374,7 @@ Enable =recentf-mode=.
     (kbd "M-H") #'org-shiftmetaleft
     (kbd "M-K") #'org-shiftmetaup
     (kbd "M-J") #'org-shiftmetadown
-    (kbd "§") #'verb-send-request-on-point-other-window-stay)
+    (kbd "§") #'verb-send-request-on-point)
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "/inbox.org"))
   (setq org-archive-location "archive/Archive_%s::")
@@ -1522,7 +1498,7 @@ Enable =recentf-mode=.
                ("C-c n d" . org-roam-dailies-capture-today)
                ("C-c n s" . consult-org-roam-search)))
   :config
-  (setq org-roam-node-display-template (concat "${title:50} " (propertize "${tags:30}" 'face 'org-tag)))
+  (setq org-roam-node-display-template (concat "${title:50} " (propertize "${tags:50}" 'face 'org-tag)))
   (setq org-roam-db-location (expand-file-name "etc/org-roam.db" user-emacs-directory))
   (setq org-roam-directory "~/Dropbox/org/roam")
   (setq org-roam-capture-templates
@@ -1537,7 +1513,10 @@ Enable =recentf-mode=.
                       "#+author: ${author}\n#+title: ${title}\n#+subtitle: \n#+date: %t\n#+origin: ${origin}\n#+category: \n#+filetags: :kirjat:\n\n")
            :unnarrowed t)
           ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: Project")
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: project")
+           :unnarrowed t)
+          ("w" "work/bug" plain "%?"
+           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %t\n#+filetags: :bugit:työ:verb:")
            :unnarrowed t)
           ("m" "meeting" plain "%?"
            :if-new
