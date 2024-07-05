@@ -1973,10 +1973,11 @@ Yes, sometimes a game of Tetris is in order.
 
 * Custom stuff
 
+Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsconfig/.
+
 #+begin_src emacs-lisp :tangle yes
 (defun kill-other-buffers ()
-  "Keep only the current buffer and scratch buffer, kill all others.
-Modified from: https://themagitian.github.io/posts/emacsconfig/"
+  "Keep only the current buffer and scratch buffer, kill all others."
   (interactive)
   (let ((buffers-to-keep (cons (buffer-name)
                                '("*scratch*" "*Minibuf-0*" "*Minibuf-1*" "*Echo Area 0*" "*mood-line*"))))
@@ -1988,9 +1989,9 @@ Modified from: https://themagitian.github.io/posts/emacsconfig/"
   (message "Killed other buffers"))
 #+end_src
 
-#+begin_src emacs-lisp :tangle yes
-;; Source: https://github.com/daedreth/UncleDavesEmacs
+Quickly visit and evaluate configuration. Source: https://github.com/daedreth/UncleDavesEmacs.
 
+#+begin_src emacs-lisp :tangle yes
 (defun config-visit ()
   (interactive)
   (find-file (expand-file-name "config.org" user-emacs-directory)))
