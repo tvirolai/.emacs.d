@@ -12,6 +12,12 @@ This is my personal Emacs configuration. It is implemented using literate progra
 
 * General setup
 
+Enable lexical binding.
+
+#+begin_src emacs-lisp :tangle yes
+;;; -*- lexical-binding: t; -*-
+#+end_src
+
 Add personal details.
 
 #+begin_src emacs-lisp :tangle yes
@@ -352,6 +358,14 @@ Setup =mood-line=.
 #+begin_src emacs-lisp :tangle yes
 (use-package hide-mode-line
   :ensure t)
+#+end_src
+
+Use [[https://github.com/wolray/symbol-overlay][symbol-overlay]] mode.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package symbol-overlay
+  :ensure t
+  :hook (prog-mode . symbol-overlay-mode))
 #+end_src
 
 Use =spacious-padding=.
@@ -897,8 +911,8 @@ Elisp keybindings.
   :hook ((python-mode . python-black-on-save-mode-enable-dwim))
          (python-ts-mode . python-black-on-save-mode-enable-dwim))
 
-(add-hook 'python-mode-hook #'eglot-ensure)
-(add-hook 'python-ts-mode-hook #'eglot-ensure)
+(add-hook 'python-mode-hook #'lsp)
+(add-hook 'python-ts-mode-hook #'lsp)
 #+end_src
 
 * LSP-mode
@@ -1374,7 +1388,7 @@ Enable =recentf-mode=.
     (kbd "M-H") #'org-shiftmetaleft
     (kbd "M-K") #'org-shiftmetaup
     (kbd "M-J") #'org-shiftmetadown
-    (kbd "§") #'verb-send-request-on-point)
+    (kbd "§") #'verb-send-request-on-point-other-window-stay)
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "/inbox.org"))
   (setq org-archive-location "archive/Archive_%s::")
