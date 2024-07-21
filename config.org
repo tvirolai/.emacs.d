@@ -346,13 +346,12 @@ Scroll smoothly when using a mouse or trackpad. Which is basically never.
 Setup =mood-line=.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package mood-line
-  ;; Enable mood-line
+(use-package doom-modeline
+  :ensure t
+  :hook (after-init . doom-modeline-mode)
   :config
-  (mood-line-mode)
-  ;; Use pretty Fira Code-compatible glyphs
-  :custom
-  (mood-line-glyph-alist mood-line-glyphs-fira-code))
+  (setq doom-modeline-icon nil)
+  (setq doom-modeline-time-icon nil))
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
