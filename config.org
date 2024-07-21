@@ -331,27 +331,25 @@ Suppress compilation warnings.
 (setq native-comp-async-report-warnings-errors nil)
 #+end_src
 
-Display current time on modeline.
-
-#+begin_src emacs-lisp :tangle yes
-(display-time-mode 1)
-#+end_src
-
 Scroll smoothly when using a mouse or trackpad. Which is basically never.
 
 #+begin_src emacs-lisp :tangle yes
 (pixel-scroll-precision-mode)
 #+end_src
 
-Setup =mood-line=.
+Setup =doom-modeline=.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package doom-modeline
   :ensure t
   :hook (after-init . doom-modeline-mode)
   :config
+  (display-time-mode 1)
   (setq doom-modeline-icon nil)
-  (setq doom-modeline-time-icon nil))
+  (setq doom-modeline-time-icon nil)
+  ;; Prevent crazy path expansions.
+  (setq doom-modeline-project-detection 'project)
+  (setq doom-modeline-project-detection 'ffip))
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
