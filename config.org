@@ -425,6 +425,18 @@ Rainbow-delimiters are useful in lisps.
   :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
+** Nov.el mode
+
+A mode for reading epub files.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package nov
+  :ensure t
+  :defer
+  :config
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+#+end_src
+
 ** Olivetti mode
 
 Olivetti mode squeezes the buffer into a column of limited width. This helps readability.
