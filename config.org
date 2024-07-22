@@ -77,7 +77,7 @@ Enable =straight.el=.
 Configure =use-package=.
 
 #+begin_src emacs-lisp :tangle yes
-(setq use-package-always-ensure t)
+;; (setq use-package-always-ensure t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -94,6 +94,7 @@ Disable unnecessary stuff.
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq use-short-answers t)
+;; (setq initial-scratch-message "")
 #+end_src
 
 Set 50MB as the limit for garbage collection.
@@ -558,7 +559,7 @@ This maybe fixes some indentation issues in org mode.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package evil-multiedit
-  :ensure
+  :ensure t
   :defer
   :config (evil-multiedit-default-keybinds))
 #+end_src
@@ -699,6 +700,14 @@ Easy buffer switching.
 #+end_src
 
 * Programming languages
+
+** Bash
+
+Use LSP when editing shell scripts.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'bash-ts-mode-hook #'lsp)
+#+end_src
 
 ** Clojure
 
@@ -1775,11 +1784,19 @@ Copied from [[https://github.com/abrochard/emacs-config/blob/master/configuratio
   (setq vterm-max-scrollback 100000)
   (setq vterm-keymap-exceptions nil))
 
-(use-package multi-vterm
-  :after vterm
-  :config (add-hook 'vterm-mode-hook
-                    (lambda ()
-                      (evil-insert-state))))
+;; (use-package multi-vterm
+;;   :after vterm
+;;   :config (add-hook 'vterm-mode-hook
+;;                     (lambda ()
+;;                       (evil-insert-state))))
+#+end_src
+
+* Configure epg-pinentry-mode
+
+This is needed for =pass= and =epa=.
+
+#+begin_src emacs-lisp :tangle yes
+(setq epg-pinentry-mode 'loopback)
 #+end_src
 
 * Pass
@@ -1791,7 +1808,6 @@ Use the =pass= package to interact with the similarly named Linux password manag
   :ensure t
   :defer
   :config
-  (setq epg-pinentry-mode 'loopback)
   (require 'auth-source-pass)
   (auth-source-pass-enable))
 #+end_src
