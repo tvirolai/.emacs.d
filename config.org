@@ -736,6 +736,11 @@ Use LSP when editing shell scripts.
 
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'bash-ts-mode-hook #'lsp)
+#+end_src
+
+[[https://github.com/bats-core/bats-core][Bats]] is a testing framework for Bash. =.bats=-files should be considered as Bash files.
+
+#+begin_src emacs-lisp :tangle yes
 (add-to-list 'auto-mode-alist '("\\.bats\\'" . bash-ts-mode))
 #+end_src
 
