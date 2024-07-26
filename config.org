@@ -454,7 +454,6 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
 #+begin_src emacs-lisp :tangle yes
 (use-package pulse
   :ensure nil
-  :defer
   :init
   (defun pulse-line (&rest _)
     "Pulse the current line."
@@ -734,6 +733,7 @@ Use LSP when editing shell scripts.
 
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'bash-ts-mode-hook #'lsp)
+(add-to-list 'auto-mode-alist '("\\.bats\\'" . bash-ts-mode))
 #+end_src
 
 ** Clojure
