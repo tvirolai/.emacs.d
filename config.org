@@ -410,7 +410,6 @@ Rainbow mode shows color codes as well as some other values (like the value `red
 
 #+begin_src emacs-lisp :tangle yes
 (use-package rainbow-mode
-  :defer
   :ensure t
   :hook (prog-mode . rainbow-mode))
 #+end_src
@@ -664,6 +663,8 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (define-key minibuffer-local-isearch-map [escape] 'minibuffer-keyboard-quit)
 #+end_src
 
+A handful of bindings inspired by Doom Emacs / Spacemacs.
+
 #+begin_src emacs-lisp :tangle yes
 (evil-set-leader 'normal (kbd "SPC"))
 
@@ -676,6 +677,8 @@ then it takes a second \\[keyboard-quit] to abort the minibuffer."
 (define-key my-leader-map (kbd "RET") 'consult-bookmark)
 (define-key my-leader-map "<" 'consult-buffer)
 (define-key my-leader-map "z" 'consult-recent-file)
+(define-key my-leader-map "," 'avy-goto-char-timer)
+(define-key my-leader-map "." 'consult-line)
 #+end_src
 
 A handful of must-have keybindings for me.
@@ -1240,7 +1243,6 @@ Writable grep. This makes possible to use workflows for search and replace like:
   ;; (setq eldoc-documentation-strategy #'eldoc-documentation-compose-eagerly)
 
   :config
-
   ;; Hide the mode line of the Embark live/completions buffers
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
@@ -1998,7 +2000,7 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
 
 * Tetris
 
-Yes, sometimes a game of Tetris is in order.
+No Evil mode when playing Tetris.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package tetris
@@ -2027,11 +2029,12 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
 
 #+begin_src emacs-lisp :tangle yes
 (defun config-visit ()
+  "Open the configuration file."
   (interactive)
   (find-file (expand-file-name "config.org" user-emacs-directory)))
 
 (defun config-reload ()
-  "Reloads the config.org at runtime"
+  "Reload config.org."
   (interactive)
   (org-babel-load-file (expand-file-name "config.org" user-emacs-directory)))
 
