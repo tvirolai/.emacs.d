@@ -2046,3 +2046,33 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
 (global-set-key (kbd "C-c e") 'config-visit)
 (global-set-key (kbd "C-c r") 'config-reload)
 #+end_src
+
+* An inspirational quote
+
+#+begin_src emacs-lisp :tangle yes
+(defun slurp (f)
+  (with-temp-buffer
+    (insert-file-contents f)
+    (buffer-substring-no-properties
+     (point-min)
+     (point-max))))
+
+(defun get-quote (rows)
+  (let* ((count (length rows))
+         (quote-length 4)
+         (start-index (random (- count quote-length)))
+         (res (seq-subseq rows start-index (+ start-index quote-length))))
+    (mapconcat (lambda (x) (concat ";; " x)) res "\n")))
+
+(defun tv/generate-manowar-quote ()
+  (get-quote
+   (split-string
+    (slurp (expand-file-name "etc/manowar.txt"
+                             user-emacs-directory)) "\n" t)))
+
+(setq initial-scratch-message (tv/generate-manowar-quote))
+
+(defun tv/reset-scratch-message ()
+  (interactive)
+  (setq initial-scratch-message (tv/generate-manowar-quote)))
+#+end_src
