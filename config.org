@@ -2050,6 +2050,8 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
 * An inspirational quote
 
 #+begin_src emacs-lisp :tangle yes
+(defconst lyric-file "etc/lyrics.txt")
+
 (defun slurp (f)
   (with-temp-buffer
     (insert-file-contents f)
@@ -2068,18 +2070,20 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
         (get-quote rows)
       (concat (mapconcat (lambda (x) (concat ";; " x)) res "\n") "\n\n"))))
 
-(defun tv/generate-manowar-quote ()
-  (if (file-exists-p (expand-file-name "etc/manowar.txt"
+(defun tv/generate-quote ()
+  (if (file-exists-p (expand-file-name lyric-file
                                        user-emacs-directory))
       (get-quote
        (split-string
-        (slurp (expand-file-name "etc/manowar.txt"
+        (slurp (expand-file-name lyric-file
                                  user-emacs-directory)) "\n" t))
-    (message "Manowar lyrics not found!")))
+    (message "Lyrics not found!")))
 
-(setq initial-scratch-message (tv/generate-manowar-quote))
+(setq initial-scratch-message (tv/generate-quote))
 
 (defun tv/reset-scratch-message ()
   (interactive)
-  (setq initial-scratch-message (tv/generate-manowar-quote)))
+  (let ((msg (tv/generate-quote)))
+    (setq initial-scratch-message msg)
+    (message msg)))
 #+end_src
