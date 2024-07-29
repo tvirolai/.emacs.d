@@ -2062,13 +2062,20 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
          (quote-length 4)
          (start-index (random (- count quote-length)))
          (res (seq-subseq rows start-index (+ start-index quote-length))))
-    (mapconcat (lambda (x) (concat ";; " x)) res "\n")))
+    (if (seq-filter (lambda (x)
+                      (string-match-p "^\\(?:0\\|[1-9][0-9]*\\)" x))
+                    res)
+        (get-quote rows)
+      (concat (mapconcat (lambda (x) (concat ";; " x)) res "\n") "\n\n"))))
 
 (defun tv/generate-manowar-quote ()
-  (get-quote
-   (split-string
-    (slurp (expand-file-name "etc/manowar.txt"
-                             user-emacs-directory)) "\n" t)))
+  (if (file-exists-p (expand-file-name "etc/manowar.txt"
+                                       user-emacs-directory))
+      (get-quote
+       (split-string
+        (slurp (expand-file-name "etc/manowar.txt"
+                                 user-emacs-directory)) "\n" t))
+    (message "Manowar lyrics not found!")))
 
 (setq initial-scratch-message (tv/generate-manowar-quote))
 
