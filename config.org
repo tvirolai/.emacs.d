@@ -2050,7 +2050,8 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
 * An inspirational quote
 
 #+begin_src emacs-lisp :tangle yes
-(defconst lyric-file "etc/lyrics.txt")
+;; (defconst lyric-file "etc/lyrics.txt")
+(defconst lyric-file "etc/room.txt")
 
 (defun slurp (f)
   (with-temp-buffer
@@ -2068,7 +2069,7 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
                       (string-match-p "^\\(?:0\\|[1-9][0-9]*\\)" x))
                     res)
         (get-quote rows)
-      (concat (mapconcat (lambda (x) (concat ";; " x)) res "\n") "\n\n"))))
+      (mapconcat (lambda (x) (concat ";; " x)) res "\n"))))
 
 (defun tv/generate-quote ()
   (if (file-exists-p (expand-file-name lyric-file
@@ -2079,7 +2080,7 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
                                  user-emacs-directory)) "\n" t))
     (message "Lyrics not found!")))
 
-(setq initial-scratch-message (tv/generate-quote))
+(setq initial-scratch-message (concat (tv/generate-quote) "\n\n"))
 
 (defun tv/reset-scratch-message ()
   (interactive)
