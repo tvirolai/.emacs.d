@@ -2106,7 +2106,7 @@ newlines at the end of the message."
             (set-marker scratch-message-beg-marker (point))
             (insert message)
             (set-marker scratch-message-end-marker (point))
-            (let ((comment-start (or comment-start " ")))
+            (let ((comment-start (or comment-start ";;")))
               (comment-region scratch-message-beg-marker
                               scratch-message-end-marker)))
           (set-buffer-modified-p bm)))
@@ -2116,8 +2116,7 @@ newlines at the end of the message."
   (interactive)
   (let ((msg (tv/generate-quote)))
     (setq tv/scratch-message msg)
-    (message msg)
     (tv/scratch-message-insert msg)))
 
-(tv/scratch-message-insert)
+(tv/reset-scratch-message)
 #+end_src
