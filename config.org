@@ -1127,7 +1127,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
     (unless (or (bound-and-true-p mct--active)
                 (bound-and-true-p vertico--input)
                 (eq (current-local-map) read-passwd-map))
-      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+      (setq-local corfu-auto nil) ;; Enable/disable auto completion
       (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
                   corfu-popupinfo-delay nil)
       (corfu-mode 1)))
@@ -1663,10 +1663,7 @@ Enable =recentf-mode=.
   (defun gopar/get-schedule-or-deadline-if-available ()
     (let ((scheduled (org-get-scheduled-time (point)))
           (deadline (org-get-deadline-time (point))))
-      (if (not (or scheduled deadline))
-          (format "🗓️ ")
-        ;; (format " ")
-        "   "))))
+      "   ")))
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
@@ -2050,11 +2047,11 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
 * An inspirational quote
 
 #+begin_src emacs-lisp :tangle yes
-;; (defconst lyric-file "etc/lyrics.txt")
-(defconst lyric-file "etc/room.txt")
 (defvar tv/scratch-message "")
 (defvar scratch-message-beg-marker (make-marker))
 (defvar scratch-message-end-marker (make-marker))
+(defconst lyric-file "etc/lyrics.txt")
+;; (defconst lyric-file "etc/room.txt")
 
 (defun slurp (f)
   (with-temp-buffer
