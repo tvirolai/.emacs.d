@@ -506,6 +506,7 @@ Vim keybindings here.
   :config
   (evil-mode 1)
   (evil-set-undo-system 'undo-tree)
+  ;; (evil-set-undo-system 'undo-redo)
   (setq evil-split-window-below t
         evil-vsplit-window-right t)
   (setq evil-ex-substitute-global t)
@@ -2046,6 +2047,8 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
 
 * An inspirational quote
 
+Insert a random 4-line quote from a corpus file on top of the scratch buffer. The corpus on my work laptop is a file containing all the lyrics of Manowar, on the private machine I have the screenplay for The Room.
+
 #+begin_src emacs-lisp :tangle yes
 (defvar tv/scratch-message "")
 (defvar scratch-message-beg-marker (make-marker))
@@ -2116,4 +2119,12 @@ newlines at the end of the message."
     (tv/scratch-message-insert msg)))
 
 (tv/reset-scratch-message)
+#+end_src
+
+* Insert GPG passphrase to register ?o
+
+Read a GPG passphrase from environment variable to a register for easier access.
+
+#+begin_src emacs-lisp :tangle yes
+(set-register ?o (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNF")))
 #+end_src
