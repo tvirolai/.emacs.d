@@ -2001,16 +2001,17 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
 (use-package helpful)
 #+end_src
 
-* Tetris
+* Various minor tweaks
 
-No Evil mode when playing Tetris.
+** Insert GPG passphrase to register ?o
+
+Read a GPG passphrase from environment variable to a register for easier access.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package tetris
-  :hook (tetris-mode . turn-off-evil-mode))
+(set-register ?o (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNF")))
 #+end_src
 
-* Custom stuff
+** Kill buffers at scale
 
 Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsconfig/.
 
@@ -2028,7 +2029,9 @@ Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsc
   (message "Killed other buffers"))
 #+end_src
 
-Quickly visit and evaluate configuration. Source: https://github.com/daedreth/UncleDavesEmacs.
+** Quicky visit and evaluate configuration
+
+Source: https://github.com/daedreth/UncleDavesEmacs.
 
 #+begin_src emacs-lisp :tangle yes
 (defun config-visit ()
@@ -2045,7 +2048,7 @@ Quickly visit and evaluate configuration. Source: https://github.com/daedreth/Un
 (global-set-key (kbd "C-c r") 'config-reload)
 #+end_src
 
-* An inspirational quote
+** An inspirational quote
 
 Insert a random 4-line quote from a corpus file on top of the scratch buffer. The corpus on my work laptop is a file containing all the lyrics of Manowar, on the private machine I have the screenplay for The Room.
 
@@ -2121,10 +2124,11 @@ newlines at the end of the message."
 (tv/reset-scratch-message)
 #+end_src
 
-* Insert GPG passphrase to register ?o
+** Tetris
 
-Read a GPG passphrase from environment variable to a register for easier access.
+No Evil mode when playing Tetris.
 
 #+begin_src emacs-lisp :tangle yes
-(set-register ?o (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNF")))
+(use-package tetris
+  :hook (tetris-mode . turn-off-evil-mode))
 #+end_src
