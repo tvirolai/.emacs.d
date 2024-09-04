@@ -475,7 +475,7 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
 ** Whitespace
 
 #+begin_src emacs-lisp :tangle yes
-(add-hook 'before-save-hook #'whitespace-cleanup)
+(add-hook 'before-save-hook #'delete-trailing-whitespace)
 
 (setq-default sentence-end-double-space nil)
 #+end_src
@@ -1872,6 +1872,8 @@ Disable images.
   :defer
   :hook ((dired-mode . dired-hide-details-mode)
          (dired-mode . hl-line-mode))
+  :bind (:map dired-mode-map
+              ("C-c C-e" . wdired-change-to-wdired-mode))
   :custom
   (dired-kill-when-opening-new-dired-buffer t) ;; Without this, each directory level opens in its own buffer.
   (dired-do-revert-buffer t)
@@ -1884,6 +1886,10 @@ Disable images.
   (setq dired-recursive-copies 'always)
   (setq dired-dwim-target t)
   (evil-define-key 'normal 'global (kbd "C-M-ä") 'dired-jump))
+
+(use-package diredfl
+  :ensure t
+  :hook (after-init . diredfl-global-mode))
 
 (use-package all-the-icons-dired
   :ensure t
@@ -2046,6 +2052,48 @@ Source: https://github.com/daedreth/UncleDavesEmacs.
 
 (global-set-key (kbd "C-c e") 'config-visit)
 (global-set-key (kbd "C-c r") 'config-reload)
+#+end_src
+
+** Sudo current buffer
+
+From [[https://github.com/abrochard/emacs-config][abrochard]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun sudo ()
+  "Use TRAMP to `sudo' the current buffer"
+  (interactive)
+  (when buffer-file-name
+    (find-alternate-file
+     (concat "/sudo:root@localhost:"
+             buffer-file-name))))
+#+end_src
+
+** Generate scratch buffer
+
+From [[https://github.com/abrochard/emacs-config][abrochard]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun generate-scratch-buffer ()
+  "Create and switch to a temporary scratch buffer with a random
+     name."
+  (interactive)
+  (switch-to-buffer (make-temp-name "*scratch-")))
+#+end_src
+
+** Copy filename and path to clipboard
+
+From [[https://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/][bbatsov]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun copy-filename ()
+  "Copy the current buffer file name to the clipboard."
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode)
+                      default-directory
+                    (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
 #+end_src
 
 ** An inspirational quote
