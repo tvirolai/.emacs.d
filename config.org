@@ -923,7 +923,10 @@ Elisp keybindings.
 
 (use-package ielm
   :config
-  (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode))
+  (add-hook 'ielm-mode-hook #'rainbow-delimiters-mode)
+  (add-hook 'ielm-mode-hook #'(lambda ()
+                                (setq-local corfu-auto nil)
+                                (corfu-mode))))
 #+end_src
 
 ** Typescript
@@ -1110,7 +1113,6 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (corfu-on-exact-match 'insert) ;; Insert when there's only one match
   (corfu-quit-no-match t)        ;; Quit when there is no match
   :init
-  (setq corfu-exclude-modes '(eshell-mode))
   (setq corfu-quit-at-boundary 'separator)
   (global-corfu-mode)
   (corfu-history-mode))
@@ -1742,7 +1744,11 @@ Use ansi-colors in shell.
         eshell-save-history-on-exit t
         eshell-prefer-lisp-functions nil
         eshell-directory-name (expand-file-name "etc/eshell" user-emacs-directory)
-        eshell-destroy-buffer-when-process-dies t))
+        eshell-destroy-buffer-when-process-dies t)
+  :config
+  (add-hook 'eshell-mode-hook #'(lambda ()
+                                  (setq-local corfu-auto nil)
+                                  (corfu-mode))))
 #+end_src
 
 Eshell aliases.
