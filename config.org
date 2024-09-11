@@ -1121,7 +1121,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :ensure t
   :init
   (setq cape-dabbrev-min-length 2)
-  (setq cape-dabbrev-check-other-buffers 'some)
+  (setq cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
 
@@ -1736,7 +1736,13 @@ Use ansi-colors in shell.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package eshell
-  :hook (eshell-mode . hide-mode-line-mode)
+  :hook ((eshell-mode . hide-mode-line-mode)
+         (eshell-mode . (lambda ()
+                          (setq-local completion-styles '(basic))
+                          (setq-local corfu-count 10)
+                          (setq-local corfu-auto nil)
+                          (setq-local corfu-preview-current nil)
+                          (setq-local completion-at-point-functions '(pcomplete-completions-at-point cape-file)))))
   :init
   (setq eshell-scroll-to-bottom-on-input 'all
         eshell-error-if-no-glob t
@@ -1744,11 +1750,7 @@ Use ansi-colors in shell.
         eshell-save-history-on-exit t
         eshell-prefer-lisp-functions nil
         eshell-directory-name (expand-file-name "etc/eshell" user-emacs-directory)
-        eshell-destroy-buffer-when-process-dies t)
-  :config
-  (add-hook 'eshell-mode-hook #'(lambda ()
-                                  (setq-local corfu-auto nil)
-                                  (corfu-mode))))
+        eshell-destroy-buffer-when-process-dies t))
 #+end_src
 
 Eshell aliases.
