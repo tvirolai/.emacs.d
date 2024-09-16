@@ -78,7 +78,7 @@ Enable =straight.el=.
 Configure =use-package=.
 
 #+begin_src emacs-lisp :tangle yes
-;; (setq use-package-always-ensure t)
+(setq use-package-always-ensure t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -226,6 +226,7 @@ Use =tree-sitter=.
   :after tree-sitter)
 
 (use-package treesit-auto
+  :ensure t
   :custom
   (treesit-auto-install 'prompt)
   :config
@@ -239,6 +240,7 @@ Use =doom-dracula= theme.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package doom-themes
+  :ensure t
   :config
   (load-theme 'doom-dracula t))
 #+end_src
@@ -497,6 +499,7 @@ Vim keybindings here.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package evil
+  :ensure t
   :demand t
   :bind (("<escape>" . keyboard-escape-quit))
   :init
@@ -549,6 +552,7 @@ Comment out / in stuff easily.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package evil-owl
+  :ensure t
   :config
   (setq evil-owl-max-string-length 500)
   (setq evil-owl-idle-delay 0.5)
@@ -613,11 +617,11 @@ Magit is the Git package.
   :defer
   :ensure t
   :config
-  (add-hook 'git-commit-setup-hook
-            (lambda ()
-              (add-hook 'with-editor-post-finish-hook
-                        #'kill-magit-diff-buffer-in-current-repo
-                        nil t)))
+  ;; (add-hook 'git-commit-setup-hook
+  ;;           (lambda ()
+  ;;             (add-hook 'with-editor-post-finish-hook
+  ;;                       #'kill-magit-diff-buffer-in-current-repo
+  ;;                       nil t)))
   (evil-define-key 'normal magit-status-mode-map
     "q" #'mu-magit-kill-buffers)
   (add-hook 'magit-post-refresh-hook
@@ -1996,6 +2000,12 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
       ("q" "exit menu" (lambda ()
                          (interactive)
                          (transient-quit-one)) :transient nil)]]))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(use-package transpose-frame
+  :ensure t
+  :after transient)
 #+end_src
 
 * Winner
