@@ -413,7 +413,6 @@ Presentation mode scales font sizes up, which is very useful when showing things
 
 #+begin_src emacs-lisp :tangle yes
 (use-package presentation
-  :defer
   :ensure t)
 #+end_src
 
@@ -455,7 +454,6 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
 
 #+begin_src emacs-lisp :tangle yes
 (use-package olivetti
-  :defer
   :ensure t
   :custom
   (olivetti-body-width 94))
@@ -519,8 +517,8 @@ Vim keybindings here.
   ;; no vim insert bindings
   :config
   (evil-mode 1)
-  (evil-set-undo-system 'undo-tree)
-  ;; (evil-set-undo-system 'undo-redo)
+  ;; (evil-set-undo-system 'undo-tree)
+  (evil-set-undo-system 'undo-redo)
   (setq evil-split-window-below t
         evil-vsplit-window-right t)
   (setq evil-ex-substitute-global t)
@@ -542,12 +540,12 @@ Vim keybindings here.
 (unless (file-exists-p tv/undo-dir)
   (make-directory tv/undo-dir))
 
-(use-package undo-tree
-  :ensure t
-  :hook (after-init . global-undo-tree-mode)
-  :config
-  ;; Prevent undo tree files from polluting your git repo
-  (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir))))
+;; (use-package undo-tree
+;;   :ensure t
+;;   :hook (after-init . global-undo-tree-mode)
+;;   :config
+;;   ;; Prevent undo tree files from polluting your git repo
+;;   (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir))))
 #+end_src
 
 Comment out / in stuff easily.
