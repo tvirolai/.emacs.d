@@ -205,6 +205,16 @@ Store miscellaneous files under =/etc=.
 (setq bookmark-default-file (expand-file-name "etc/bookmarks" user-emacs-directory))
 #+end_src
 
+Set keybindings for profiler.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package profiler
+  :bind
+  ("C-x P r"  . profiler-report)
+  ("C-x P 1"  . profiler-start)
+  ("C-x P 0"  . profiler-stop))
+#+end_src
+
 * Tree-sitter
 
 Use =tree-sitter=.
