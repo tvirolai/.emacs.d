@@ -528,6 +528,7 @@ Vim keybindings here.
   (setq evil-shift-width 2))
 
 (use-package evil-collection
+  :ensure t
   :after evil
   :config
   (setq evil-want-integration t)
@@ -578,7 +579,9 @@ Comment out / in stuff easily.
 (with-eval-after-load 'evil
   (defalias #'forward-evil-word #'forward-evil-symbol)
   ;; make evil-search-word look for symbol rather than word boundaries
-  (setq-default evil-symbol-word-search t))
+  (setq-default evil-symbol-word-search t)
+  (define-key isearch-mode-map (kbd "<down>") 'isearch-ring-advance)
+  (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat))
 #+end_src
 
 This maybe fixes some indentation issues in org mode.
