@@ -874,11 +874,11 @@ working with."
 #+begin_src emacs-lisp :tangle yes
 (use-package sql
   :ensure t
+  :hook ((sql-mode . sqlup-mode)
+         (sql-interactive-mode . sqlup-mode))
   :defer
   :config
-  (maybe-highlight-ms-sql-kws)
-  (sqlup-mode)
-  (add-hook 'sql-interactive-mode-hook 'sqlup-mode))
+  (maybe-highlight-ms-sql-kws))
 #+end_src
 
 Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mode.
@@ -886,12 +886,14 @@ Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mod
 #+begin_src emacs-lisp :tangle yes
 (use-package sql-indent
   :ensure t
+  :after sql
   :defer)
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
 (use-package sqlup-mode
   :ensure t
+  :after sql
   :defer)
 #+end_src
 
