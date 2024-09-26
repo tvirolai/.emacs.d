@@ -548,6 +548,16 @@ Vim keybindings here.
 ;;   (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir))))
 #+end_src
 
+Evil-surround.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package evil-surround
+  :ensure t
+  :after evil
+  :config
+  (global-evil-surround-mode 1))
+#+end_src
+
 Comment out / in stuff easily.
 
 #+begin_src emacs-lisp :tangle yes
