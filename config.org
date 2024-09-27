@@ -1384,6 +1384,7 @@ Enable =recentf-mode=.
 #+begin_src emacs-lisp :tangle yes
 (use-package markdown-mode
   :ensure t
+  :hook (markdown-mode . display-line-numbers-mode)
   :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown"))
 #+end_src
