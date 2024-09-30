@@ -713,6 +713,8 @@ A handful of must-have keybindings for me.
 #+begin_src emacs-lisp :tangle yes
 (evil-define-key 'normal 'global (kbd "ö") 'save-buffer)
 (evil-define-key 'normal 'global (kbd "ä") 'delete-other-windows)
+;; Grep across open buffers by setting "." as the file regex.
+(evil-define-key 'normal 'global (kbd "M-ä") 'multi-occur-in-matching-buffers)
 (evil-define-key 'normal 'global (kbd "C-ä") 'split-window-right)
 (evil-define-key 'normal 'global (kbd "C-ö") 'split-window-below)
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
@@ -763,6 +765,7 @@ Use LSP when editing shell scripts.
 
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'bash-ts-mode-hook #'lsp)
+(setq sh-basic-offset 2)
 #+end_src
 
 [[https://github.com/bats-core/bats-core][Bats]] is a testing framework for Bash. =.bats=-files should be considered as Bash files.
