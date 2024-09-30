@@ -1776,6 +1776,7 @@ Use ansi-colors in shell.
 (use-package eshell
   :hook ((eshell-mode . hide-mode-line-mode)
          (eshell-mode . (lambda ()
+                          (setenv "TERM" "xterm-256color")
                           (setq-local completion-styles '(basic))
                           (setq-local corfu-count 10)
                           (setq-local corfu-auto nil)
