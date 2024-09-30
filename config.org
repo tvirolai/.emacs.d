@@ -1095,7 +1095,13 @@ Writable grep. This makes possible to use workflows for search and replace like:
 3. =query-replace-regexp=
 
 #+begin_src emacs-lisp :tangle yes
-(use-package wgrep :ensure t)
+(use-package wgrep
+  :ensure t
+  :after evil-collection
+  :config
+  (evil-collection-define-key 'normal 'wgrep-mode-map
+    "d" 'wgrep-mark-deletion
+    "U" 'wgrep-remove-all-change))
 #+end_src
 
 * Completion
