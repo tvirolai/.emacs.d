@@ -652,6 +652,10 @@ Magit is the Git package.
   :ensure t
   :defer
   :hook (after-init . global-git-gutter-mode))
+
+(use-package git-timemachine
+  :ensure t
+  :defer)
 #+end_src
 
 * Keybindings
