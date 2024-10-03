@@ -179,7 +179,7 @@ Create a directory for savefiles if it doesn't exist.
   (make-directory tv-savefile-dir))
 #+end_src
 
-Put backup files in system's temp dir.
+Put backup files under =etc/.tmp/=.
 
 #+begin_src emacs-lisp :tangle yes
 (setq backup-directory-alist `(("." . ,(expand-file-name "etc/.tmp/backups/"
@@ -266,7 +266,7 @@ Add helpers to switch between themes.
   "Load light theme."
   (interactive)
   (disable-all-themes)
-  (load-theme 'leuven t))
+  (load-theme 'doom-flatwhite t))
 
 (defun load-dark-theme ()
   "Load dark theme."
@@ -562,6 +562,7 @@ Comment out / in stuff easily.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package evil-commentary
+  :ensure t
   :after evil
   :config
   (evil-commentary-mode))
@@ -932,7 +933,7 @@ to this hack to run the indentation for the whole buffer."
 
 (defun tv/format-sql-buffer ()
   (interactive)
-  (tv/indent-sql-buffer)
+  ;; (tv/indent-sql-buffer)
   (sqlup-capitalize-keywords-in-region (point-min) (point-max)))
 
 (evil-define-key 'normal sql-mode-map
@@ -1804,10 +1805,11 @@ Eshell aliases.
         (gl . magit-log)
         (d  . dired)
         (c  . clear)
+        (cl  . clear)
         (o  . find-file)
+        (ff  . find-file)
         (oo . find-file-other-window)
-        (l  . (lambda () (eshell/ls '-la)))
-        (eshell/clear . eshell/clear-scrollback)))
+        (l  . (lambda () (eshell/ls '-la)))))
 
 (mapc (lambda (alias)
         (defalias (car alias) (cdr alias)))
