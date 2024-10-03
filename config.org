@@ -894,9 +894,11 @@ working with."
 (use-package sql
   :ensure t
   :hook ((sql-mode . sqlup-mode)
+         (sql-mode. lsp)
          (sql-interactive-mode . sqlup-mode))
   :defer
   :config
+  (setq lsp-sqls-workspace-config-path nil)
   (maybe-highlight-ms-sql-kws))
 #+end_src
 
