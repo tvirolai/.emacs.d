@@ -894,8 +894,8 @@ working with."
 (use-package sql
   :ensure t
   :hook ((sql-mode . sqlup-mode)
-         (sql-mode. lsp)
-         (sql-interactive-mode . sqlup-mode))
+         (sql-interactive-mode . sqlup-mode)
+         (sql-mode. lsp))
   :defer
   :config
   (setq lsp-sqls-workspace-config-path nil)
@@ -2168,8 +2168,9 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
 (defvar tv/scratch-message "")
 (defvar scratch-message-beg-marker (make-marker))
 (defvar scratch-message-end-marker (make-marker))
-(defconst lyric-file "etc/lyrics.txt")
-;; (defconst lyric-file "etc/room.txt")
+(defvar lyric-file (if (string= "siilim211207.local" (system-name))
+                       "etc/manowar.txt"
+                     "etc/room.txt"))
 
 (defun slurp (f)
   (with-temp-buffer
