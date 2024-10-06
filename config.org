@@ -25,6 +25,14 @@ Add personal details.
       user-mail-address (base64-decode-string "dHVvbW8udmlyb2xhaW5lbkBzaWlsaS5jb20="))
 #+end_src
 
+Is this the work laptop or something else?
+
+#+begin_src emacs-lisp :tangle yes
+(defconst work-laptop-p
+  (>= (string-match-p (regexp-quote "siili")
+                      (system-name))) 0)
+#+end_src
+
 Configure path.
 
 #+begin_src emacs-lisp :tangle yes
@@ -2168,7 +2176,7 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
 (defvar tv/scratch-message "")
 (defvar scratch-message-beg-marker (make-marker))
 (defvar scratch-message-end-marker (make-marker))
-(defvar lyric-file (if (string= "siilim211207.local" (system-name))
+(defvar lyric-file (if work-laptop-p
                        "etc/manowar.txt"
                      "etc/room.txt"))
 
