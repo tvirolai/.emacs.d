@@ -15,7 +15,7 @@ This is my personal Emacs configuration. It is implemented using literate progra
 Enable lexical binding.
 
 #+begin_src emacs-lisp :tangle yes
-;;; -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t -*-
 #+end_src
 
 Add personal details.
@@ -581,6 +581,7 @@ Comment out / in stuff easily.
 #+begin_src emacs-lisp :tangle yes
 (use-package evil-owl
   :ensure t
+  :after evil
   :config
   (setq evil-owl-max-string-length 500)
   (setq evil-owl-idle-delay 0.5)
@@ -664,7 +665,8 @@ Magit is the Git package.
 
 (use-package git-timemachine
   :ensure t
-  :defer)
+  :defer
+  :bind (("s-g" . git-timemachine)))
 #+end_src
 
 * Keybindings
