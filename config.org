@@ -165,7 +165,9 @@ Mac-specific settings.
 UTF-8 should be preferred everywhere.
 
 #+begin_src emacs-lisp :tangle yes
+(set-charset-priority 'unicode)
 (prefer-coding-system 'utf-8)
+(set-language-environment "UTF-8")
 (set-default-coding-systems 'utf-8)
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
@@ -324,10 +326,22 @@ Require a newline at the end.
 (setq require-final-newline t)
 #+end_src
 
+Show trailing whitespace
+
+#+begin_src emacs-lisp :tangle yes
+(setq show-trailing-whitespace t)
+#+end_src
+
 Maximize the frame on startup.
 
 #+begin_src emacs-lisp :tangle yes
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
+#+end_src
+
+No lockfiles.
+
+#+begin_src emacs-lisp :tangle yes
+(setq create-lockfiles nil)
 #+end_src
 
 Wrap lines by default. I hate horizontal scrolling.
@@ -722,6 +736,7 @@ A handful of bindings inspired by Doom Emacs / Spacemacs.
 (define-key my-leader-map "z" 'consult-recent-file)
 (define-key my-leader-map "," 'avy-goto-char-timer)
 (define-key my-leader-map "." 'consult-line)
+(define-key my-leader-map "x" 'consult-imenu)
 #+end_src
 
 A handful of must-have keybindings for me.
@@ -1166,7 +1181,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (corfu-auto-prefix 2)
   (corfu-auto-delay 0.2)
   (corfu-on-exact-match 'insert) ;; Insert when there's only one match
-  (corfu-quit-no-match t)        ;; Quit when there is no match
+  (corfu-quit-no-match t)        ;; Quit when there is no bind
   :init
   (setq corfu-quit-at-boundary 'separator)
   (global-corfu-mode)
