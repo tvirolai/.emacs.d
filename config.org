@@ -29,9 +29,7 @@ Is this the work laptop or something else?
 
 #+begin_src emacs-lisp :tangle yes
 (defconst work-laptop-p
-  (>= (or (string-match-p (regexp-quote "siili")
-                           (system-name))
-          -1) 0))
+  (equal (system-name) "siilim211207.local"))
 #+end_src
 
 Configure path.
