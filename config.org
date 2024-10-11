@@ -615,15 +615,6 @@ Comment out / in stuff easily.
   (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat))
 #+end_src
 
-=evil-goggles= highlights the area that a command (like yank) affects.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package evil-goggles
-  :ensure t
-  :config
-  (evil-goggles-mode))
-#+end_src
-
 This maybe fixes some indentation issues in org mode.
 
 #+begin_src emacs-lisp :tangle yes
