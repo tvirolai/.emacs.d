@@ -36,6 +36,7 @@ Configure path.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package exec-path-from-shell
+  :if work-laptop-p
   :ensure t
   :init
   (when (memq window-system '(mac ns x))
@@ -2101,8 +2102,9 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
 Read a GPG passphrase from environment variable to a register for easier access.
 
 #+begin_src emacs-lisp :tangle yes
-(set-register ?o (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNF")))
-(set-register ?p (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNFX1BST0Q=")))
+(when work-laptop-p
+  (set-register ?o (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNF")))
+  (set-register ?p (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNFX1BST0Q="))))
 #+end_src
 
 ** Kill buffers at scale
@@ -2259,6 +2261,20 @@ newlines at the end of the message."
     (tv/scratch-message-insert msg)))
 
 (tv/reset-scratch-message)
+#+end_src
+
+** Open a Jira ticket in the browser
+
+#+begin_src emacs-lisp :tangle yes
+(when work-laptop-p
+  (defun tv/jira ()
+    "Open a Jira ticket in browser. Accepts either a prefixed or non-prefixed input."
+    (interactive)
+    (let* ((ticket-number (read-string "Tikettinumero: "))
+           (url (concat "https://varmajira.eficode.com/browse/" (if (cl-search "-" ticket-number)
+                                                                    ticket-number
+                                                                  (concat "UMP-" ticket-number)))))
+      (browse-url url))))
 #+end_src
 
 ** Tetris
