@@ -276,7 +276,7 @@ Add helpers to switch between themes.
   "Load light theme."
   (interactive)
   (disable-all-themes)
-  (load-theme 'doom-flatwhite t))
+  (load-theme 'doom-solarized-light t))
 
 (defun load-dark-theme ()
   "Load dark theme."
@@ -662,11 +662,11 @@ Magit is the Git package.
   :defer
   :ensure t
   :config
-  ;; (add-hook 'git-commit-setup-hook
-  ;;           (lambda ()
-  ;;             (add-hook 'with-editor-post-finish-hook
-  ;;                       #'kill-magit-diff-buffer-in-current-repo
-  ;;                       nil t)))
+  (add-hook 'git-commit-setup-hook
+            (lambda ()
+              (add-hook 'with-editor-post-finish-hook
+                        #'kill-magit-diff-buffer-in-current-repo
+                        nil t)))
   (evil-define-key 'normal magit-status-mode-map
     "q" #'mu-magit-kill-buffers)
   (add-hook 'magit-post-refresh-hook
@@ -748,7 +748,8 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-ä") 'split-window-right)
 (evil-define-key 'normal 'global (kbd "C-ö") 'split-window-below)
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
-(evil-define-key 'normal 'global (kbd "å") 'yank-from-kill-ring)
+(evil-define-key 'normal 'global (kbd "å") 'consult-yank-pop)
+(evil-define-key 'normal 'global (kbd "M-ö") 'evil-end-of-line) ;; $ is too unwieldy on a Scandinavian keyboard
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
 (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
 (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
@@ -1074,31 +1075,6 @@ This makes etags work, i.e. allows us to jump to definitions.
   (push "build" counsel-etags-ignore-directories))
 #+end_src
 
-* Projectile
-
-#+begin_src emacs-lisp :tangle yes
-(use-package projectile
-  :ensure t
-  :init (projectile-global-mode)
-  :config
-  (setq projectile-project-search-path '("~/dev"))
-  (setq projectile-cache-file (expand-file-name "etc/projectile.cache" user-emacs-directory))
-  (setq projectile-dirconfig-file (expand-file-name "etc/.projectile" user-emacs-directory))
-  (setq projectile-known-projects-file (expand-file-name "etc/projectile.bookmarks.eld" user-emacs-directory))
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map))
-#+end_src
-
-=ibuffer-projectile= groups the open buffers in ibuffer by project.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package ibuffer-projectile
-  :hook ((ibuffer . (lambda ()
-                      (ibuffer-projectile-set-filter-groups)
-                      (unless (eq ibuffer-sorting-mode 'alphabetic)
-                        (ibuffer-do-sort-by-alphabetic)))))
-  :ensure t)
-#+end_src
-
 * Editorconfig
 
 Pick up formatting settings from =.editorconfig= files.
@@ -1118,7 +1094,7 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
 (use-package ripgrep
   :ensure t
   :config
-  (evil-define-key 'normal 'global "Ä" 'projectile-ripgrep))
+  (evil-define-key 'normal 'global "Ä" #'consult-ripgrep))
 #+end_src
 
 * Wgrep
@@ -1504,7 +1480,7 @@ Enable =recentf-mode=.
     (kbd "M-J") #'org-shiftmetadown
     (kbd "§") #'verb-send-request-on-point-other-window-stay)
   (setq org-directory "~/Dropbox/org/")
-  (setq org-default-notes-file (concat org-directory "/inbox.org"))
+  (setq org-default-notes-file (concat org-directory "inbox.org"))
   (setq org-archive-location "archive/Archive_%s::")
   (setq org-ellipsis " ▾")
   (setq org-src-fontify-natively t)
