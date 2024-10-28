@@ -355,6 +355,12 @@ Make the titlebar transparent.
 (set-frame-parameter nil 'ns-transparent-titlebar t)
 #+end_src
 
+We are using a dark color theme, which the title bar should reflect too.
+
+#+begin_src emacs-lisp :tangle yes
+(set-frame-parameter nil 'ns-appearance 'dark)
+#+end_src
+
 Remove the icon from the titlebar.
 
 #+begin_src emacs-lisp :tangle yes
@@ -391,13 +397,6 @@ Setup =doom-modeline=.
 #+begin_src emacs-lisp :tangle yes
 (use-package hide-mode-line
   :ensure t)
-#+end_src
-
-Tweak the titlebar.
-
-#+begin_src emacs-lisp :tangle yes
-(set-frame-parameter nil 'ns-appearance 'dark)
-(set-frame-parameter nil 'ns-transparent-titlebar nil)
 #+end_src
 
 Use [[https://github.com/wolray/symbol-overlay][symbol-overlay]] mode.
