@@ -97,19 +97,19 @@ Configure =use-package=.
 Disable unnecessary stuff.
 
 #+begin_src emacs-lisp :tangle yes
-(setq inhibit-startup-screen t)
 (blink-cursor-mode -1)
-(setq ring-bell-function 'ignore)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(setq inhibit-startup-screen t)
+(setq ring-bell-function 'ignore)
 (setq use-short-answers t)
 (setq initial-scratch-message "")
 #+end_src
 
-Set 50MB as the limit for garbage collection.
+Set 10MB as the limit for garbage collection.
 
 #+begin_src emacs-lisp :tangle yes
-(setq gc-cons-threshold 50000000)
+(setq gc-cons-threshold 10000000)
 #+end_src
 
 Warn when opening files bigger than 100MB.
@@ -417,6 +417,19 @@ Setup line numbers.
 
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'conf-mode-hook #'display-line-numbers-mode)
+#+end_src
+
+Create missing parent folders automatically. Source: [[https://github.com/bbatsov/emacs.d/blob/master/init.el][bbatsov]].
+
+#+begin_src emacs-lisp :tangle yes
+;; auto-create missing folders
+(defun er-auto-create-missing-dirs ()
+  "Make missing parent directories automatically."
+  (let ((target-dir (file-name-directory buffer-file-name)))
+    (unless (file-exists-p target-dir)
+      (make-directory target-dir t))))
+
+(add-to-list 'find-file-not-found-functions #'er-auto-create-missing-dirs)
 #+end_src
 
 We don't want line numbers to be shown in org-mode buffers, apart from this one. Here, also =electric-pair-mode= should be enabled.
