@@ -97,7 +97,7 @@ Configure =use-package=.
 Disable unnecessary stuff.
 
 #+begin_src emacs-lisp :tangle yes
-(blink-cursor-mode -1)
+(blink-cursor-mode t) ;; Trying out how this feels for now
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq inhibit-startup-screen t)
@@ -1233,7 +1233,6 @@ Writable grep. This makes possible to use workflows for search and replace like:
 #+begin_src emacs-lisp :tangle yes
 (use-package consult
   :ensure
-  :after projectile
   :bind (("C-å" . consult-line)
          ("C-c M-x" . consult-mode-command)
          ("C-x b" . consult-buffer)
@@ -1248,11 +1247,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
          :map minibuffer-local-map
          ("M-s" . consult-history)                 ;; orig. next-matching-history-element
          ("M-r" . consult-history)
-         :map projectile-command-map
-         ("b" . consult-project-buffer)
          :map prog-mode-map
          ("M-g o" . consult-imenu))
-
   :init
   (defun remove-items (x y)
     (setq y (cl-remove-if (lambda (item) (memq item x)) y))
@@ -1264,13 +1260,6 @@ Writable grep. This makes possible to use workflows for search and replace like:
         xref-show-definitions-function #'consult-xref)
   (setq consult-narrow-key "<")
   (setq consult-line-start-from-top nil))
-
-(use-package consult-ag
-  :ensure
-  :defer
-  :bind (:map projectile-command-map
-              ("s s" . consult-ag)
-              ("s g" . consult-grep)))
 #+end_src
 
 ** Avy
