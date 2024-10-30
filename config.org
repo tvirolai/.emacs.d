@@ -1249,13 +1249,13 @@ Writable grep. This makes possible to use workflows for search and replace like:
          ("M-r" . consult-history)
          :map prog-mode-map
          ("M-g o" . consult-imenu))
+
   :init
   (defun remove-items (x y)
     (setq y (cl-remove-if (lambda (item) (memq item x)) y))
     y)
 
   ;; Any themes that are incomplete/lacking don't work with centaur tabs/solair mode
-  (setq consult-project-function (lambda (_) (projectile-project-root)))
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
   (setq consult-narrow-key "<")
@@ -1438,7 +1438,8 @@ Enable =recentf-mode=.
   :defer
   :custom
   (fill-column 100)
-  (org-pretty-entities t)
+  ;; Disable the underscore-to-subscript thing.
+  (org-pretty-entities nil)
   (org-log-done 'time)
   (org-log-into-drawer t)
   (org-startup-folded 'nofold)
@@ -1678,7 +1679,7 @@ Enable =recentf-mode=.
      ""))
   (org-agenda-prefix-format
    '((agenda . " %-4e %i %-12:c%?-12t% s ")
-     (todo . " %i %-10:c %-5e %(gopar/get-schedule-or-deadline-if-available)")
+     (todo . " %i %-10:c %-5e %(get-schedule-or-deadline-if-available)")
      (tags . " %i %-12:c")
      (search . " %i %-12:c")))
   ;; Lets define some custom cmds in agenda menu
@@ -1717,7 +1718,7 @@ Enable =recentf-mode=.
        (org-agenda-include-diary nil)))))
   :init
   ;; Originally from here: https://stackoverflow.com/a/59001859/2178312
-  (defun gopar/get-schedule-or-deadline-if-available ()
+  (defun get-schedule-or-deadline-if-available ()
     (let ((scheduled (org-get-scheduled-time (point)))
           (deadline (org-get-deadline-time (point))))
       "   ")))
