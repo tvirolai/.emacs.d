@@ -273,21 +273,23 @@ Use =doom-dracula= theme.
 Add helpers to switch between themes.
 
 #+begin_src emacs-lisp :tangle yes
-(defun disable-all-themes ()
+(defun tv/disable-all-themes ()
   "Disable all enabled custom themes."
   (mapc #'disable-theme custom-enabled-themes))
 
-(defun load-light-theme ()
+(defun tv/load-light-theme ()
   "Load light theme."
   (interactive)
-  (disable-all-themes)
-  (load-theme 'doom-solarized-light t))
+  (tv/disable-all-themes)
+  (load-theme 'doom-solarized-light t)
+  (set-frame-parameter nil 'ns-appearance 'light))
 
-(defun load-dark-theme ()
+(defun tv/load-dark-theme ()
   "Load dark theme."
   (interactive)
-  (disable-all-themes)
-  (load-theme 'doom-dracula t))
+  (tv/disable-all-themes)
+  (load-theme 'doom-dracula t)
+  (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
 
 Setup font.
