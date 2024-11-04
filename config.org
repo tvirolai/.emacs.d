@@ -36,7 +36,6 @@ Configure path.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package exec-path-from-shell
-  :if work-laptop-p
   :ensure t
   :init
   (when (memq window-system '(mac ns x))
@@ -128,6 +127,12 @@ Increase kill-ring capacity.
 
 #+begin_src emacs-lisp :tangle yes
 (setq kill-ring-max 1000)
+#+end_src
+
+Replace a selection with yanked content.
+
+#+begin_src emacs-lisp :tangle yes
+(delete-selection-mode 1)
 #+end_src
 
 Shut Emacs down when I'm asking, even if processes are running.
