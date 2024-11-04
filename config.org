@@ -669,13 +669,13 @@ This maybe fixes some indentation issues in org mode.
 Magit is the Git package.
 
 #+begin_src emacs-lisp :tangle yes
-(defun kill-magit-diff-buffer-in-current-repo (&rest _)
+(defun tv/kill-magit-diff-buffer-in-current-repo (&rest _)
   "Delete the magit-diff buffer related to the current repo."
   (let ((magit-diff-buffer-in-current-repo
          (magit-mode-get-buffer 'magit-diff-mode)))
     (kill-buffer magit-diff-buffer-in-current-repo)))
 
-(defun mu-magit-kill-buffers ()
+(defun tv/mu-magit-kill-buffers ()
   "Restore window configuration and kill all Magit buffers."
   (interactive)
   (let ((buffers (magit-mode-get-buffers)))
@@ -689,10 +689,10 @@ Magit is the Git package.
   (add-hook 'git-commit-setup-hook
             (lambda ()
               (add-hook 'with-editor-post-finish-hook
-                        #'kill-magit-diff-buffer-in-current-repo
+                        #'tv/kill-magit-diff-buffer-in-current-repo
                         nil t)))
   (evil-define-key 'normal magit-status-mode-map
-    "q" #'mu-magit-kill-buffers)
+    "q" #'tv/mu-magit-kill-buffers)
   (add-hook 'magit-post-refresh-hook
             #'git-gutter:update-all-windows))
 
@@ -933,7 +933,7 @@ Set keybindings.
 
 (setq lsp-sqls-workspace-config-path nil)
 
-(defun maybe-highlight-ms-sql-kws ()
+(defun tv/maybe-highlight-ms-sql-kws ()
   "Highlight MS SQL keywords when it's certain that's the dialect we're
 working with."
   (when (cl-search "umaija" (buffer-file-name))
@@ -949,7 +949,7 @@ working with."
   :defer
   :config
   (setq lsp-sqls-workspace-config-path nil)
-  (maybe-highlight-ms-sql-kws))
+  (tv/maybe-highlight-ms-sql-kws))
 #+end_src
 
 Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mode.
@@ -1529,7 +1529,7 @@ Enable =recentf-mode=.
 
 ;; From elken
 
-(defun org-archive-done-tasks ()
+(defun tv/org-archive-done-tasks ()
   "Attempt to archive all done tasks in file"
   (interactive)
   (org-map-entries
@@ -1538,7 +1538,7 @@ Enable =recentf-mode=.
      (setq org-map-continue-from (org-element-property :begin (org-element-at-point))))
    "/DONE" 'file))
 
-(defun org-remove-kill-tasks ()
+(defun tv/org-remove-kill-tasks ()
   (interactive)
   (org-map-entries
    (lambda ()
@@ -1548,8 +1548,8 @@ Enable =recentf-mode=.
    "/KILL" 'file))
 
 (evil-define-key 'normal org-mode-map
-  (kbd "C-c DEL a") #'org-archive-done-tasks
-  (kbd "C-c DEL k") #'org-remove-kill-tasks)
+  (kbd "C-c DEL a") #'tv/org-archive-done-tasks
+  (kbd "C-c DEL k") #'tv/org-remove-kill-tasks)
 
 (use-package hl-todo
   :ensure t
@@ -1858,7 +1858,7 @@ Eshell-autosuggest.
 Copied from [[https://github.com/abrochard/emacs-config/blob/master/configuration.org][abrochard]].
 
 #+begin_src emacs-lisp :tangle yes
-(defun eshell-here ()
+(defun tv/eshell-here ()
   "Opens up a new shell in the directory associated with the
     current buffer's file. The eshell is renamed to match that
     directory to make multiple eshell windows easier."
@@ -1870,7 +1870,7 @@ Copied from [[https://github.com/abrochard/emacs-config/blob/master/configuratio
     (insert (concat "ls"))
     (eshell-send-input)))
 
-(bind-key "C-!" 'eshell-here)
+(bind-key "C-!" 'tv/eshell-here)
 #+end_src
 
 ** Vterm
@@ -2101,7 +2101,7 @@ Read a GPG passphrase from environment variable to a register for easier access.
 Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsconfig/.
 
 #+begin_src emacs-lisp :tangle yes
-(defun kill-other-buffers ()
+(defun tv/kill-other-buffers ()
   "Keep only the current buffer and scratch buffer, kill all others."
   (interactive)
   (let ((buffers-to-keep (cons (buffer-name)
@@ -2114,23 +2114,23 @@ Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsc
   (message "Killed other buffers"))
 #+end_src
 
-** Quicky visit and evaluate configuration
+** Quickly visit and evaluate configuration
 
 Source: https://github.com/daedreth/UncleDavesEmacs.
 
 #+begin_src emacs-lisp :tangle yes
-(defun config-visit ()
+(defun tv/config-visit ()
   "Open the configuration file."
   (interactive)
   (find-file (expand-file-name "config.org" user-emacs-directory)))
 
-(defun config-reload ()
+(defun tv/config-reload ()
   "Reload config.org."
   (interactive)
   (org-babel-load-file (expand-file-name "config.org" user-emacs-directory)))
 
-(global-set-key (kbd "C-c e") 'config-visit)
-(global-set-key (kbd "C-c r") 'config-reload)
+(global-set-key (kbd "C-c e") 'tv/config-visit)
+(global-set-key (kbd "C-c r") 'tv/config-reload)
 #+end_src
 
 ** Sudo current buffer
@@ -2138,7 +2138,7 @@ Source: https://github.com/daedreth/UncleDavesEmacs.
 From [[https://github.com/abrochard/emacs-config][abrochard]].
 
 #+begin_src emacs-lisp :tangle yes
-(defun sudo ()
+(defun tv/sudo ()
   "Use TRAMP to `sudo' the current buffer"
   (interactive)
   (when buffer-file-name
@@ -2152,7 +2152,7 @@ From [[https://github.com/abrochard/emacs-config][abrochard]].
 From [[https://github.com/abrochard/emacs-config][abrochard]].
 
 #+begin_src emacs-lisp :tangle yes
-(defun generate-scratch-buffer ()
+(defun tv/generate-scratch-buffer ()
   "Create and switch to a temporary scratch buffer with a random
      name."
   (interactive)
@@ -2164,7 +2164,7 @@ From [[https://github.com/abrochard/emacs-config][abrochard]].
 From [[https://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/][bbatsov]].
 
 #+begin_src emacs-lisp :tangle yes
-(defun copy-filename ()
+(defun tv/copy-filename ()
   "Copy the current buffer file name to the clipboard."
   (interactive)
   (let ((filename (if (equal major-mode 'dired-mode)
