@@ -362,7 +362,7 @@ Make the titlebar transparent.
 (set-frame-parameter nil 'ns-transparent-titlebar t)
 #+end_src
 
-We are using a dark color theme, which the title bar should reflect too.
+We are using a dark color theme by default, which the title bar should reflect too.
 
 #+begin_src emacs-lisp :tangle yes
 (set-frame-parameter nil 'ns-appearance 'dark)
