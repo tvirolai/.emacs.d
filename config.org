@@ -270,24 +270,29 @@ Use =doom-dracula= theme.
   (load-theme 'doom-dracula t))
 #+end_src
 
+Disable custom themes before loading a new one.
+
+#+begin_src emacs-lisp :tangle yes
+(defun disable-custom-themes (&optional theme no-confirm no-enable)
+  (mapc #'disable-theme custom-enabled-themes))
+
+(advice-add 'load-theme :before #'disable-custom-themes)
+#+end_src
+
 Add helpers to switch between themes.
 
 #+begin_src emacs-lisp :tangle yes
-(defun tv/disable-all-themes ()
-  "Disable all enabled custom themes."
-  (mapc #'disable-theme custom-enabled-themes))
-
 (defun tv/load-light-theme ()
   "Load light theme."
   (interactive)
-  (tv/disable-all-themes)
+  (tv/disable-custom-themes)
   (load-theme 'doom-solarized-light t)
   (set-frame-parameter nil 'ns-appearance 'light))
 
 (defun tv/load-dark-theme ()
   "Load dark theme."
   (interactive)
-  (tv/disable-all-themes)
+  (tv/disable-custom-themes)
   (load-theme 'doom-dracula t)
   (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
@@ -1194,7 +1199,11 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (setq cape-dabbrev-min-length 2)
   (setq cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  (add-to-list 'completion-at-point-functions #'cape-history)
   (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
 
   (defun corfu-enable-always-in-minibuffer ()
     "Enable Corfu in the minibuffer if Vertico/Mct are not active."
@@ -1566,7 +1575,12 @@ Enable =recentf-mode=.
   :custom
   (org-appear-autoemphasis t)
   (org-appear-autosubmarkers t)
-  :hook (org-mode . org-appear-mode))
+  :hook (org-mode . org-appear-mode)
+  :config
+  (setq org-hide-emphasis-markers t)  ;; Must be activated for org-appear to work
+  (setq org-appear-autoemphasis   t   ;; Show bold, italics, verbatim, etc.
+        org-appear-autolinks      t   ;; Show links
+        org-appear-autosubmarkers t))
 #+end_src
 
 ** Evil-org
