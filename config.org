@@ -285,14 +285,14 @@ Add helpers to switch between themes.
 (defun tv/load-light-theme ()
   "Load light theme."
   (interactive)
-  (tv/disable-custom-themes)
+  (disable-custom-themes)
   (load-theme 'doom-solarized-light t)
   (set-frame-parameter nil 'ns-appearance 'light))
 
 (defun tv/load-dark-theme ()
   "Load dark theme."
   (interactive)
-  (tv/disable-custom-themes)
+  (disable-custom-themes)
   (load-theme 'doom-dracula t)
   (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
@@ -784,7 +784,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
 (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
 (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
-(evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left)
+(evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left) ;; Yes! I did it, rebound C-h. SPC h in normal mode is the alternative.
 (evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
