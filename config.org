@@ -220,6 +220,12 @@ Store miscellaneous files under =/etc=.
 (setq bookmark-default-file (expand-file-name "etc/bookmarks" user-emacs-directory))
 #+end_src
 
+Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is useful for example when yanking stuff from the kill-ring using M-y.
+
+#+begin_src emacs-lisp :tangle yes
+(setq enable-recursive-minibuffers t)
+#+end_src
+
 Set keybindings for profiler.
 
 #+begin_src emacs-lisp :tangle yes
@@ -660,15 +666,6 @@ This maybe fixes some indentation issues in org mode.
   (advice-add fn
               :after
               #'(lambda (&rest _args) (balance-windows))))
-#+end_src
-
-* Evil-multiedit
-
-#+begin_src emacs-lisp :tangle yes
-(use-package evil-multiedit
-  :ensure t
-  :defer
-  :config (evil-multiedit-default-keybinds))
 #+end_src
 
 * Version control
@@ -1199,7 +1196,6 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (setq cape-dabbrev-min-length 2)
   (setq cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-dict)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-to-list 'completion-at-point-functions #'cape-history)
   (add-to-list 'completion-at-point-functions #'cape-file)
