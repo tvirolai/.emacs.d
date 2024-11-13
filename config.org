@@ -32,6 +32,12 @@ Is this the work laptop or something else?
   (equal (system-name) "siilim211207.local"))
 #+end_src
 
+Set configuration file name for later reference.
+
+#+begin_src emacs-lisp :tangle yes
+(defconst config-file "config.org")
+#+end_src
+
 Configure path.
 
 #+begin_src emacs-lisp :tangle yes
@@ -461,7 +467,7 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'org-mode-hook #'(lambda ()
                              (interactive)
-                             (when (cl-search "config.org" (buffer-name))
+                             (when (cl-search config-file (buffer-name))
                                (electric-pair-mode)
                                (display-line-numbers-mode))))
 #+end_src
@@ -810,7 +816,6 @@ Easy buffer switching.
 (use-package flycheck
   :ensure
   :defer
-  :hook ((python-mode . flycheck-mode))
   :bind (:map flycheck-mode-map
               ("C-c C-n" . flycheck-next-error)
               ("C-c C-p" . flycheck-previous-error)))
@@ -1043,10 +1048,10 @@ Elisp keybindings.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package python-black
-  :demand t
+  :ensure t
   :after python
-  :hook ((python-mode . python-black-on-save-mode-enable-dwim)
-         (python-ts-mode . python-black-on-save-mode-enable-dwim)))
+  :hook ((python-mode . python-black-on-save-mode)
+         (python-ts-mode . python-black-on-save-mode)))
 
 (add-hook 'python-mode-hook #'lsp)
 (add-hook 'python-ts-mode-hook #'lsp)
@@ -1811,6 +1816,7 @@ Use ansi-colors in shell.
   :hook ((eshell-mode . hide-mode-line-mode)
          (eshell-mode . (lambda ()
                           (setenv "TERM" "xterm-256color")
+                          ;; (evil-set-initial-state 'emacs)
                           (setq-local completion-styles '(basic))
                           (setq-local corfu-count 10)
                           (setq-local corfu-auto nil)
@@ -2134,12 +2140,12 @@ Source: https://github.com/daedreth/UncleDavesEmacs.
 (defun tv/config-visit ()
   "Open the configuration file."
   (interactive)
-  (find-file (expand-file-name "config.org" user-emacs-directory)))
+  (find-file (expand-file-name config-file user-emacs-directory)))
 
 (defun tv/config-reload ()
   "Reload config.org."
   (interactive)
-  (org-babel-load-file (expand-file-name "config.org" user-emacs-directory)))
+  (org-babel-load-file (expand-file-name config-file user-emacs-directory)))
 
 (global-set-key (kbd "C-c e") 'tv/config-visit)
 (global-set-key (kbd "C-c r") 'tv/config-reload)
@@ -2157,6 +2163,17 @@ From [[https://github.com/abrochard/emacs-config][abrochard]].
     (find-alternate-file
      (concat "/sudo:root@localhost:"
              buffer-file-name))))
+#+end_src
+
+** Sort buffer
+
+Sort all lines in a buffer.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/sort-buffer()
+  "Select the lines in a buffer."
+  (interactive)
+  (sort-lines nil (point-min) (point-max)))
 #+end_src
 
 ** Generate scratch buffer
