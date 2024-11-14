@@ -790,10 +790,16 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "å") 'consult-yank-pop)
 (evil-define-key 'normal 'global (kbd "M-ö") 'evil-end-of-line) ;; $ is too unwieldy on a Scandinavian keyboard
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
+
 (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
 (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
 (evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left) ;; Yes! I did it, rebound C-h. SPC h in normal mode is the alternative.
 (evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
+(evil-define-key 'insert 'global (kbd "C-j") 'evil-window-next)
+(evil-define-key 'insert 'global (kbd "C-k") 'evil-window-prev)
+(evil-define-key 'insert 'global (kbd "C-h") 'evil-window-left)
+(evil-define-key 'insert 'global (kbd "C-l") 'evil-window-right)
+
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
@@ -806,6 +812,19 @@ Frame management.
 (evil-define-key 'normal 'global (kbd "M-§") 'other-frame)
 (evil-define-key 'normal 'global (kbd "M-n") 'make-frame)
 (evil-define-key 'normal 'global (kbd "M-°") 'delete-frame)
+#+end_src
+
+Window management. Source: [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager][Mastering Emacs]].
+
+#+begin_src emacs-lisp :tangle yes
+(setq switch-to-buffer-obey-display-actions t)
+(setq switch-to-buffer-in-dedicated-window 'pop)
+
+(defun tv/toggle-window-dedication ()
+  "Toggles window dedication in the selected window."
+  (interactive)
+  (set-window-dedicated-p (selected-window)
+     (not (window-dedicated-p (selected-window)))))
 #+end_src
 
 Easy buffer switching.
