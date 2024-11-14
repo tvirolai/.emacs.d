@@ -2228,6 +2228,34 @@ From [[https://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/][b
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 #+end_src
 
+** Base64 wrappers
+
+When doing lots of base64 encoding and decoding, it's more ergonomical to process a word under point with a single command rather than always define a region first.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/apply-fn-to-word-under-point (fn)
+  (let* ((point-loc (point))
+         (bounds (bounds-of-thing-at-point 'symbol))
+         (text   (buffer-substring-no-properties (car bounds) (cdr bounds))))
+    (when bounds
+      (delete-region (car bounds) (cdr bounds))
+      (insert (funcall fn text))
+      (goto-char point-loc))))
+
+(defun tv/base64-encode-word ()
+  "Base64 encode the word under point."
+  (interactive)
+  (tv/apply-fn-to-word-under-point 'base64-encode-string))
+
+(defun tv/base64-decode-word ()
+  "Base64 decode the word under point."
+  (interactive)
+  (tv/apply-fn-to-word-under-point 'base64-decode-string))
+
+(evil-define-key 'normal 'global (kbd "M-s-e") 'tv/base64-encode-word)
+(evil-define-key 'normal 'global (kbd "M-s-d") 'tv/base64-decode-word)
+#+end_src
+
 ** An inspirational quote
 
 Insert a random 4-line quote from a corpus file on top of the scratch buffer. The corpus on my work laptop is a file containing all the lyrics of Manowar, on the private machine I have the screenplay for The Room.
