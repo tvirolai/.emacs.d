@@ -99,10 +99,15 @@ Configure =use-package=.
 (eval-when-compile (require 'use-package))
 #+end_src
 
+The cursor may blink.
+
+#+begin_src emacs-lisp :tangle yes
+(blink-cursor-mode t)
+#+end_src
+
 Disable unnecessary stuff.
 
 #+begin_src emacs-lisp :tangle yes
-(blink-cursor-mode t) ;; Trying out how this feels for now
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (setq inhibit-startup-screen t)
