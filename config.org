@@ -1081,10 +1081,13 @@ Elisp keybindings.
   :ensure t
   :after python
   :hook ((python-mode . python-black-on-save-mode)
-         (python-ts-mode . python-black-on-save-mode)))
+         (python-mode . lsp)
+         (python-ts-mode . python-black-on-save-mode)
+         (python-ts-mode . lsp))
+  :config (setq lsp-pylsp-plugins-flake8-ignore '("D103" "D100" "D105")))
 
-(add-hook 'python-mode-hook #'lsp)
-(add-hook 'python-ts-mode-hook #'lsp)
+;; (add-hook 'python-mode-hook #'lsp)
+;; (add-hook 'python-ts-mode-hook #'lsp)
 #+end_src
 
 * LSP-mode
