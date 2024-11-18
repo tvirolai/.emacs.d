@@ -382,6 +382,7 @@ Make the titlebar transparent.
 
 #+begin_src emacs-lisp :tangle yes
 (set-frame-parameter nil 'ns-transparent-titlebar t)
+(add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 #+end_src
 
 We are using a dark color theme by default, which the title bar should reflect too.
@@ -581,8 +582,6 @@ Vim keybindings here.
   :demand t
   :bind (("<escape>" . keyboard-escape-quit))
   :init
-  ;; allows for using cgn
-  ;; (setq evil-search-module 'evil-search)
   (setq evil-want-keybinding nil)
   ;; no vim insert bindings
   :config
@@ -615,7 +614,8 @@ Vim keybindings here.
   :hook (after-init . global-undo-tree-mode)
   :config
   ;; Prevent undo tree files from polluting your git repo
-  (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir))))
+  (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir)))
+  (setq undo-tree-enable-undo-in-region nil))
 #+end_src
 
 Evil-surround.
@@ -660,8 +660,8 @@ Comment out / in stuff easily.
   (defalias #'forward-evil-word #'forward-evil-symbol)
   ;; make evil-search-word look for symbol rather than word boundaries
   (setq-default evil-symbol-word-search t)
-  (define-key isearch-mode-map (kbd "<down>") 'isearch-ring-advance)
-  (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat))
+  (define-key isearch-mode-map (kbd "<up>") 'isearch-ring-retreat)
+  (define-key isearch-mode-map (kbd "<down>") 'isearch-ring-advance))
 #+end_src
 
 This maybe fixes some indentation issues in org mode.
@@ -832,6 +832,12 @@ Easy buffer switching.
 #+begin_src emacs-lisp :tangle yes
 (evil-define-key 'normal 'global (kbd "C-M-l") 'next-buffer)
 (evil-define-key 'normal 'global (kbd "C-M-h") 'previous-buffer)
+#+end_src
+
+Jump to previous positions from the mark ring by repeating the command.
+
+#+begin_src emacs-lisp :tangle yes
+(setq set-mark-command-repeat-pop t)
 #+end_src
 
 * Flycheck
@@ -1468,8 +1474,11 @@ Enable =recentf-mode=.
 
 ** XML
 
+Use 4 spaces as the default indentation level.
+
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'nxml-mode-hook #'display-line-numbers-mode)
+(setq nxml-child-indent 4 nxml-attribute-indent 4)
 #+end_src
 
 * Org-mode
@@ -1919,6 +1928,7 @@ Copied from [[https://github.com/abrochard/emacs-config/blob/master/configuratio
 
 #+begin_src emacs-lisp :tangle yes
 (use-package vterm
+  :hook (vterm-mode . hide-mode-line-mode)
   :ensure t
   :defer
   :custom
