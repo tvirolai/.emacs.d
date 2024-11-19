@@ -1282,7 +1282,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
 
 #+begin_src emacs-lisp :tangle yes
 (use-package consult
-  :ensure
+  :ensure t
   :bind (("C-å" . consult-line)
          ("C-c M-x" . consult-mode-command)
          ("C-x b" . consult-buffer)
@@ -2349,15 +2349,22 @@ newlines at the end of the message."
 ** Open a Jira ticket in the browser
 
 #+begin_src emacs-lisp :tangle yes
+(defvar visited-jira-issues '())
+
 (when work-laptop-p
   (defun tv/jira ()
     "Open a Jira ticket in browser. Accepts either a prefixed or non-prefixed input."
     (interactive)
-    (let* ((ticket-number (read-string "Tikettinumero: "))
-           (url (concat "https://varmajira.eficode.com/browse/" (if (cl-search "-" ticket-number)
-                                                                    ticket-number
-                                                                  (concat "UMP-" ticket-number)))))
-      (browse-url url))))
+    (let* ((ticket-number (if visited-jira-issues
+                              (completing-read "Tikettinumero: " visited-jira-issues)
+                            (read-string "Tikettinumero: ")))
+           (parsed-ticket (if (cl-search "-" ticket-number)
+                              ticket-number
+                            (concat "UMP-" ticket-number)))
+           (url (concat "https://varmajira.eficode.com/browse/" parsed-ticket)))
+      (progn
+        (push parsed-ticket visited-jira-issues)
+        (browse-url url)))))
 #+end_src
 
 ** Tetris
