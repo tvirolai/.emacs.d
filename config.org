@@ -389,6 +389,7 @@ We are using a dark color theme by default, which the title bar should reflect t
 
 #+begin_src emacs-lisp :tangle yes
 (set-frame-parameter nil 'ns-appearance 'dark)
+(add-to-list 'default-frame-alist '(ns-appearance . 'dark))
 #+end_src
 
 Remove the icon from the titlebar.
@@ -2349,9 +2350,10 @@ newlines at the end of the message."
 ** Open a Jira ticket in the browser
 
 #+begin_src emacs-lisp :tangle yes
-(defvar visited-jira-issues '())
-
 (when work-laptop-p
+
+  (defvar visited-jira-issues '())
+
   (defun tv/jira ()
     "Open a Jira ticket in browser. Accepts either a prefixed or non-prefixed input."
     (interactive)
