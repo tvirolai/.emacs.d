@@ -629,6 +629,16 @@ Evil-surround.
   (global-evil-surround-mode 1))
 #+end_src
 
+Evil-matchit.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package evil-matchit
+  :ensure t
+  :after evil
+  :config
+  (global-evil-matchit-mode 1))
+#+end_src
+
 Comment out / in stuff easily.
 
 #+begin_src emacs-lisp :tangle yes
@@ -1221,7 +1231,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
   (corfu-auto t)                 ;; Enable auto completion
   (corfu-auto-prefix 2)
-  (corfu-auto-delay 0.2)
+  (corfu-auto-delay 0.4)
   (corfu-on-exact-match 'insert) ;; Insert when there's only one match
   (corfu-quit-no-match t)        ;; Quit when there is no bind
   :init
