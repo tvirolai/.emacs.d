@@ -110,6 +110,7 @@ Disable unnecessary stuff.
 #+begin_src emacs-lisp :tangle yes
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
+(menu-bar-mode -1)
 (setq inhibit-startup-screen t)
 (setq ring-bell-function 'ignore)
 (setq use-short-answers t)
@@ -974,6 +975,20 @@ Set keybindings.
   "Ö" #'cider-find-var
   "q" #'cider-popup-buffer-quit
   "K" #'cider-doc)
+#+end_src
+
+** Haskell
+
+#+begin_src emacs-lisp :tangle yes
+(use-package haskell-mode
+  :ensure t
+  :defer
+  :hook ((haskell-mode . lsp)))
+
+(use-package lsp-haskell
+  :after haskell-mode
+  :ensure t
+  :defer)
 #+end_src
 
 ** SQL
