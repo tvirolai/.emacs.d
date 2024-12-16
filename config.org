@@ -979,11 +979,15 @@ Set keybindings.
 
 ** Haskell
 
+Haskell configs. Locally remap the 'font-lock-keyword-face attribute, since slanted keywords (especially operators like pipes for guards) look silly in Haskell.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package haskell-mode
   :ensure t
   :defer
-  :hook ((haskell-mode . lsp)))
+  :hook ((haskell-mode . lsp)
+         (haskell-mode . (lambda ()
+                           (face-remap-add-relative 'font-lock-keyword-face nil :slant 'normal)))))
 
 (use-package lsp-haskell
   :after haskell-mode
