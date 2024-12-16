@@ -979,7 +979,7 @@ Set keybindings.
 
 ** Haskell
 
-Haskell configs. Locally remap the 'font-lock-keyword-face attribute, since slanted keywords (especially operators like pipes for guards) look silly in Haskell.
+Haskell configs. Locally remap the =font-lock-keyword-face= attribute, since slanted keywords (especially operators like pipes for guards) look silly in Haskell.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package haskell-mode
@@ -2197,6 +2197,8 @@ Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsc
                 (kill-buffer buffer))))
           (buffer-list)))
   (message "Killed other buffers"))
+
+(global-set-key (kbd "C-c å") 'tv/kill-other-buffers)
 #+end_src
 
 ** Quickly visit and evaluate configuration
@@ -2374,6 +2376,8 @@ newlines at the end of the message."
     (tv/scratch-message-insert msg)))
 
 (tv/reset-scratch-message)
+
+(global-set-key (kbd "C-c ä") 'tv/reset-scratch-message)
 #+end_src
 
 ** Open a Jira ticket in the browser
