@@ -47,6 +47,7 @@ Configure path.
   (when (memq window-system '(mac ns x))
     (require 'exec-path-from-shell)
     (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS" "VARMA_GPG_SYMMETRIC_PASSPHRASE"
+                   "CLAUDE_API_KEY"
                    "VARMA_GPG_SYMMETRIC_PASSPHRASE_PROD" "VARMA_ARTIFACTORY_USERNAME" "VARMA_ARTIFACTORY_PASSWORD" "VARMA_ELAMA_BOT_USERNAME" "VARMA_ELAMA_BOT_PASSWORD"))
       (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
@@ -852,11 +853,29 @@ Jump to previous positions from the mark ring by repeating the command.
 (setq set-mark-command-repeat-pop t)
 #+end_src
 
+* AI
+
+** Gptel
+
+Let's try whether this could be useful. Gptel is a light-weight LLM client supporting multiple backends.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package gptel
+  :ensure t
+  :defer
+  :config
+  (setq
+   gptel-model 'claude-3-5-sonnet-20241022
+   gptel-backend (gptel-make-anthropic "Claude"
+                   :stream t
+                   :key (getenv "CLAUDE_API_KEY"))))
+#+end_src
+
 * Flycheck
 
 #+begin_src emacs-lisp :tangle yes
 (use-package flycheck
-  :ensure
+  :ensure t
   :defer
   :bind (:map flycheck-mode-map
               ("C-c C-n" . flycheck-next-error)
