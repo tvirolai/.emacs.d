@@ -861,6 +861,7 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 
 #+begin_src emacs-lisp :tangle yes
 (use-package gptel
+  :if work-laptop-p
   :ensure t
   :defer
   :config
@@ -1006,6 +1007,7 @@ Haskell configs. Locally remap the =font-lock-keyword-face= attribute, since sla
   :defer
   :hook ((haskell-mode . lsp)
          (haskell-mode . (lambda ()
+                           (setq lsp-enable-completion-at-point nil)
                            (face-remap-add-relative 'font-lock-keyword-face nil :slant 'normal)))))
 
 (use-package lsp-haskell
