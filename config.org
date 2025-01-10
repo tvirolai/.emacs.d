@@ -406,10 +406,17 @@ Suppress compilation warnings.
 (setq native-comp-async-report-warnings-errors nil)
 #+end_src
 
-Scroll smoothly when using a mouse or trackpad. Which is basically never.
+Scroll smoothly when using a mouse or trackpad. While this for me equals basically never, the [[https://github.com/jdtsmith/ultra-scroll][ultra-scroll]] package seems to be great.
 
 #+begin_src emacs-lisp :tangle yes
-(pixel-scroll-precision-mode)
+;; (package-vc-install '(ultra-scroll :vc-backend Git :url  "https://github.com/jdtsmith/ultra-scroll"))
+
+(use-package ultra-scroll
+  ;:load-path "~/code/emacs/ultra-scroll" ; if you git clone'd instead of package-vc-install
+  :init (setq scroll-conservatively 101 ; important!
+              scroll-margin 0)
+  :config
+  (ultra-scroll-mode 1))
 #+end_src
 
 Setup =doom-modeline=.
@@ -580,51 +587,70 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
 Prefer vertical splits to horizontal ones. Trying how this feels, might customize later on. Source: [[https://emacs.stackexchange.com/questions/39034/prefer-vertical-splits-over-horizontal-ones][StackOverFlow]].
 
 #+begin_src emacs-lisp :tangle yes
-(defun split-window-sensibly-prefer-horizontal (&optional window)
-"Based on split-window-sensibly, but designed to prefer a horizontal split,
-i.e. windows tiled side-by-side."
+;; (defun split-window-sensibly-prefer-horizontal (&optional window)
+;;   "Based on split-window-sensibly, but designed to prefer a horizontal split,
+;; i.e. windows tiled side-by-side."
+;;   (interactive)
+;;   (let ((window (or window (selected-window))))
+;;     (or (and (window-splittable-p window t)
+;;              ;; Split window horizontally
+;;              (with-selected-window window
+;;                (split-window-right)))
+;;         (and (window-splittable-p window)
+;;              ;; Split window vertically
+;;              (with-selected-window window
+;;                (split-window-below)))
+;;         (and
+;;          ;; If WINDOW is the only usable window on its frame (it is
+;;          ;; the only one or, not being the only one, all the other
+;;          ;; ones are dedicated) and is not the minibuffer window, try
+;;          ;; to split it horizontally disregarding the value of
+;;          ;; `split-height-threshold'.
+;;          (let ((frame (window-frame window)))
+;;            (or
+;;             (eq window (frame-root-window frame))
+;;             (catch 'done
+;;               (walk-window-tree (lambda (w)
+;;                                   (unless (or (eq w window)
+;;                                               (window-dedicated-p w))
+;;                                     (throw 'done nil)))
+;;                                 frame)
+;;               t)))
+;;          (not (window-minibuffer-p window))
+;;          (let ((split-width-threshold 0))
+;;            (when (window-splittable-p window t)
+;;              (with-selected-window window
+;;                (split-window-right))))))))
+
+;; (defun split-window-really-sensibly (&optional window)
+;;   (let ((window (or window (selected-window))))
+;;     (if (> (window-total-width window) (* 2 (window-total-height window)))
+;;         (with-selected-window window (split-window-sensibly-prefer-horizontal window))
+;;       (with-selected-window window (split-window-sensibly window)))))
+
+;; (setq split-height-threshold 4
+;;       split-width-threshold 40
+;;       split-window-preferred-function 'split-window-really-sensibly)
+
+;; https://www.reddit.com/r/emacs/comments/1hxutdw/split_window_right_quality_of_life_enhancements/
+
+(defun pmx-split-window-conservatively (&optional window)
+  "Split WINDOW only if absolutely necessary.
+Only split if there is no split, and only split into left & right
+windows."
   (interactive)
   (let ((window (or window (selected-window))))
-    (or (and (window-splittable-p window t)
-         ;; Split window horizontally
-         (with-selected-window window
-           (split-window-right)))
-    (and (window-splittable-p window)
-         ;; Split window vertically
-         (with-selected-window window
-           (split-window-below)))
-    (and
-         ;; If WINDOW is the only usable window on its frame (it is
-         ;; the only one or, not being the only one, all the other
-         ;; ones are dedicated) and is not the minibuffer window, try
-         ;; to split it horizontally disregarding the value of
-         ;; `split-height-threshold'.
-         (let ((frame (window-frame window)))
-           (or
-            (eq window (frame-root-window frame))
-            (catch 'done
-              (walk-window-tree (lambda (w)
-                                  (unless (or (eq w window)
-                                              (window-dedicated-p w))
-                                    (throw 'done nil)))
-                                frame)
-              t)))
-     (not (window-minibuffer-p window))
-     (let ((split-width-threshold 0))
-       (when (window-splittable-p window t)
-         (with-selected-window window
-               (split-window-right))))))))
+    (if (and
+         (window-splittable-p window t)
+         (= (length (window-list)) 1))
+        (with-selected-window window
+          (split-window-right))
+      nil)))
 
-(defun split-window-really-sensibly (&optional window)
-  (let ((window (or window (selected-window))))
-    (if (> (window-total-width window) (* 2 (window-total-height window)))
-        (with-selected-window window (split-window-sensibly-prefer-horizontal window))
-      (with-selected-window window (split-window-sensibly window)))))
+(setq split-window-preferred-function #'pmx-split-window-conservatively)
 
-(setq
-   split-height-threshold 4
-   split-width-threshold 40
-   split-window-preferred-function 'split-window-really-sensibly)
+(setq warning-display-at-bottom nil)
+(setq ediff-split-window-function 'split-window-horizontally)
 #+end_src
 
 * Evil mode
@@ -889,7 +915,7 @@ Window management. Source: [[https://www.masteringemacs.org/article/demystifying
   "Toggles window dedication in the selected window."
   (interactive)
   (set-window-dedicated-p (selected-window)
-     (not (window-dedicated-p (selected-window)))))
+                          (not (window-dedicated-p (selected-window)))))
 #+end_src
 
 Easy buffer switching.
@@ -2238,8 +2264,19 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
 
 * Helpful
 
+[[https://github.com/Wilfred/helpful][Helpful]] seems to be useful. It provides more information about things than the built-in help system.
+
 #+begin_src emacs-lisp :tangle yes
-(use-package helpful)
+(use-package helpful
+  :ensure t
+  :config
+  (define-key help-map "f" #'helpful-callable)
+  (define-key help-map "k" #'helpful-key)
+  (define-key help-map "x" #'helpful-command)
+  (define-key help-map "F" #'helpful-function)
+  ;; Lookup the current symbol at point. C-c C-d is a common keybinding
+  ;; for this in lisp modes.
+  (global-set-key (kbd "C-c C-d") #'helpful-at-point))
 #+end_src
 
 * Various minor tweaks
