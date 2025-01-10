@@ -411,12 +411,18 @@ Scroll smoothly when using a mouse or trackpad. While this for me equals basical
 #+begin_src emacs-lisp :tangle yes
 ;; (package-vc-install '(ultra-scroll :vc-backend Git :url  "https://github.com/jdtsmith/ultra-scroll"))
 
+(defvar us-path "~/dev/ultra-scroll")
+
 (use-package ultra-scroll
-  ;:load-path "~/code/emacs/ultra-scroll" ; if you git clone'd instead of package-vc-install
+  :if (file-directory-p us-path)
+  :load-path us-path
   :init (setq scroll-conservatively 101 ; important!
               scroll-margin 0)
   :config
   (ultra-scroll-mode 1))
+
+(unless us-path
+  (pixel-scroll-mode))
 #+end_src
 
 Setup =doom-modeline=.
