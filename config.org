@@ -422,7 +422,7 @@ Scroll smoothly when using a mouse or trackpad. While this for me equals basical
   (ultra-scroll-mode 1))
 
 (unless us-path
-  (pixel-scroll-mode))
+  (pixel-scroll-precision-mode))
 #+end_src
 
 Setup =doom-modeline=.
