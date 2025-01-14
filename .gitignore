@@ -23,3 +23,5 @@ projectile-bookmarks.eld
 *.cache
 tree-sitter
 auto-save-list
+etc
+quelpa
