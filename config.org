@@ -1800,6 +1800,7 @@ Use 4 spaces as the default indentation level.
   :bind (:map global-map
               (("C-c n i" . org-roam-node-insert)
                ("C-c n f" . org-roam-node-find)
+               ("C-c n l" . org-roam-buffer-toggle)
                ("C-c n n" . org-roam-capture)
                ("C-c n d" . org-roam-dailies-capture-today)
                ("C-c n s" . consult-org-roam-search)))
@@ -2285,9 +2286,18 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
   (global-set-key (kbd "C-c C-d") #'helpful-at-point))
 #+end_src
 
+* Ztree
+
+Ztree is /"A major mode for displaying the directory tree in text mode"/. One thing I sometimes need is =ztree-diff= since it generates a diff of two directories.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ztree
+  :ensure t)
+#+end_src
+
 * Various minor tweaks
 
-** Insert GPG passphrase to register ?o
+** Insert pull GPG passphrases from environment variables to Emacs registers
 
 Read a GPG passphrase from environment variable to a register for easier access.
 
