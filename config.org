@@ -316,7 +316,7 @@ Add helpers to switch between themes.
   (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
 
-Setup font.
+Setup font. I prefer font for all purposes as variable pitch fonts tend to look bad in Emacs in my opinion.
 
 #+begin_src emacs-lisp :tangle yes
 (set-face-attribute 'default nil
@@ -2067,7 +2067,8 @@ Copied from [[https://github.com/abrochard/emacs-config/blob/master/configuratio
 
 #+begin_src emacs-lisp :tangle yes
 (use-package vterm
-  :hook (vterm-mode . hide-mode-line-mode)
+  :hook ((vterm-mode . hide-mode-line-mode)
+         (vterm-mode . (lambda () (setq-local global-hl-line-mode nil))))
   :ensure t
   :defer
   :custom
@@ -2077,12 +2078,6 @@ Copied from [[https://github.com/abrochard/emacs-config/blob/master/configuratio
   (setq vterm-kill-buffer-on-exit t)
   (setq vterm-max-scrollback 100000)
   (setq vterm-keymap-exceptions nil))
-
-;; (use-package multi-vterm
-;;   :after vterm
-;;   :config (add-hook 'vterm-mode-hook
-;;                     (lambda ()
-;;                       (evil-insert-state))))
 #+end_src
 
 * Configure epg-pinentry-mode
