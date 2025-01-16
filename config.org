@@ -967,6 +967,20 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
               ("C-c C-p" . flycheck-previous-error)))
 #+end_src
 
+* Ibuffer-projectile
+
+Sort =ibuffer= by project.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ibuffer-projectile
+  :ensure t
+  :hook (ibuffer-hook . (lambda ()
+                          (ibuffer-projectile-set-filter-groups)
+                          (unless (eq ibuffer-sorting-mode 'alphabetic)
+                            (ibuffer-do-sort-by-alphabetic)))))
+#+end_src
+
+
 * Programming languages
 
 ** Bash
