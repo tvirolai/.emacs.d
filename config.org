@@ -2316,6 +2316,16 @@ Read a GPG passphrase from environment variable to a register for easier access.
   (set-register ?p (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNFX1BST0Q="))))
 #+end_src
 
+** Jump to scratch buffer
+
+Bind a key combination to take me straight to the scratch buffer.
+
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "C-c Å") '(lambda ()
+                                 (interactive)
+                                 (switch-to-buffer "*scratch*")))
+#+end_src
+
 ** Kill buffers at scale
 
 Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsconfig/.
