@@ -1646,8 +1646,7 @@ Use 4 spaces as the default indentation level.
   (org-log-into-drawer t)
   (org-startup-folded 'nofold)
   (org-todo-keywords
-   '((sequence "TODO(t)" "PROJ(p)" "LOOP(r)" "STRT(s)" "WAIT(w)"
-               "HOLD(h)" "IDEA(i)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
+   '((sequence "TODO(t)" "HOLD(h)" "DOING(g)" "DONE(d)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   (org-done ((t (:foreground "PaleGreen"
@@ -1788,7 +1787,8 @@ Use 4 spaces as the default indentation level.
           (org-open-at-point)
         (progn
           (let ((state (org-get-todo-state)))
-            (cond ((string= state "[ ]") (org-todo "[X]"))
+            (cond ((string= state "[ ]") (org-todo "[-]"))
+                  ((string= state "[-]") (org-todo "[X]"))
                   ((string= state "[X]") (org-todo "[ ]"))
                   ((string= state "TODO") (org-todo "DOING"))
                   ((string= state "DOING") (org-todo "DONE"))
