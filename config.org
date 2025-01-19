@@ -316,7 +316,7 @@ Add helpers to switch between themes.
   (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
 
-Setup font. I prefer font for all purposes as variable pitch fonts tend to look bad in Emacs in my opinion.
+Setup font. I prefer monospace font for all purposes as I don't like how variable pitch fonts look in Emacs.
 
 #+begin_src emacs-lisp :tangle yes
 (set-face-attribute 'default nil
@@ -1131,9 +1131,7 @@ working with."
 #+begin_src emacs-lisp :tangle yes
 (use-package sql
   :ensure t
-  :hook ((sql-mode . sqlup-mode)
-         (sql-interactive-mode . sqlup-mode)
-         (sql-mode. lsp))
+  :hook ((sql-mode. lsp))
   :defer
   :config
   (setq lsp-sqls-workspace-config-path nil)
@@ -1144,13 +1142,6 @@ Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mod
 
 #+begin_src emacs-lisp :tangle yes
 (use-package sql-indent
-  :ensure t
-  :after sql
-  :defer)
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes
-(use-package sqlup-mode
   :ensure t
   :after sql
   :defer)
@@ -1171,17 +1162,17 @@ to this hack to run the indentation for the whole buffer."
     (kill-local-variable 'indent-line-function)
     (kill-local-variable 'align-mode-rules-list)))
 
-(defun tv/format-sql-buffer ()
-  (interactive)
-  ;; (tv/indent-sql-buffer)
-  (sqlup-capitalize-keywords-in-region (point-min) (point-max)))
+;; (defun tv/format-sql-buffer ()
+;;   (interactive)
+;;   ;; (tv/indent-sql-buffer)
+;;   (sqlup-capitalize-keywords-in-region (point-min) (point-max)))
 
-(evil-define-key 'normal sql-mode-map
-  "ö" #'(lambda ()
-          (interactive)
-          (when (< (buffer-size) 100000)
-            (tv/format-sql-buffer))
-          (save-buffer)))
+;; (evil-define-key 'normal sql-mode-map
+;;   "ö" #'(lambda ()
+;;           (interactive)
+;;           (when (< (buffer-size) 100000)
+;;             (tv/format-sql-buffer))
+;;           (save-buffer)))
 #+end_src
 
 ** Emacs Lisp
@@ -1637,6 +1628,7 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org
+  :ensure nil
   :defer
   :custom
   (fill-column 100)
@@ -1689,6 +1681,8 @@ Use 4 spaces as the default indentation level.
     (kbd "M-K") #'org-shiftmetaup
     (kbd "M-J") #'org-shiftmetadown
     (kbd "§") #'verb-send-request-on-point-other-window-stay)
+  (setq org-M-RET-may-split-line '((default . nil)))
+  (setq org-insert-heading-respect-content t)
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "inbox.org"))
   (setq org-archive-location "archive/Archive_%s::")
@@ -1869,7 +1863,8 @@ Use 4 spaces as the default indentation level.
                           (600 800 1000 1200 1400 1600 1800 2000)
                           " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
   ;; (org-agenda-start-with-log-mode '(closed clock state))
-  (org-agenda-files (list org-default-notes-file))
+  ;; (org-agenda-files (list org-default-notes-file))
+  (org-agenda-files (list org-directory))
   ;; (org-agenda-todo-ignore-scheduled 'future)
   ;; TODO entries that can't be marked as done b/c of children are shown as dimmed in agenda view
   (org-agenda-dim-blocked-tasks 'invisible)
