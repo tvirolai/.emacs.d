@@ -421,7 +421,7 @@ Scroll smoothly when using a mouse or trackpad. While this for me equals basical
   :config
   (ultra-scroll-mode 1))
 
-(unless us-path
+(unless (file-directory-p us-path)
   (pixel-scroll-precision-mode))
 #+end_src
 
@@ -445,7 +445,7 @@ Setup =doom-modeline=.
   :ensure t)
 #+end_src
 
-Use [[https://github.com/wolray/symbol-overlay][symbol-overlay]] mode.
+Use [[https://github.com/wolray/symbol-overlay][symbol-overlay]] mode to highlight symbols matching the one under the cursor.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package symbol-overlay
@@ -695,10 +695,16 @@ Vim keybindings here.
 
 (unless (file-exists-p tv/undo-dir)
   (make-directory tv/undo-dir))
+#+end_src
 
+Frustratingly, Emacs seems to freeze when trying to save XML with =undo-tree-mode= on.
+
+#+begin_src emacs-lisp :tangle yes
 (use-package undo-tree
   :ensure t
-  :hook (after-init . global-undo-tree-mode)
+  :hook ((after-init . global-undo-tree-mode)
+         (nxml-mode-hook . (lambda ()
+                             (undo-tree-mode -1))))
   :config
   ;; Prevent undo tree files from polluting your git repo
   (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir)))
@@ -1711,7 +1717,12 @@ Use 4 spaces as the default indentation level.
            :jump-to-captured t)
           ("t" "New task" entry
            (file+headline org-default-notes-file "Tasks")
-           "* TODO %i%?")))
+           "* TODO %i%?")
+          ("b" "book" plain "%?"
+           :if-new
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+author: ${author}\n#+title: ${title}\n#+subtitle: \n#+date: %t\n#+origin: ${origin}\n#+category: \n#+filetags: :kirjat:\n\n")
+           :unnarrowed t)))
   (global-set-key (kbd "C-c c") 'org-capture)
   ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
   :hook ((org-mode . visual-line-mode)
@@ -1794,7 +1805,72 @@ Use 4 spaces as the default indentation level.
     (kbd "RET") #'tv/org-todo-toggle-or-open-link))
 #+end_src
 
+** Denote
+
+I use =denote= for note taking and personal knowledge management. I migrated from =org-roam= to =denote= mostly due to the slow database indexing - after importing about 1200 notes from my IMDB watchlist, the indexing started taking minutes. Denote does not use a database, which is a huge plus in my book.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package denote
+  :defer
+  :ensure t
+  :init
+  (require 'denote-org-extras)
+  (denote-rename-buffer-mode 1)
+  :custom-face
+  (denote-faces-link ((t (:slant italic))))
+  :config
+  (setq denote-directory (concat org-directory "notes"))
+  (setq denote-templates
+        '((note . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: \n\n")
+          (book . "#+title: ${title}\n#+author: \n#+subtitle: \n#+date: %<%Y-%m-%d>\n#+origin: \n#+category: \n#+filetags: :kirjat:\n\n")
+          (film . "#+title: ${title}\n#+director: \n#+original title: \n#+date: %<%Y-%m-%d>\n#+seen at: \n#+category: \n#+filetags: :elokuvat:\n\n")
+          (project . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: project\n\n* Goals\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n")
+          (bug . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: :bugit:työ:verb:\n\n")
+          (meeting . "#+title: ${title}\n#+present: \n#+date: %<%Y-%m-%d>\n#+category: \n#+filetags: :työ:\n\n")))
+  ;; (setq denote-templates
+  ;;     `((report . "* Some heading\n\n* Another heading")
+  ;;       (memo . ,(concat "* Some heading"
+  ;;                        "\n\n"
+  ;;                        "* Another heading"
+  ;;                        "\n\n"))
+  ;;       (book . "#+author: \n#+title: \n#+subtitle: \n#+origin: \n#+category: \n#+filetags: :kirjat:\n\n")))
+  :bind (:map global-map
+              (("C-c n i" . denote-open-or-create)
+               ("C-c n l" . denote-link-or-create)
+               ("C-c n n" . denote-create-note-with-template))))
+
+(use-package consult-notes
+  :commands (consult-notes
+             consult-notes-search-in-all-notes)
+  :custom
+  (consult-notes-file-dir-sources
+   `(("Denote" ?d ,denote-directory)))
+  :bind (:map global-map
+              (("C-c n f" . consult-notes))))
+#+end_src
+
+** Consult-denote
+
+#+begin_src emacs-lisp :tangle yes
+(use-package consult-denote
+  :ensure t
+  :after denote
+  :defer
+  :config
+  (define-key global-map (kbd "C-c n f") #'consult-denote-find)
+  (define-key global-map (kbd "C-c n g") #'consult-denote-grep))
+#+end_src
+
+** Consult-notes
+
+#+begin_src emacs-lisp :tangle yes
+
+#+end_src
+
+
 ** Org Roam
+
+To be deprecated.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org-roam
@@ -1805,13 +1881,13 @@ Use 4 spaces as the default indentation level.
   (org-roam-tag-sources '(prop))
   (org-roam-db-update-method 'immediate)
   :hook (after-init . org-roam-db-autosync-mode)
-  :bind (:map global-map
-              (("C-c n i" . org-roam-node-insert)
-               ("C-c n f" . org-roam-node-find)
-               ("C-c n l" . org-roam-buffer-toggle)
-               ("C-c n n" . org-roam-capture)
-               ("C-c n d" . org-roam-dailies-capture-today)
-               ("C-c n s" . consult-org-roam-search)))
+  ;; :bind (:map global-map
+  ;;             (("C-c n i" . org-roam-node-insert)
+  ;;              ("C-c n f" . org-roam-node-find)
+  ;;              ("C-c n l" . org-roam-buffer-toggle)
+  ;;              ("C-c n n" . org-roam-capture)
+  ;;              ("C-c n d" . org-roam-dailies-capture-today)
+  ;;              ("C-c n s" . consult-org-roam-search)))
   :config
   (setq org-roam-node-display-template (concat "${title:50} " (propertize "${tags:50}" 'face 'org-tag)))
   (setq org-roam-db-location (expand-file-name "etc/org-roam.db" user-emacs-directory))
@@ -1826,6 +1902,11 @@ Use 4 spaces as the default indentation level.
            :if-new
            (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
                       "#+author: ${author}\n#+title: ${title}\n#+subtitle: \n#+date: %t\n#+origin: ${origin}\n#+category: \n#+filetags: :kirjat:\n\n")
+           :unnarrowed t)
+          ("f" "film" plain "%?"
+           :if-new
+           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                      "#+director: ${director}\n#+title: ${title}\n#+original title: \n#+date: %t\n#+seen at: ${seen at}\n#+category: \n#+filetags: :elokuvat:\n\n")
            :unnarrowed t)
           ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
            :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: project")
@@ -2118,6 +2199,7 @@ Show information about the file under editing.
 #+begin_src emacs-lisp :tangle yes
 (use-package file-info
   :ensure t
+  :defer
   :bind (("C-c f" . 'file-info-show)))
 #+end_src
 
@@ -2292,7 +2374,7 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
 
 * Ztree
 
-Ztree is /"A major mode for displaying the directory tree in text mode"/. One thing I sometimes need is =ztree-diff= since it generates a diff of two directories.
+Ztree is /"A major mode for displaying the directory tree in text mode"/. One thing I sometimes need is =ztree-diff= for generating a diff of two directories.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ztree
@@ -2379,7 +2461,7 @@ From [[https://github.com/abrochard/emacs-config][abrochard]].
 Sort all lines in a buffer.
 
 #+begin_src emacs-lisp :tangle yes
-(defun tv/sort-buffer()
+(defun tv/sort-buffer ()
   "Select the lines in a buffer."
   (interactive)
   (sort-lines nil (point-min) (point-max)))
