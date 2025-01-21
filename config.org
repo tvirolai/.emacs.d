@@ -1153,6 +1153,15 @@ Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mod
   :defer)
 #+end_src
 
+Sqlup-mode capitalizes SQL keywords automatically. Note that is has a [[https://github.com/Trevoke/sqlup-mode.el/issues/69][bug]] which might accidentally capitalize quoted strings. This has bitten me previously but I currently sometimes use this to format selections of SQL.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sqlup-mode
+  :ensure t
+  :after sql
+  :defer)
+#+end_src
+
 Custom functions for formatting SQL code.
 
 #+begin_src emacs-lisp :tangle yes
@@ -1167,18 +1176,6 @@ to this hack to run the indentation for the whole buffer."
   (progn
     (kill-local-variable 'indent-line-function)
     (kill-local-variable 'align-mode-rules-list)))
-
-;; (defun tv/format-sql-buffer ()
-;;   (interactive)
-;;   ;; (tv/indent-sql-buffer)
-;;   (sqlup-capitalize-keywords-in-region (point-min) (point-max)))
-
-;; (evil-define-key 'normal sql-mode-map
-;;   "ö" #'(lambda ()
-;;           (interactive)
-;;           (when (< (buffer-size) 100000)
-;;             (tv/format-sql-buffer))
-;;           (save-buffer)))
 #+end_src
 
 ** Emacs Lisp
@@ -1860,13 +1857,6 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   (define-key global-map (kbd "C-c n f") #'consult-denote-find)
   (define-key global-map (kbd "C-c n g") #'consult-denote-grep))
 #+end_src
-
-** Consult-notes
-
-#+begin_src emacs-lisp :tangle yes
-
-#+end_src
-
 
 ** Org Roam
 
