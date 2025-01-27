@@ -1165,13 +1165,14 @@ Sqlup-mode capitalizes SQL keywords automatically. Note that is has a [[https://
 Custom functions for formatting SQL code.
 
 #+begin_src emacs-lisp :tangle yes
-(defun tv/indent-sql-buffer ()
+(defun tv/format-sql-buffer ()
   "Since there's some bug that breaks the indentation (`sqlind-indent-line`
 specifically) when running it with `newline-and-indent`, I've resorted
-to this hack to run the indentation for the whole buffer."
+to this hack to run the indentation and capitalization for the whole buffer."
   (interactive)
   (sqlind-minor-mode)
   (indent-region (point-min) (point-max))
+  (sqlup-capitalize-keywords-in-buffer)
   (setq sqlind-minor-mode nil)
   (progn
     (kill-local-variable 'indent-line-function)
@@ -1706,7 +1707,7 @@ Use 4 spaces as the default indentation level.
      (shell . t)))
   (setq org-src-preserve-indentation nil
         org-edit-src-content-indentation 0
-        org-indent-mode t)
+        org-indent-mode nil)
   (setq org-capture-templates
         '(("f" "Fleeting note" item
            (file+headline org-default-notes-file "Notes")
@@ -1722,8 +1723,7 @@ Use 4 spaces as the default indentation level.
            :unnarrowed t)))
   (global-set-key (kbd "C-c c") 'org-capture)
   ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
-  :hook ((org-mode . visual-line-mode)
-         (org-mode . org-indent-mode)))
+  :hook ((org-mode . visual-line-mode)))
 
 ;; From elken
 
@@ -1766,7 +1766,7 @@ Use 4 spaces as the default indentation level.
   :config
   (setq org-hide-emphasis-markers t)  ;; Must be activated for org-appear to work
   (setq org-appear-autoemphasis   t   ;; Show bold, italics, verbatim, etc.
-        org-appear-autolinks      t   ;; Show links
+        org-appear-autolinks      nil   ;; Show links
         org-appear-autosubmarkers t))
 #+end_src
 
@@ -1822,7 +1822,7 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
           (book . "#+title: ${title}\n#+author: \n#+subtitle: \n#+date: %<%Y-%m-%d>\n#+origin: \n#+category: \n#+filetags: :kirjat:\n\n")
           (film . "#+title: ${title}\n#+director: \n#+original title: \n#+date: %<%Y-%m-%d>\n#+seen at: \n#+category: \n#+filetags: :elokuvat:\n\n")
           (project . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: project\n\n* Goals\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n")
-          (bug . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: :bugit:työ:verb:\n\n")
+          (bug . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: :bugit:työ:\n\n")
           (meeting . "#+title: ${title}\n#+present: \n#+date: %<%Y-%m-%d>\n#+category: \n#+filetags: :työ:\n\n")))
   ;; (setq denote-templates
   ;;     `((report . "* Some heading\n\n* Another heading")
@@ -1834,6 +1834,7 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   :bind (:map global-map
               (("C-c n i" . denote-open-or-create)
                ("C-c n l" . denote-link-or-create)
+               ("C-c n L" . denote-link-after-creating)
                ("C-c n n" . denote-create-note-with-template))))
 
 (use-package consult-notes
@@ -1856,59 +1857,6 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   :config
   (define-key global-map (kbd "C-c n f") #'consult-denote-find)
   (define-key global-map (kbd "C-c n g") #'consult-denote-grep))
-#+end_src
-
-** Org Roam
-
-To be deprecated.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package org-roam
-  :ensure t
-  :defer
-  :custom
-  (org-roam-v2-ack t)
-  (org-roam-tag-sources '(prop))
-  (org-roam-db-update-method 'immediate)
-  :hook (after-init . org-roam-db-autosync-mode)
-  ;; :bind (:map global-map
-  ;;             (("C-c n i" . org-roam-node-insert)
-  ;;              ("C-c n f" . org-roam-node-find)
-  ;;              ("C-c n l" . org-roam-buffer-toggle)
-  ;;              ("C-c n n" . org-roam-capture)
-  ;;              ("C-c n d" . org-roam-dailies-capture-today)
-  ;;              ("C-c n s" . consult-org-roam-search)))
-  :config
-  (setq org-roam-node-display-template (concat "${title:50} " (propertize "${tags:50}" 'face 'org-tag)))
-  (setq org-roam-db-location (expand-file-name "etc/org-roam.db" user-emacs-directory))
-  (setq org-roam-directory "~/Dropbox/org/roam")
-  (setq org-roam-capture-templates
-        `(("n" "default note" plain "%?"
-           :if-new
-           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                      "#+title: ${title}\n#+date: %t\n#+filetags: \n\n ")
-           :unnarrowed t)
-          ("b" "book" plain "%?"
-           :if-new
-           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                      "#+author: ${author}\n#+title: ${title}\n#+subtitle: \n#+date: %t\n#+origin: ${origin}\n#+category: \n#+filetags: :kirjat:\n\n")
-           :unnarrowed t)
-          ("f" "film" plain "%?"
-           :if-new
-           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                      "#+director: ${director}\n#+title: ${title}\n#+original title: \n#+date: %t\n#+seen at: ${seen at}\n#+category: \n#+filetags: :elokuvat:\n\n")
-           :unnarrowed t)
-          ("p" "project" plain "* Goals\n\n%?\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n"
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+filetags: project")
-           :unnarrowed t)
-          ("w" "work/bug" plain "%?"
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n#+date: %t\n#+filetags: :bugit:työ:verb:")
-           :unnarrowed t)
-          ("m" "meeting" plain "%?"
-           :if-new
-           (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
-                      "#+title: %^{title}\n#+present: %^{present} \n#+date: %t\n#+category: \n#+filetags: :työ:\n\n ")
-           :unnarrowed t))))
 #+end_src
 
 ** Org Agenda
@@ -1982,14 +1930,7 @@ To be deprecated.
        (org-agenda-tag-filter-preset '("+12WY"))
        (org-agenda-start-with-log-mode '(closed clock state))
        (org-agenda-archives-mode t)
-       ))
-
-     ("r" "Weekly Review"
-      ((agenda "")
-       (todo))
-      ((org-agenda-sorting-strategy '(time-up habit-up category-up priority-down ))
-       (org-agenda-files "~/Dropbox/org/weekly-reivew-agenda-files.org")
-       (org-agenda-include-diary nil)))))
+       ))))
   :init
   ;; Originally from here: https://stackoverflow.com/a/59001859/2178312
   (defun get-schedule-or-deadline-if-available ()
