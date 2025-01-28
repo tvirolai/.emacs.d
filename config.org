@@ -588,77 +588,6 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
   (global-set-key (kbd "C-c C-r") 'sudo-edit))
 #+end_src
 
-** Configure splits
-
-Prefer vertical splits to horizontal ones. Trying how this feels, might customize later on. Source: [[https://emacs.stackexchange.com/questions/39034/prefer-vertical-splits-over-horizontal-ones][StackOverFlow]].
-
-#+begin_src emacs-lisp :tangle yes
-;; (defun split-window-sensibly-prefer-horizontal (&optional window)
-;;   "Based on split-window-sensibly, but designed to prefer a horizontal split,
-;; i.e. windows tiled side-by-side."
-;;   (interactive)
-;;   (let ((window (or window (selected-window))))
-;;     (or (and (window-splittable-p window t)
-;;              ;; Split window horizontally
-;;              (with-selected-window window
-;;                (split-window-right)))
-;;         (and (window-splittable-p window)
-;;              ;; Split window vertically
-;;              (with-selected-window window
-;;                (split-window-below)))
-;;         (and
-;;          ;; If WINDOW is the only usable window on its frame (it is
-;;          ;; the only one or, not being the only one, all the other
-;;          ;; ones are dedicated) and is not the minibuffer window, try
-;;          ;; to split it horizontally disregarding the value of
-;;          ;; `split-height-threshold'.
-;;          (let ((frame (window-frame window)))
-;;            (or
-;;             (eq window (frame-root-window frame))
-;;             (catch 'done
-;;               (walk-window-tree (lambda (w)
-;;                                   (unless (or (eq w window)
-;;                                               (window-dedicated-p w))
-;;                                     (throw 'done nil)))
-;;                                 frame)
-;;               t)))
-;;          (not (window-minibuffer-p window))
-;;          (let ((split-width-threshold 0))
-;;            (when (window-splittable-p window t)
-;;              (with-selected-window window
-;;                (split-window-right))))))))
-
-;; (defun split-window-really-sensibly (&optional window)
-;;   (let ((window (or window (selected-window))))
-;;     (if (> (window-total-width window) (* 2 (window-total-height window)))
-;;         (with-selected-window window (split-window-sensibly-prefer-horizontal window))
-;;       (with-selected-window window (split-window-sensibly window)))))
-
-;; (setq split-height-threshold 4
-;;       split-width-threshold 40
-;;       split-window-preferred-function 'split-window-really-sensibly)
-
-;; https://www.reddit.com/r/emacs/comments/1hxutdw/split_window_right_quality_of_life_enhancements/
-
-(defun pmx-split-window-conservatively (&optional window)
-  "Split WINDOW only if absolutely necessary.
-Only split if there is no split, and only split into left & right
-windows."
-  (interactive)
-  (let ((window (or window (selected-window))))
-    (if (and
-         (window-splittable-p window t)
-         (= (length (window-list)) 1))
-        (with-selected-window window
-          (split-window-right))
-      nil)))
-
-(setq split-window-preferred-function #'pmx-split-window-conservatively)
-
-(setq warning-display-at-bottom nil)
-(setq ediff-split-window-function 'split-window-horizontally)
-#+end_src
-
 * Evil mode
 
 Vim keybindings here.
@@ -878,6 +807,8 @@ A handful of bindings inspired by Doom Emacs / Spacemacs.
 (define-key my-leader-map "," 'avy-goto-char-timer)
 (define-key my-leader-map "." 'consult-line)
 (define-key my-leader-map "x" 'consult-imenu)
+;; Grep from all open buffers
+(define-key my-leader-map "-" 'swiper-all)
 #+end_src
 
 A handful of must-have keybindings for me.
@@ -906,6 +837,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
+(evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 #+end_src
 
