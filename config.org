@@ -894,6 +894,21 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
                    :key (getenv "CLAUDE_API_KEY"))))
 #+end_src
 
+* Media playback
+
+** Ready player mode
+
+Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodium.com/a-tour-of-ready-player-mode][Seems]] like a nice way to play music and other media directly from Emacs.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ready-player
+  :ensure t
+  :custom
+  (ready-player-my-media-collection-location "~/Dropbox/Public")
+  :config
+  (ready-player-mode +1))
+#+end_src
+
 * Flycheck
 
 #+begin_src emacs-lisp :tangle yes
