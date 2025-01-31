@@ -1636,6 +1636,7 @@ Use 4 spaces as the default indentation level.
   (setq org-insert-heading-respect-content t)
   (setq org-directory "~/Dropbox/org/")
   (setq org-default-notes-file (concat org-directory "inbox.org"))
+  (setq org-work-notes-file (concat org-directory "work.org"))
   (setq org-archive-location "archive/Archive_%s::")
   (setq org-ellipsis " ▾")
   (setq org-src-fontify-natively t)
@@ -1663,6 +1664,9 @@ Use 4 spaces as the default indentation level.
           ("t" "New task" entry
            (file+headline org-default-notes-file "Tasks")
            "* TODO %i%?")
+          ("w" "Work-related task" entry
+           (file+headline org-work-notes-file "Tasks")
+           "* TODO %?" :empty-lines 1)
           ("b" "book" plain "%?"
            :if-new
            (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
@@ -1764,6 +1768,7 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   (denote-faces-link ((t (:slant italic))))
   :config
   (setq denote-directory (concat org-directory "notes"))
+  (setq denote-backlinks-show-context nil)
   (setq denote-templates
         '((note . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: \n\n")
           (book . "#+title: ${title}\n#+author: \n#+subtitle: \n#+date: %<%Y-%m-%d>\n#+origin: \n#+category: \n#+filetags: :kirjat:\n\n")
