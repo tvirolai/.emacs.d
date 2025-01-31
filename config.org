@@ -1759,11 +1759,10 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
 
 #+begin_src emacs-lisp :tangle yes
 (use-package denote
-  :defer
   :ensure t
-  :init
-  (require 'denote-org-extras)
-  (denote-rename-buffer-mode 1)
+  ;; :init
+  ;; (require 'denote-org-extras)
+  ;; (denote-rename-buffer-mode 1) ;; This seems to cause freezes when trying to open files.
   :custom-face
   (denote-faces-link ((t (:slant italic))))
   :config
@@ -1776,13 +1775,6 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
           (project . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: project\n\n* Goals\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n")
           (bug . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: :bugit:työ:\n\n")
           (meeting . "#+title: ${title}\n#+present: \n#+date: %<%Y-%m-%d>\n#+category: \n#+filetags: :työ:\n\n")))
-  ;; (setq denote-templates
-  ;;     `((report . "* Some heading\n\n* Another heading")
-  ;;       (memo . ,(concat "* Some heading"
-  ;;                        "\n\n"
-  ;;                        "* Another heading"
-  ;;                        "\n\n"))
-  ;;       (book . "#+author: \n#+title: \n#+subtitle: \n#+origin: \n#+category: \n#+filetags: :kirjat:\n\n")))
   :bind (:map global-map
               (("C-c n i" . denote-open-or-create)
                ("C-c n l" . denote-link-or-create)
@@ -1790,13 +1782,15 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
                ("C-c n n" . denote-create-note-with-template))))
 
 (use-package consult-notes
+  :ensure t
   :commands (consult-notes
              consult-notes-search-in-all-notes)
   :custom
   (consult-notes-file-dir-sources
    `(("Denote" ?d ,denote-directory)))
   :bind (:map global-map
-              (("C-c n f" . consult-notes))))
+              (("C-c n f" . consult-notes)))
+  )
 #+end_src
 
 ** Consult-denote
@@ -1804,11 +1798,8 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
 #+begin_src emacs-lisp :tangle yes
 (use-package consult-denote
   :ensure t
-  :after denote
-  :defer
-  :config
-  (define-key global-map (kbd "C-c n f") #'consult-denote-find)
-  (define-key global-map (kbd "C-c n g") #'consult-denote-grep))
+  :bind (:map global-map
+              (("C-c n g" . consult-denote-grep))))
 #+end_src
 
 ** Org Agenda
