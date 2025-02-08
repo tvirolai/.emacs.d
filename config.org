@@ -1781,13 +1781,6 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   :config
   (setq denote-directory (concat org-directory "notes"))
   (setq denote-backlinks-show-context nil)
-  ;; (setq denote-templates
-  ;;       '((note . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: \n\n")
-  ;;         (book . "#+title: ${title}\n#+author: \n#+subtitle: \n#+date: %<%Y-%m-%d>\n#+origin: \n#+category: \n#+filetags: :kirjat:\n\n")
-  ;;         (film . "#+title: ${title}\n#+director: \n#+original title: \n#+date: %<%Y-%m-%d>\n#+seen at: \n#+category: \n#+filetags: :elokuvat:\n\n")
-  ;;         (project . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: project\n\n* Goals\n\n* Tasks\n\n** TODO Add initial tasks\n\n* Dates\n\n")
-  ;;         (bug . "#+title: ${title}\n#+date: %<%Y-%m-%d>\n#+filetags: :bugit:työ:\n\n")
-  ;;         (meeting . "#+title: ${title}\n#+present: \n#+date: %<%Y-%m-%d>\n#+category: \n#+filetags: :työ:\n\n")))
   :bind (:map global-map
               (("C-c n b" . denote-find-backlink)
                ("C-c n d" . denote-create-note)
@@ -1800,7 +1793,8 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
                ("C-c n R" . denote-rename-file-using-front-matter)
                ("C-c n l" . denote-link-or-create)
                ("C-c n L" . denote-link-after-creating)
-               ("C-c n n" . denote-create-note-with-template))))
+               ("C-c n n" . denote-create-note)
+               ("C-c n N" . denote-create-note-with-template))))
 
 (use-package consult-notes
   :ensure t
