@@ -2541,6 +2541,23 @@ newlines at the end of the message."
         (browse-url url)))))
 #+end_src
 
+** Find and insert all Jira ticket codes at point
+
+Here's a tiny helper function, written using AI (Claude), that automates a tiny bit of my workday. During work, I keep my TODOs in an inbox file. All the references to Jira tickets in that file are ones that I've been working on during the day. At the end of the day, I archive the done / killed tasks. By running this function, I can copy all the ticket numbers in the file to the kill ring / clipboard where they can be pasted to our time tracking software. A bit silly, perhaps, but why not?
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/kill-ump-numbers ()
+  "Find all UMP-XXXXX or MAIJA-XXXXX strings in the buffer and kill them."
+  (interactive)
+  (let ((matches nil))
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "\\(?:UMP\\|MAIJA\\)-[0-9]\\{3,5\\}" nil t)
+        (message (match-string 0))
+        (push (match-string 0) matches)))
+    (kill-new (mapconcat 'identity (nreverse matches) "\n"))))
+#+end_src
+
 ** Tetris
 
 No Evil mode when playing Tetris.
