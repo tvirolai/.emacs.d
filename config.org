@@ -909,6 +909,10 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
   :ensure t
   :custom
   (ready-player-my-media-collection-location "/Volumes/Musumusa/musa/Music/")
+  (ready-player-ask-for-project-sustainability nil)
+  (ready-player-hide-modeline nil)
+  :bind (:map ready-player-minor-mode-map
+              ("RET" . ready-player-menu))
   :config
   (ready-player-mode +1))
 #+end_src
