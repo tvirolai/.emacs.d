@@ -1596,11 +1596,11 @@ Use 4 spaces as the default indentation level.
   ;; Disable the underscore-to-subscript thing.
   (org-pretty-entities t)
   (org-log-done 'time)
-  (org-log-into-drawer t)
+  (org-log-into-drawer nil)
   (org-use-sub-superscripts "{}")
   (org-fold-catch-invisible-edits 'error)
   (org-todo-keywords
-   '((sequence "TODO(t)" "HOLD(d@/!)" "DOING(g)" "|" "DONE(d!)" "KILL(k)")
+   '((sequence "TODO(t)" "HOLD(d@/!)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   (org-done ((t (:foreground "PaleGreen"
