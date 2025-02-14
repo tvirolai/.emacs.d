@@ -412,6 +412,16 @@ Suppress compilation warnings.
 (setq native-comp-async-report-warnings-errors nil)
 #+end_src
 
+Mood-line.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package mood-line
+  :config
+  (mood-line-mode)
+  :custom
+  (mood-line-glyph-alist mood-line-glyphs-fira-code))
+#+end_src
+
 Scroll smoothly when using a mouse or trackpad. While this for me equals basically never, the [[https://github.com/jdtsmith/ultra-scroll][ultra-scroll]] package seems to be great.
 
 #+begin_src emacs-lisp :tangle yes
