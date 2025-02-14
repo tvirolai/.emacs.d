@@ -256,9 +256,14 @@ Use =tree-sitter=.
 #+begin_src emacs-lisp :tangle yes
 (setq treesit-extra-load-path `(,(concat user-emacs-directory "var/tree-sitter-dist/")
                                 ,(concat user-emacs-directory "var/tree-sitter")))
+
+(defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
+  (when (< (buffer-size) 1000000)
+    (turn-on-tree-sitter-mode)))
+
 (use-package tree-sitter
   :hook ((tree-sitter-after-on . tree-sitter-hl-mode)
-         (prog-mode . turn-on-tree-sitter-mode))
+         (prog-mode . tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large))
   :config (require 'tree-sitter-langs)
   ;; This makes every node a link to a section of code
   (setq tree-sitter-debug-jump-buttons t
@@ -426,21 +431,6 @@ Scroll smoothly when using a mouse or trackpad. While this for me equals basical
   (pixel-scroll-precision-mode))
 #+end_src
 
-Setup =doom-modeline=.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package doom-modeline
-  :ensure t
-  :hook (after-init . doom-modeline-mode)
-  :config
-  (display-time-mode 1)
-  (setq doom-modeline-icon nil)
-  (setq doom-modeline-time-icon nil)
-  ;; Prevent crazy path expansions.
-  (setq doom-modeline-project-detection 'project)
-  (setq doom-modeline-project-detection 'ffip))
-#+end_src
-
 #+begin_src emacs-lisp :tangle yes
 (use-package hide-mode-line
   :ensure t)
@@ -603,8 +593,8 @@ Vim keybindings here.
   ;; no vim insert bindings
   :config
   (evil-mode 1)
-  (evil-set-undo-system 'undo-tree)
-  ;; (evil-set-undo-system 'undo-redo)
+  ;; (evil-set-undo-system 'undo-tree)
+  (evil-set-undo-system 'undo-redo)
   (setq evil-split-window-below t
         evil-vsplit-window-right t)
   (setq evil-ex-substitute-global t)
@@ -633,15 +623,15 @@ Vim keybindings here.
 Frustratingly, Emacs seems to freeze when trying to save XML with =undo-tree-mode= on.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package undo-tree
-  :ensure t
-  :hook ((after-init . global-undo-tree-mode)
-         (nxml-mode-hook . (lambda ()
-                             (undo-tree-mode -1))))
-  :config
-  ;; Prevent undo tree files from polluting your git repo
-  (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir)))
-  (setq undo-tree-enable-undo-in-region nil))
+;; (use-package undo-tree
+;;   :ensure t
+;;   :hook ((after-init . global-undo-tree-mode)
+;;          (nxml-mode-hook . (lambda ()
+;;                              (undo-tree-mode -1))))
+;;   :config
+;;   ;; Prevent undo tree files from polluting your git repo
+;;   (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir)))
+;;   (setq undo-tree-enable-undo-in-region nil))
 #+end_src
 
 Evil-surround.
@@ -2540,16 +2530,18 @@ newlines at the end of the message."
 Here's a tiny helper function, written using AI (Claude), that automates a tiny bit of my workday. During work, I keep my TODOs in an inbox file. All the references to Jira tickets in that file are ones that I've been working on during the day. At the end of the day, I archive the done / killed tasks. By running this function, I can copy all the ticket numbers in the file to the kill ring / clipboard where they can be pasted to our time tracking software. A bit silly, perhaps, but why not?
 
 #+begin_src emacs-lisp :tangle yes
-(defun tv/kill-ump-numbers ()
-  "Find all UMP-XXXXX or MAIJA-XXXXX strings in the buffer and kill them."
-  (interactive)
-  (let ((matches nil))
-    (save-excursion
-      (goto-char (point-min))
-      (while (re-search-forward "\\(?:UMP\\|MAIJA\\)-[0-9]\\{3,5\\}" nil t)
-        (message (match-string 0))
-        (push (match-string 0) matches)))
-    (kill-new (mapconcat 'identity (nreverse matches) "\n"))))
+(when work-laptop-p
+
+  (defun tv/kill-ump-numbers ()
+    "Find all UMP-XXXXX or MAIJA-XXXXX strings in the buffer and kill them."
+    (interactive)
+    (let ((matches nil))
+      (save-excursion
+        (goto-char (point-min))
+        (while (re-search-forward "\\(?:UMP\\|MAIJA\\)-[0-9]\\{3,5\\}" nil t)
+          (message (match-string 0))
+          (push (match-string 0) matches)))
+      (kill-new (mapconcat 'identity (nreverse matches) "\n")))))
 #+end_src
 
 ** Tetris
