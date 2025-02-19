@@ -415,11 +415,27 @@ Suppress compilation warnings.
 Mood-line.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package mood-line
+;; (use-package mood-line
+;;   :config
+;;   (mood-line-mode)
+;;   :custom
+;;   (mood-line-glyph-alist mood-line-glyphs-fira-code))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(use-package moody
   :config
-  (mood-line-mode)
+  (moody-replace-mode-line-front-space)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
+
+(use-package minions
+  :ensure t
   :custom
-  (mood-line-glyph-alist mood-line-glyphs-fira-code))
+  (minions-mode-line-lighter "…")
+  (minions-mode-line-delimiters '("" . ""))
+  :config
+  (minions-mode +1))
 #+end_src
 
 Scroll smoothly when using a mouse or trackpad. While this for me equals basically never, the [[https://github.com/jdtsmith/ultra-scroll][ultra-scroll]] package seems to be great.
@@ -1840,6 +1856,9 @@ Modified from [[https://github.com/pprevos/emacs-writing-studio/blob/master/init
 #+end_src
 
 ** Org Agenda
+:PROPERTIES:
+:ID:       DB9E54AF-CBBB-4C0E-B54E-A3EF408626A4
+:END:
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org-agenda
@@ -1923,6 +1942,15 @@ Modified from [[https://github.com/pprevos/emacs-writing-studio/blob/master/init
 (use-package org-present
   :ensure t
   :defer)
+#+end_src
+
+Enable dragging and dropping images to org documents. Note that the command-line utility =pngpaste= must be installed for this to work.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-download
+  :ensure t
+  :config
+  (setq-default org-download-image-dir (concat org-directory "assets")))
 #+end_src
 
 * Elfeed
