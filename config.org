@@ -1,6 +1,6 @@
 #+title: Config
 #+author: Tuomo Virolainen
-#+STARTUP: nofold
+#+STARTUP: showall
 
 * Introduction
 
@@ -294,6 +294,13 @@ Use =doom-dracula= theme.
   (load-theme 'doom-dracula t))
 #+end_src
 
+Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ef-themes
+  :ensure t)
+#+end_src
+
 Disable custom themes before loading a new one.
 
 #+begin_src emacs-lisp :tangle yes
@@ -309,7 +316,7 @@ Add helpers to switch between themes.
 (defun tv/load-light-theme ()
   "Load light theme."
   (interactive)
-  (load-theme 'doom-solarized-light t)
+  (load-theme 'modus-operandi-deuteranopia t)
   (set-frame-parameter nil 'ns-appearance 'light))
 
 (defun tv/load-dark-theme ()
@@ -329,8 +336,8 @@ Setup font. I prefer monospace font for all purposes as I don't like how variabl
                     :width 'normal)
 
 (set-face-attribute 'variable-pitch nil
-                    :family "SF Mono"
-                    :height 140
+                    :family "SF Pro"
+                    :height 160
                     :weight 'normal
                     :width 'normal)
 
@@ -550,6 +557,18 @@ A mode for reading epub files.
   :defer
   :config
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
+#+end_src
+
+** Openwith
+
+Open PDF files in the GUI default application from Dired. PDF-tools is slow and clunky so I prefer this approach.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package openwith
+  :ensure t
+  :config
+  (setq openwith-associations '(("\\.pdf\\'" "open" (file))))
+  (openwith-mode t))
 #+end_src
 
 ** Olivetti mode
