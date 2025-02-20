@@ -2601,6 +2601,17 @@ Here's a tiny helper function, written using AI (Claude), that automates a tiny 
       (kill-new (mapconcat 'identity (nreverse matches) "\n")))))
 #+end_src
 
+** Write mode
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/write-mode ()
+  "Enable nice settings for reading or writing."
+  (interactive)
+  (olivetti-mode)
+  (variable-pitch-mode)
+  (display-line-numbers-mode -1))
+#+end_src
+
 ** Tetris
 
 No Evil mode when playing Tetris.
