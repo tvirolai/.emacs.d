@@ -249,40 +249,6 @@ Set keybindings for profiler.
   ("C-x P 0"  . profiler-stop))
 #+end_src
 
-* Tree-sitter
-
-Use =tree-sitter=.
-
-#+begin_src emacs-lisp :tangle yes
-(setq treesit-extra-load-path `(,(concat user-emacs-directory "var/tree-sitter-dist/")
-                                ,(concat user-emacs-directory "var/tree-sitter")))
-
-(defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
-  (when (< (buffer-size) 1000000)
-    (turn-on-tree-sitter-mode)))
-
-(use-package tree-sitter
-  :hook ((tree-sitter-after-on . tree-sitter-hl-mode)
-         (prog-mode . tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large))
-  :config (require 'tree-sitter-langs)
-  ;; This makes every node a link to a section of code
-  (setq tree-sitter-debug-jump-buttons t
-        ;; and this highlights the entire sub tree in your code
-        tree-sitter-debug-highlight-jump-region t))
-
-(use-package tree-sitter-langs
-  :ensure t
-  :after tree-sitter)
-
-(use-package treesit-auto
-  :ensure t
-  :custom
-  (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
-#+end_src
-
 * Appearance
 
 Use =doom-dracula= theme.
@@ -326,7 +292,7 @@ Add helpers to switch between themes.
   (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
 
-Setup font. I prefer monospace font for all purposes as I don't like how variable pitch fonts look in Emacs.
+Setup fonts.
 
 #+begin_src emacs-lisp :tangle yes
 (set-face-attribute 'default nil
@@ -564,11 +530,20 @@ A mode for reading epub files.
 Open PDF files in the GUI default application from Dired. PDF-tools is slow and clunky so I prefer this approach.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package openwith
+;; (use-package openwith
+;;   :ensure t
+;;   :config
+;;   (setq openwith-associations '(("\\.pdf\\'" "open" (file))))
+;;   (openwith-mode t))
+#+end_src
+
+** PDF-tools
+
+#+begin_src emacs-lisp :tangle yes
+(use-package pdf-tools
   :ensure t
   :config
-  (setq openwith-associations '(("\\.pdf\\'" "open" (file))))
-  (openwith-mode t))
+  (setq pdf-view-use-scaling nil))
 #+end_src
 
 ** Olivetti mode
@@ -622,6 +597,40 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
   :defer
   :config
   (global-set-key (kbd "C-c C-r") 'sudo-edit))
+#+end_src
+
+* Tree-sitter
+
+Use =tree-sitter=.
+
+#+begin_src emacs-lisp :tangle yes
+(setq treesit-extra-load-path `(,(concat user-emacs-directory "var/tree-sitter-dist/")
+                                ,(concat user-emacs-directory "var/tree-sitter")))
+
+(defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
+  (when (< (buffer-size) 1000000)
+    (turn-on-tree-sitter-mode)))
+
+(use-package tree-sitter
+  :hook ((tree-sitter-after-on . tree-sitter-hl-mode)
+         (prog-mode . tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large))
+  :config (require 'tree-sitter-langs)
+  ;; This makes every node a link to a section of code
+  (setq tree-sitter-debug-jump-buttons t
+        ;; and this highlights the entire sub tree in your code
+        tree-sitter-debug-highlight-jump-region t))
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
+
+(use-package treesit-auto
+  :ensure t
+  :custom
+  (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
 #+end_src
 
 * Evil mode
@@ -1224,6 +1233,13 @@ Elisp keybindings.
 ;; (add-hook 'python-ts-mode-hook #'lsp)
 #+end_src
 
+** Groovy
+
+#+begin_src emacs-lisp :tangle yes
+(use-package groovy-mode
+  :ensure t)
+#+end_src
+
 * LSP-mode
 
 #+begin_src emacs-lisp :tangle yes
@@ -1352,7 +1368,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   ;; Optional customizations
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)                 ;; Enable auto completion
+  (corfu-auto nil)               ;; Enable auto completion
   (corfu-auto-prefix 2)
   (corfu-auto-delay 0.4)
   (corfu-on-exact-match 'insert) ;; Insert when there's only one match
@@ -1390,7 +1406,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :init
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
-
+  :hook ((prog-mode-hook . completion-preview-mode)
+	 (text-mode-hook . completion-preview-mode))
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
   ;; (setq read-extended-command-predicate
@@ -2341,7 +2358,7 @@ Ztree is /"A major mode for displaying the directory tree in text mode"/. One th
 
 * Various minor tweaks
 
-** Insert pull GPG passphrases from environment variables to Emacs registers
+** Pull GPG passphrases from environment variables to Emacs registers
 
 Read a GPG passphrase from environment variable to a register for easier access.
 
