@@ -2573,9 +2573,15 @@ newlines at the end of the message."
     (setq tv/scratch-message msg)
     (tv/scratch-message-insert msg)))
 
+
+(defun tv/reset-eshell-message ()
+  (let ((props (text-properties-at 0 eshell-banner-message)))
+    (setq eshell-banner-message (propertize (concat (tv/generate-quote) "\n\n\n") 'insert-in-front-hooks (plist-get props 'insert-in-front-hooks)))))
+
 (tv/reset-scratch-message)
 
 (global-set-key (kbd "C-c ä") 'tv/reset-scratch-message)
+(add-hook 'eshell-mode-hook #'tv/reset-eshell-message)
 #+end_src
 
 ** Open a Jira ticket in the browser
