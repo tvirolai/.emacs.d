@@ -936,7 +936,8 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
   :defer
   :config
   (setq
-   gptel-model 'claude-3-5-sonnet-20241022
+   ;; gptel-model 'claude-3-5-sonnet-20241022
+   gptel-model 'claude-3-7-sonnet-20250219
    gptel-backend (gptel-make-anthropic "Claude"
                    :stream t
                    :key (getenv "CLAUDE_API_KEY"))))
@@ -1368,7 +1369,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   ;; Optional customizations
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto nil)               ;; Enable auto completion
+  (corfu-auto t)               ;; Enable auto completion
   (corfu-auto-prefix 2)
   (corfu-auto-delay 0.4)
   (corfu-on-exact-match 'insert) ;; Insert when there's only one match
@@ -1406,8 +1407,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :init
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
-  :hook ((prog-mode-hook . completion-preview-mode)
-	 (text-mode-hook . completion-preview-mode))
+  ;; :hook ((prog-mode-hook . completion-preview-mode)
+  ;; 	 (text-mode-hook . completion-preview-mode))
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
   ;; (setq read-extended-command-predicate
