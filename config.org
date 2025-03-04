@@ -2581,7 +2581,7 @@ newlines at the end of the message."
 (tv/reset-scratch-message)
 
 (global-set-key (kbd "C-c ä") 'tv/reset-scratch-message)
-(add-hook 'eshell-mode-hook #'tv/reset-eshell-message)
+(add-hook 'eshell-mode-hook 'tv/reset-eshell-message)
 #+end_src
 
 ** Open a Jira ticket in the browser
