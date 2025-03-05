@@ -256,6 +256,10 @@ Use =doom-dracula= theme.
 #+begin_src emacs-lisp :tangle yes
 (use-package doom-themes
   :ensure t
+  :custom
+  (doom-dracula-brighter-modeline t)
+  (doom-dracula-brighter-comments t)
+  (doom-dracula-colorful-headers t)
   :config
   (load-theme 'doom-dracula t))
 #+end_src
@@ -282,13 +286,13 @@ Add helpers to switch between themes.
 (defun tv/load-light-theme ()
   "Load light theme."
   (interactive)
-  (load-theme 'modus-operandi-deuteranopia t)
+  (load-theme 'modus-operandi t)
   (set-frame-parameter nil 'ns-appearance 'light))
 
 (defun tv/load-dark-theme ()
   "Load dark theme."
   (interactive)
-  (load-theme 'doom-dracula t)
+  (load-theme 'modus-vivendi t)
   (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
 
