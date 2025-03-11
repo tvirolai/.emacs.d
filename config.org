@@ -1803,6 +1803,9 @@ Use 4 spaces as the default indentation level.
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys)
 
+  (defun tv/checkbox-state ()
+    (plist-get (cadr (org-element-context)) :checkbox))
+
   (defun tv/org-todo-toggle-or-open-link ()
     "Open link or toggle a TODO, depending on which one is under point."
     (interactive)
@@ -1811,9 +1814,7 @@ Use 4 spaces as the default indentation level.
           (org-open-at-point)
         (progn
           (let ((state (org-get-todo-state)))
-            (cond ((string= state "[ ]") (org-todo "[-]"))
-                  ((string= state "[-]") (org-todo "[X]"))
-                  ((string= state "[X]") (org-todo "[ ]"))
+            (cond ((eq (type-of (tv/checkbox-state)) 'symbol) (org-toggle-checkbox))
                   ((string= state "TODO") (org-todo "DOING"))
                   ((string= state "DOING") (org-todo "DONE"))
                   ((string= state "DONE") (org-todo "TODO"))
