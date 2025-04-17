@@ -791,6 +791,10 @@ Magit is the Git package.
                         #'tv/kill-magit-diff-buffer-in-current-repo
                         nil t)))
   (evil-define-key 'normal magit-status-mode-map
+    "C-l" #'evil-window-right
+    "C-h" #'evil-window-left
+    "C-k" #'evil-window-prev
+    "C-j" #'evil-window-next
     "q" #'tv/mu-magit-kill-buffers)
   (add-hook 'magit-post-refresh-hook
             #'git-gutter:update-all-windows))
@@ -940,7 +944,6 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
   :defer
   :config
   (setq
-   ;; gptel-model 'claude-3-5-sonnet-20241022
    gptel-model 'claude-3-7-sonnet-20250219
    gptel-backend (gptel-make-anthropic "Claude"
                    :stream t
@@ -1660,7 +1663,7 @@ Use 4 spaces as the default indentation level.
   (org-use-sub-superscripts "{}")
   (org-fold-catch-invisible-edits 'error)
   (org-todo-keywords
-   '((sequence "TODO(t)" "HOLD(d@/!)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
+   '((sequence "TODO(t)" "HOLD(h@/!)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   (org-done ((t (:foreground "PaleGreen"
@@ -1803,9 +1806,6 @@ Use 4 spaces as the default indentation level.
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys)
 
-  (defun tv/checkbox-state ()
-    (plist-get (cadr (org-element-context)) :checkbox))
-
   (defun tv/org-todo-toggle-or-open-link ()
     "Open link or toggle a TODO, depending on which one is under point."
     (interactive)
@@ -1814,11 +1814,11 @@ Use 4 spaces as the default indentation level.
           (org-open-at-point)
         (progn
           (let ((state (org-get-todo-state)))
-            (cond ((eq (type-of (tv/checkbox-state)) 'symbol) (org-toggle-checkbox))
-                  ((string= state "TODO") (org-todo "DOING"))
-                  ((string= state "DOING") (org-todo "DONE"))
-                  ((string= state "DONE") (org-todo "TODO"))
-                  (t (message state))))))))
+            (cond
+             ((string= state "TODO") (org-todo "DOING"))
+             ((string= state "DOING") (org-todo "DONE"))
+             ((string= state "DONE") (org-todo "TODO"))
+             (t (org-todo))))))))
 
   (evil-define-key 'normal org-mode-map
     (kbd "RET") #'tv/org-todo-toggle-or-open-link))
@@ -1833,8 +1833,7 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   :defer t
   :ensure t
   :init
-  (require 'denote-org-extras)
-  ;; (denote-rename-buffer-mode 1) ;; This seems to cause freezes when trying to open files.
+  (denote-rename-buffer-mode 1) ;; This seems to cause freezes when trying to open files. EDIT: Maybe not anymore, trying it out again.
   :custom-face
   (denote-faces-link ((t (:slant italic))))
   :hook
@@ -1869,13 +1868,40 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
                ("C-c n s" . consult-notes-search-in-all-notes))))
 #+end_src
 
-** Consult-denote
+** Denote extensions
+
+*** Consult-denote
 
 #+begin_src emacs-lisp :tangle yes
 (use-package consult-denote
   :ensure t
   :bind (:map global-map
               (("C-c n g" . consult-denote-grep))))
+#+end_src
+
+*** Denote-org
+
+#+begin_src emacs-lisp :tangle yes
+(use-package denote-org
+  :ensure t)
+#+end_src
+
+*** Denote-journal
+
+Just trying this one out for now.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package denote-journal
+  :ensure t)
+#+end_src
+
+*** Denote-sequence
+
+Just trying this one out for now.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package denote-sequence
+  :ensure t)
 #+end_src
 
 ** Denote-explore
