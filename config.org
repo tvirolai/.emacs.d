@@ -643,9 +643,6 @@ Vim keybindings here.
   :ensure t
   :demand t
   :bind (("<escape>" . keyboard-escape-quit))
-  :hook (nxml-mode-hook . (lambda ()
-                            (message "voi vittu")
-                            (setq evil-set-undo-system 'undo-redo)))
   :init
   (setq evil-want-keybinding nil)
   ;; no vim insert bindings
