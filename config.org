@@ -1,5 +1,4 @@
-#+title: Config
-#+author: Tuomo Virolainen
+#+title:   Emacs configuration
 #+STARTUP: showall
 
 * Introduction
@@ -8,7 +7,7 @@ This is my personal Emacs configuration. It is implemented using literate progra
 
 1. The two-liner =init.el= config file is loaded, which in turns calls the =org-babel-load-file= function with this file.
 2. The org file is processed and the code blocks are tangled into a =config.el= file.
-3. The generated configuration file is then loaded. As the =config.el= file is basically a function of this one, I've omitted it from version control.
+3. The generated configuration file is then loaded.
 
 * General setup
 
@@ -119,7 +118,7 @@ Disable unnecessary stuff.
 #+end_src
 
 #+begin_src emacs-lisp :tangle yes
-(setq ns-use-srgb-colorspace nil)
+;; (setq ns-use-srgb-colorspace nil)
 #+end_src
 
 Set 10MB as the limit for garbage collection.
@@ -1413,6 +1412,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :init
   (setq corfu-quit-at-boundary 'separator)
   (global-corfu-mode)
+  (corfu-popupinfo-mode)
   (corfu-history-mode))
 
 (use-package cape
@@ -1958,6 +1958,40 @@ Modified from [[https://github.com/pprevos/emacs-writing-studio/blob/master/init
    ("C-c w x D" . denote-explore-degree-barchart)))
 #+end_src
 
+** Align front matter
+
+Re-indent front-matter. Could be handy if a key longer than the stock ones has been added. Used AI (Claude) for this one.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/align-org-front-matter ()
+  "Align key-value pairs in Org Mode front matter."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (let ((front-matter-end (save-excursion
+                              (re-search-forward "^\\($\\|[^#]\\)" nil t)
+                              (point)))
+          (keys nil))
+      ;; First pass: collect all keys and find max length
+      (while (re-search-forward "^#\\+\\([A-Za-z_]+\\):" front-matter-end t)
+        (push (match-string-no-properties 1) keys))
+      (when keys
+        (let ((max-length (apply #'max (mapcar #'length keys))))
+
+      (print max-length)
+          ;; Second pass: realign all front matter
+          (goto-char (point-min))
+          (while (re-search-forward "^#\\+\\([A-Za-z_]+\\):\\s-*\\(.*\\)" front-matter-end t)
+            (let* ((key (match-string-no-properties 1))
+                   (val (match-string-no-properties 2))
+                   (padding (- (+ max-length 1) (length key))))
+              (replace-match (format "#\+%s:%s%s"
+                                    key
+                                    (make-string padding ?\s)
+                                    val))))))))
+  (message "Front matter aligned."))
+#+end_src
+
 ** Org Agenda
 :PROPERTIES:
 :ID:       DB9E54AF-CBBB-4C0E-B54E-A3EF408626A4
@@ -2287,6 +2321,13 @@ Disable images.
   :hook (dired-mode . all-the-icons-dired-mode)
   :custom
   (all-the-icons-dired-monochrome nil))
+#+end_src
+
+Install [[https://github.com/Fuco1/dired-narrow][dired-narrow]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package dired-narrow
+  :ensure t)
 #+end_src
 
 * Transient
@@ -2730,9 +2771,6 @@ From [[https://lmno.lol/alvaro/emacs-quick-kill-process][Xenodium]].
        :error-autofocus t
        :silent-success t))))
 #+end_src
-
-#+RESULTS:
-: dwim-shell-commands-kill-process
 
 ** Find and insert all Jira ticket codes at point
 
