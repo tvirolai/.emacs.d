@@ -1986,7 +1986,7 @@ Modified from [[https://github.com/pprevos/emacs-writing-studio/blob/master/init
    ("C-c w x c" . denote-explore-count-notes)
    ("C-c w x C" . denote-explore-count-keywords)
    ;; Denote Janitor
-   ("C-c w x d" . denote-explore-identify-duplicate-notes)
+   ("C-c w x d" . denote-explore-duplicate-notes)
    ("C-c w x z" . denote-explore-zero-keywords)
    ("C-c w x s" . denote-explore-single-keywords)
    ("C-c w x o" . denote-explore-sort-keywords)
@@ -2016,8 +2016,6 @@ Re-indent front-matter. Could be handy if a key longer than the stock ones has b
         (push (match-string-no-properties 1) keys))
       (when keys
         (let ((max-length (apply #'max (mapcar #'length keys))))
-
-      (print max-length)
           ;; Second pass: realign all front matter
           (goto-char (point-min))
           (while (re-search-forward "^#\\+\\([A-Za-z_]+\\):\\s-*\\(.*\\)" front-matter-end t)
@@ -2127,6 +2125,13 @@ Enable dragging and dropping images to org documents. Note that the command-line
   :ensure t
   :config
   (setq-default org-download-image-dir (concat org-directory "assets")))
+#+end_src
+
+** Org-modern mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-modern
+  :ensure t)
 #+end_src
 
 * Elfeed
