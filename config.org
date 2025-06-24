@@ -1864,10 +1864,10 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
 (use-package denote
   :defer t
   :ensure t
-  :init
-  (denote-rename-buffer-mode 1) ;; This seems to cause freezes when trying to open files. EDIT: Maybe not anymore, trying it out again.
-  :custom-face
-  (denote-faces-link ((t (:slant italic))))
+  ;; :init
+  ;; (denote-rename-buffer-mode 1) ;; This seems to cause freezes when trying to open files. EDIT: Maybe not anymore, trying it out again.
+  ;; :custom-face
+  ;; (denote-faces-link ((t (:slant italic))))
   :hook
   (dired-mode . denote-dired-mode)
   :config
@@ -1882,7 +1882,7 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
                ("C-c n i" . denote-open-or-create)
                ("C-c n k" . denote-rename-file-keywords)
                ("C-c n r" . denote-rename-file)
-               ("C-c n R" . denote-rename-file-using-front-matter)
+               ("C-c n R" . tv/denote-dired-rename-files-without-prompting)
                ("C-c n l" . denote-link-or-create)
                ("C-c n L" . denote-link-after-creating)
                ("C-c n n" . denote-create-note)
@@ -1898,6 +1898,45 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   :bind (:map global-map
               (("C-c n f" . consult-notes)
                ("C-c n s" . consult-notes-search-in-all-notes))))
+#+end_src
+
+** Custom Denote functions
+
+I need a variant of =denote-dired-rename-files= that doesn't prompt for input.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/denote-dired-rename-files-without-prompting ()
+  "Rename Dired marked files same way as `denote-rename-file'.
+Rename each file in sequence, making all the relevant prompts.
+Unlike `denote-rename-file', do not prompt for confirmation of
+the changes made to the file: perform them outright (same as
+setting `denote-rename-confirmations' to a nil value)."
+  (declare (interactive-only t))
+  (interactive nil dired-mode)
+  (let ((denote--used-ids (denote--get-all-used-ids))
+        (denote-rename-confirmations nil))
+    (if-let* ((marks (dired-get-marked-files)))
+        (progn
+          (dolist (file marks)
+            (pcase-let ((`(,title ,keywords ,signature ,date)
+                         (tv/denote--rename-get-file-info-from-existing file)))
+              (denote--rename-file file title keywords signature date)))
+          (denote-update-dired-buffers))
+      (user-error "No marked files; aborting"))))
+
+(defun tv/denote--rename-get-file-info-from-existing (file)
+  "Retrieve existing info from FILE without prompting.
+
+It is meant to be combined with `denote--rename-file' to create
+renaming commands."
+  (let* ((file-in-prompt (propertize (file-relative-name file) 'face 'denote-faces-prompt-current-name))
+         (file-type (denote-filetype-heuristics file))
+         (id (or (denote-retrieve-filename-identifier file) ""))
+         (date (or (denote-valid-date-p id) (denote--generate-date-for-rename file)))
+         (title (or (denote-retrieve-title-or-filename file file-type) ""))
+         (keywords (denote-extract-keywords-from-path file))
+         (signature (or (denote-retrieve-filename-signature file) "")))
+    (list title keywords signature date)))
 #+end_src
 
 ** Denote extensions
