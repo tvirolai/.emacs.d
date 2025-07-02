@@ -342,10 +342,8 @@ Require a newline at the end.
 (setq require-final-newline t)
 #+end_src
 
-Show trailing whitespace
-
 #+begin_src emacs-lisp :tangle yes
-(setq show-trailing-whitespace t)
+(setq-default sentence-end-double-space nil)
 #+end_src
 
 Maximize the frame on startup.
@@ -588,10 +586,16 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
 
 ** Whitespace
 
+Show trailing whitespace.
+
+#+begin_src emacs-lisp :tangle yes
+(setq show-trailing-whitespace t)
+#+end_src
+
+Make it go away.
+
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
-
-(setq-default sentence-end-double-space nil)
 #+end_src
 
 ** Sudo edit
@@ -2163,6 +2167,60 @@ Enable dragging and dropping images to org documents. Note that the command-line
   :ensure t)
 #+end_src
 
+** Copy articles from web to org
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-web-tools
+  :ensure t)
+#+end_src
+
+From [[https://www.reddit.com/r/emacs/comments/1lnhtbs/how_do_you_store_and_revisit_articles_from_web/][Emacs Reddit]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/eww-to-org (&optional dest)
+  "Render the current eww buffer using org markup.
+  If DEST, a buffer, is provided, insert the markup there."
+  (interactive)
+  (unless (org-region-active-p)
+    (let ((shr-width 80)) (eww-readable)))
+  (let* ((start (if (org-region-active-p) (region-beginning) (point-min)))
+         (end (if (org-region-active-p) (region-end) (point-max)))
+         (buff (or dest (generate-new-buffer "*eww-to-org*")))
+         (link (eww-current-url))
+         (title (or (plist-get eww-data :title) "")))
+    (with-current-buffer buff
+      (insert "#+title: " title "\n#+link: " link "\n\n")
+      (org-mode))
+    (save-excursion
+      (goto-char start)
+      (while (< (point) end)
+        (let* ((p (point))
+               (props (text-properties-at p))
+               (k (seq-find (lambda (x) (plist-get props x))
+                            '(shr-url image-url outline-level face)))
+               (prop (and k (list k (plist-get props k))))
+               (next (if prop
+                         (next-single-property-change p (car prop) nil end)
+                       (next-property-change p nil end)))
+               (txt (buffer-substring (point) next))
+               (txt (replace-regexp-in-string "\\*" "·" txt)))
+          (with-current-buffer buff
+            (insert
+             (pcase prop
+               ((and (or `(shr-url ,url) `(image-url ,url))
+                     (guard (string-match-p "^http" url)))
+                (let ((tt (replace-regexp-in-string "\n\\([^$]\\)" " \\1" txt)))
+                  (org-link-make-string url tt)))
+               (`(outline-level ,n)
+                (concat (make-string (- (* 2 n) 1) ?*) " " txt "\n"))
+               ('(face italic) (format "/%s/ " (string-trim txt)))
+               ('(face bold) (format "*%s* " (string-trim txt)))
+               (_ txt))))
+          (goto-char next))))
+    (pop-to-buffer buff)
+    (goto-char (point-min))))
+#+end_src
+
 * Elfeed
 
 RSS feeds are a convenient way to consume information on a pull-basis from different sources. I can't be bothered to tweak the stock elfeed experience too much.
@@ -2401,6 +2459,20 @@ Install [[https://github.com/Fuco1/dired-narrow][dired-narrow]].
 #+begin_src emacs-lisp :tangle yes
 (use-package dired-narrow
   :ensure t)
+#+end_src
+
+* Show diff for unsaved changes
+
+When there are unsaved changes and the user tries to exit Emacs, it asks whether I want to save them. With this snippet in the config, it also shows /what/ the said changes are, which should be helpful.
+
+Found this [[https://eugene-andrienko.com/en/it/2025/06/30/my-emacs-configuration-common.html#rc-emacs-cursor-minibuffer][here]].
+
+#+begin_src emacs-lisp :tangle yes
+; If asked to save buffer on C-x C-c - show diff of changes with d key
+(add-to-list 'save-some-buffers-action-alist
+             '("d" (lambda (buffer)
+                     (diff-buffer-with-file (buffer-file-name buffer)))
+               "Show diff of changes"))
 #+end_src
 
 * Transient
