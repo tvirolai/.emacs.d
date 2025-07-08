@@ -322,9 +322,6 @@ Setup fonts.
 
 (add-to-list 'default-frame-alist '(font . "SF Mono 14"))
 
-;; (set-face-attribute 'default nil
-;;                     :height 150 :weight 'regular :family "Roboto Mono")
-
 (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 #+end_src
@@ -1023,7 +1020,6 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
               ("RET" . ready-player-menu))
   :config
   (when (memq system-type '(darwin))
-    (set-fontset-font t nil "SF Pro Display" nil 'append)
     (ready-player-macos-use-sf-symbols))
   (ready-player-mode +1))
 #+end_src
