@@ -937,6 +937,22 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 #+end_src
 
+Prevent the "Text is read only" message when pressing backspace in minibuffer ([[https://emacs.stackexchange.com/questions/66589/how-to-prevent-text-is-read-only-when-in-minibuffer?newreg=e978077fa67744548d4395e6d7a973b5][source]]).
+
+#+begin_src emacs-lisp :tangle yes
+(defun backward-delete-char-stop-at-read-only (n &optional killflag)
+  "Do as `backward-delete-char' but stop at read-only text."
+  (interactive "p\nP")
+  (unless (or (get-text-property (point) 'read-only)
+          (eq (point) (point-min))
+          (get-text-property (1- (point)) 'read-only))
+    (setq n (min (- (point) (point-min)) n))
+    (setq n (- (point) (previous-single-property-change (point) 'read-only nil (- (point) n))))
+    (backward-delete-char n killflag)))
+
+(define-key minibuffer-local-map (kbd "DEL") #'backward-delete-char-stop-at-read-only)
+#+end_src
+
 Frame management.
 
 #+begin_src emacs-lisp :tangle yes
