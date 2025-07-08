@@ -658,6 +658,7 @@ Vim keybindings here.
   ;; (evil-set-undo-system 'vundo)
   ;; (evil-set-undo-system 'undo-tree)
   (evil-set-undo-system 'undo-redo)
+  (setq evil-undo-system 'undo-fu)
   (setq evil-split-window-below t
         evil-vsplit-window-right t)
   (setq evil-ex-substitute-global t)
@@ -666,6 +667,24 @@ Vim keybindings here.
   (evil-add-command-properties #'flymake-goto-next-error :jump t)
   (evil-add-command-properties #'evil-scroll-up :jump t)
   (evil-add-command-properties #'consult-grep :jump t))
+
+(use-package undo-fu
+  :ensure t
+  :after evil
+  :custom
+  (setopt undo-limit (* 13 160000))
+  (setopt undo-outer-limit (* 13 24000000))
+  (setopt undo-strong-limit (* 13 240000))
+  :config
+  (setq undo-fu-allow-undo-in-region t))
+
+(use-package undo-fu-session
+  :ensure t
+  :hook (after-init . undo-fu-session-global-mode)
+  :config
+  (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")
+        undo-fu-session-file-limit 10))
+
 
 (use-package evil-collection
   :ensure t
@@ -1552,6 +1571,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
                  nil
                  (window-parameters (mode-line-format . none)))))
 
+;; (setq prefix-help-command #'embark-prefix-help-command)
+
 ;; Consult users will also want the embark-consult package.
 (use-package embark-consult
   :ensure t ; only need to install it, embark loads it after consult if found
@@ -1621,14 +1642,14 @@ Enable =recentf-mode=.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package recentf
+  :init (recentf-mode 1)
   :config
   (setq recentf-save-file (expand-file-name "recentf" tv-savefile-dir)
-        recentf-max-saved-items 500
-        recentf-max-menu-items 15
+        recentf-max-saved-items 40
+        recentf-max-menu-items 40
         ;; disable recentf-cleanup on Emacs start, because it can cause
         ;; problems with remote files
-        recentf-auto-cleanup 'never)
-  (recentf-mode +1))
+        recentf-auto-cleanup 'never))
 #+end_src
 
 * File formats
