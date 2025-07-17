@@ -299,28 +299,74 @@ Add helpers to switch between themes.
   (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
 
-Setup fonts.
+Let's try out Fontaine for setting up fonts.
 
 #+begin_src emacs-lisp :tangle yes
-(set-face-attribute 'default nil
-                    :family "SF Mono"
-                    :height 140
-                    :weight 'normal
-                    :width 'normal)
+(use-package fontaine
+  :ensure t
+  :hook
+  ((after-init . fontaine-mode)
+   (after-init . (lambda ()
+                   ;; Set last preset or fall back to desired style from `fontaine-presets'.
+                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
+  :config
+  (setq fontaine-presets
+        '((small
+           :default-height 100)
+          (regular) ; like this it uses all the fallback values and is named `regular'
+          (medium
+           :default-family "JetBrains Mono"
+           :default-height 140
+           :fixed-pitch-family "JetBrains Mono"
+           :variable-pitch-family "SF Pro")
+          (large
+           :default-height 200)
+          (presentation
+           :default-height 180)
+          (jumbo
+           :inherit medium
+           :default-height 260)
+          (t
+           ;; I keep all properties for didactic purposes, but most can be
+           ;; omitted.  See the fontaine manual for the technicalities:
+           ;; <https://protesilaos.com/emacs/fontaine>.
+           :default-family "SF Mono"
+           :default-weight regular
+           :default-slant normal
+           :default-width normal
+           :default-height 140
 
-(set-face-attribute 'variable-pitch nil
-                    :family "SF Pro"
-                    :height 160
-                    :weight 'normal
-                    :width 'normal)
+           :fixed-pitch-family "Aporetic Sans Mono"
+           :fixed-pitch-weight nil
+           :fixed-pitch-slant nil
+           :fixed-pitch-width nil
+           :fixed-pitch-height 1.0
 
-(set-face-attribute 'fixed-pitch nil
-                    :family "SF Mono"
-                    :height 140
-                    :weight 'normal
-                    :width 'normal)
+           :fixed-pitch-serif-family nil
+           :fixed-pitch-serif-weight nil
+           :fixed-pitch-serif-slant nil
+           :fixed-pitch-serif-width nil
+           :fixed-pitch-serif-height 1.2
 
-(add-to-list 'default-frame-alist '(font . "SF Mono 14"))
+           :variable-pitch-family "SF Pro"
+           :variable-pitch-weight nil
+           :variable-pitch-slant nil
+           :variable-pitch-width nil
+           :variable-pitch-height 200
+
+           :bold-family nil
+           :bold-slant nil
+           :bold-weight bold
+           :bold-width nil
+           :bold-height 1.0
+
+           :italic-family nil
+           :italic-weight nil
+           :italic-slant italic
+           :italic-width nil
+           :italic-height 1.0
+
+           :line-spacing nil))))
 
 (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
@@ -653,6 +699,7 @@ Vim keybindings here.
   (setq evil-ex-substitute-global t)
   (setq evil-kill-on-visual-paste nil)
   (setq evil-shift-width 2)
+  (setq evil-respect-visual-line-mode t)
   (evil-add-command-properties #'flymake-goto-next-error :jump t)
   (evil-add-command-properties #'evil-scroll-up :jump t)
   (evil-add-command-properties #'consult-grep :jump t))
@@ -673,7 +720,6 @@ Vim keybindings here.
   :config
   (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")
         undo-fu-session-file-limit 10))
-
 
 (use-package evil-collection
   :ensure t
@@ -1012,6 +1058,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 #+begin_src emacs-lisp :tangle yes
 (use-package ready-player
   :ensure t
+  :defer
   :custom
   (ready-player-my-media-collection-location "/Volumes/Musumusa/musa/Music/")
   (ready-player-ask-for-project-sustainability nil)
@@ -1020,6 +1067,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
               ("RET" . ready-player-menu))
   :config
   (when (memq system-type '(darwin))
+    (set-fontset-font t nil "SF Pro Display" nil 'append)
     (ready-player-macos-use-sf-symbols))
   (ready-player-mode +1))
 #+end_src
@@ -1801,11 +1849,13 @@ Use 4 spaces as the default indentation level.
           ("t" "New task" entry
            (file+headline org-default-notes-file "Tasks")
            "* TODO %i%?")
-          ;; ("j" "Journal entry" entry
-          ;;  (file+datetree "dailies.org" "week")
-          ;;  "* %<%H:%M> %?"
-          ;;  :jump-to-captured t)
-          ))
+          ("v" "Video link" entry
+           (file+headline "notes/20221110T100214--katsottavia-videoita__linkit_videot_youtube.org" "Inbox")
+           "* [[%^{Video URL}][%^{Video title}]]")
+          ("j" "Journal entry" entry
+           (file+datetree "dailies.org" "week")
+           "* %<%H:%M> %?"
+           :jump-to-captured t)))
   ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
   :hook ((org-mode . visual-line-mode)
          ;;(org-mode . org-indent-mode)
