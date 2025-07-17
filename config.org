@@ -99,10 +99,13 @@ Configure =use-package=.
 (eval-when-compile (require 'use-package))
 #+end_src
 
-The cursor may blink.
+The cursor may blink. Not in image buffers though.
 
 #+begin_src emacs-lisp :tangle yes
 (blink-cursor-mode t)
+(add-hook 'image-mode-hook (lambda ()
+                             (setq-local blink-cursor-mode nil)
+                             (internal-show-cursor nil nil)))
 #+end_src
 
 Disable unnecessary stuff.
