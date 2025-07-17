@@ -2,6 +2,7 @@
 .idea
 *.log
 tmp/
+*.eld
 
 custom.el
 elpa/*
@@ -19,7 +20,6 @@ straight
 url
 var
 games
-projectile-bookmarks.eld
 *.cache
 tree-sitter
 auto-save-list
