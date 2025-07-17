@@ -120,10 +120,6 @@ Disable unnecessary stuff.
 (setq initial-scratch-message "")
 #+end_src
 
-#+begin_src emacs-lisp :tangle yes
-;; (setq ns-use-srgb-colorspace nil)
-#+end_src
-
 Set 10MB as the limit for garbage collection.
 
 #+begin_src emacs-lisp :tangle yes
@@ -410,15 +406,13 @@ Wrap lines by default. I hate horizontal scrolling.
 Make the titlebar transparent.
 
 #+begin_src emacs-lisp :tangle yes
-(set-frame-parameter nil 'ns-transparent-titlebar t)
 (add-to-list 'default-frame-alist '(ns-transparent-titlebar . t))
 #+end_src
 
 We are using a dark color theme by default, which the title bar should reflect too.
 
 #+begin_src emacs-lisp :tangle yes
-(set-frame-parameter nil 'ns-appearance 'dark)
-(add-to-list 'default-frame-alist '(ns-appearance . 'dark))
+(add-to-list 'default-frame-alist '(ns-appearance . dark))
 #+end_src
 
 Remove the icon from the titlebar.
