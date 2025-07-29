@@ -294,7 +294,7 @@ Add helpers to switch between themes.
 (defun tv/load-dark-theme ()
   "Load dark theme."
   (interactive)
-  (load-theme 'modus-vivendi t)
+  (load-theme 'doom-dracula t)
   (set-frame-parameter nil 'ns-appearance 'dark))
 #+end_src
 
@@ -332,11 +332,11 @@ Let's try out Fontaine for setting up fonts.
            :default-width normal
            :default-height 140
 
-           :fixed-pitch-family "Aporetic Sans Mono"
+           :fixed-pitch-family "JetBrains Mono"
            :fixed-pitch-weight nil
            :fixed-pitch-slant nil
            :fixed-pitch-width nil
-           :fixed-pitch-height 1.0
+           :fixed-pitch-height 180
 
            :fixed-pitch-serif-family nil
            :fixed-pitch-serif-weight nil
@@ -348,7 +348,7 @@ Let's try out Fontaine for setting up fonts.
            :variable-pitch-weight nil
            :variable-pitch-slant nil
            :variable-pitch-width nil
-           :variable-pitch-height 200
+           :variable-pitch-height 180
 
            :bold-family nil
            :bold-slant nil
@@ -547,6 +547,14 @@ Rainbow-delimiters are useful in lisps.
   :hook (prog-mode . rainbow-delimiters-mode))
 #+end_src
 
+** Line spacing
+
+A bit wider line spacing than the default.
+
+#+begin_src emacs-lisp :tangle yes
+(setq-default line-spacing 0.15)
+#+end_src
+
 ** Nov.el mode
 
 A mode for reading epub files.
@@ -731,16 +739,11 @@ Vim keybindings here.
   (make-directory tv/undo-dir))
 #+end_src
 
-Frustratingly, Emacs seems to freeze when trying to save XML with =undo-tree-mode= on.
-
 #+begin_src emacs-lisp :tangle yes
-;; (use-package undo-tree
-;;   :ensure t
-;;   :hook ((after-init . global-undo-tree-mode))
-;;   :config
-;;   ;; Prevent undo tree files from polluting your git repo
-;;   (setq undo-tree-history-directory-alist `(("." . ,tv/undo-dir)))
-;;   (setq undo-tree-enable-undo-in-region nil))
+(use-package evil-visual-mark-mode
+  :ensure t
+  :config
+  (evil-visual-mark-mode +1))
 #+end_src
 
 Vundo.
@@ -955,6 +958,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-ö") 'split-window-below)
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
 (evil-define-key 'normal 'global (kbd "å") 'consult-yank-pop)
+(evil-define-key 'normal 'global (kbd "Å") 'consult-org-heading)
 (evil-define-key 'normal 'global (kbd "M-ö") 'evil-end-of-line) ;; $ is too unwieldy on a Scandinavian keyboard
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
 
@@ -1301,6 +1305,8 @@ Elisp keybindings.
   (add-hook 'ielm-mode-hook #'(lambda ()
                                 (setq-local corfu-auto nil)
                                 (corfu-mode))))
+
+(add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
 #+end_src
 
 ** Typescript
@@ -1512,7 +1518,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
   ;; :hook ((prog-mode-hook . completion-preview-mode)
-  ;; 	 (text-mode-hook . completion-preview-mode))
+  ;;     (text-mode-hook . completion-preview-mode))
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
   ;; (setq read-extended-command-predicate
@@ -1521,6 +1527,21 @@ Writable grep. This makes possible to use workflows for search and replace like:
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
+#+end_src
+
+Enable Corfu in minibuffers. Source: [[https://github.com/yantar92/emacs-config/blob/master/config.org][Ihor.]]
+
+#+begin_src emacs-lisp :tangle yes
+(use-package corfu
+  :init
+  (defun corfu-enable-in-minibuffer ()
+    "Enable Corfu in the minibuffer."
+    (when (local-variable-p 'completion-at-point-functions)
+      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+                  corfu-popupinfo-delay nil)
+      (corfu-mode 1)))
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer))
 #+end_src
 
 ** Orderless
@@ -1742,7 +1763,7 @@ Use 4 spaces as the default indentation level.
 (setq nxml-child-indent 4 nxml-attribute-indent 4)
 #+end_src
 
-* Org-mode
+* Org mode
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org
@@ -1849,6 +1870,11 @@ Use 4 spaces as the default indentation level.
            (file+datetree "dailies.org" "week")
            "* %<%H:%M> %?"
            :jump-to-captured t)))
+  ;; Export settings
+  (setq org-export-with-toc nil)  ; No table of contents
+  (setq org-export-with-section-numbers nil)  ; No section numbers
+  (setq org-export-with-smart-quotes t)  ; Use smart quotes
+  (setq org-export-with-sub-superscripts nil)  ; No superscripts
   ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
   :hook ((org-mode . visual-line-mode)
          ;;(org-mode . org-indent-mode)
@@ -1897,7 +1923,7 @@ Use 4 spaces as the default indentation level.
   (setq org-appear-autoemphasis   t   ;; Show bold, italics, verbatim, etc.
         org-appear-autolinks      nil   ;; Show links
         org-appear-autosubmarkers t))
-#+end_src
+           #+end_src
 
 ** Evil-org
 
@@ -2124,9 +2150,9 @@ Re-indent front-matter. Could be handy if a key longer than the stock ones has b
                    (val (match-string-no-properties 2))
                    (padding (- (+ max-length 1) (length key))))
               (replace-match (format "#\+%s:%s%s"
-                                    key
-                                    (make-string padding ?\s)
-                                    val))))))))
+                                     key
+                                     (make-string padding ?\s)
+                                     val))))))))
   (message "Front matter aligned."))
 #+end_src
 
@@ -2289,6 +2315,38 @@ From [[https://www.reddit.com/r/emacs/comments/1lnhtbs/how_do_you_store_and_revi
     (goto-char (point-min))))
 #+end_src
 
+** Org-friendly word counting
+
+Source: [[https://chrismaiorana.com/summer-productivity-reset-emacs-functions/][Chris Maiorana]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun org-word-count ()
+  "Count words in region/buffer, estimate pages, and reading time.
+Excludes lines beginning with * or #. Prints result in echo area."
+  (interactive)
+  (let* ((start (if (use-region-p) (region-beginning) (point-min)))
+         (end (if (use-region-p) (region-end) (point-max)))
+         (word-count
+          (save-excursion
+            (goto-char start)
+            (let ((count 0)
+                  (inhibit-field-text-motion t))
+              (while (< (point) end)
+                (beginning-of-line)
+                (unless (looking-at-p "^[*#<]")
+                  (let ((line-end (line-end-position)))
+                    (while (re-search-forward "\\w+\\W*" line-end t)
+                      (setq count (1+ count)))))
+                (forward-line 1))
+              count)))
+         (words-per-page 400)
+         (reading-speed 215)
+         (page-count (/ (+ word-count words-per-page -1) words-per-page))
+         (reading-time (/ (+ word-count reading-speed -1) reading-speed)))
+    (message "%d words, ~%d pages, ~%d min read"
+             word-count page-count reading-time)))
+#+end_src
+
 * Elfeed
 
 RSS feeds are a convenient way to consume information on a pull-basis from different sources. I can't be bothered to tweak the stock elfeed experience too much.
@@ -2432,25 +2490,25 @@ Jump around directories quickly. From [[https://karthinks.com/software/jumping-d
 
 #+begin_src emacs-lisp :tangle yes
 (defun eshell/z (&optional regexp)
-    "Navigate to a previously visited directory in eshell, or to
+  "Navigate to a previously visited directory in eshell, or to
 any directory proferred by `consult-dir'."
-    (let ((eshell-dirs (delete-dups
-                        (mapcar 'abbreviate-file-name
-                                (ring-elements eshell-last-dir-ring)))))
-      (cond
-       ((and (not regexp) (featurep 'consult-dir))
-        (let* ((consult-dir--source-eshell `(:name "Eshell"
-                                             :narrow ?e
-                                             :category file
-                                             :face consult-file
-                                             :items ,eshell-dirs))
-               (consult-dir-sources (cons consult-dir--source-eshell
-                                          consult-dir-sources)))
-          (eshell/cd (substring-no-properties
-                      (consult-dir--pick "Switch directory: ")))))
-       (t (eshell/cd (if regexp (eshell-find-previous-directory regexp)
-                            (completing-read "cd: " eshell-dirs)))))))
-#+end_src
+  (let ((eshell-dirs (delete-dups
+                      (mapcar 'abbreviate-file-name
+                              (ring-elements eshell-last-dir-ring)))))
+    (cond
+     ((and (not regexp) (featurep 'consult-dir))
+      (let* ((consult-dir--source-eshell `(:name "Eshell"
+                                                 :narrow ?e
+                                                 :category file
+                                                 :face consult-file
+                                                 :items ,eshell-dirs))
+             (consult-dir-sources (cons consult-dir--source-eshell
+                                        consult-dir-sources)))
+        (eshell/cd (substring-no-properties
+                    (consult-dir--pick "Switch directory: ")))))
+     (t (eshell/cd (if regexp (eshell-find-previous-directory regexp)
+                     (completing-read "cd: " eshell-dirs)))))))
+    #+end_src
 
 ** Vterm
 
@@ -2561,7 +2619,7 @@ When there are unsaved changes and the user tries to exit Emacs, it asks whether
 Found this [[https://eugene-andrienko.com/en/it/2025/06/30/my-emacs-configuration-common.html#rc-emacs-cursor-minibuffer][here]].
 
 #+begin_src emacs-lisp :tangle yes
-; If asked to save buffer on C-x C-c - show diff of changes with d key
+                                        ; If asked to save buffer on C-x C-c - show diff of changes with d key
 (add-to-list 'save-some-buffers-action-alist
              '("d" (lambda (buffer)
                      (diff-buffer-with-file (buffer-file-name buffer)))
@@ -2699,6 +2757,18 @@ Ztree is /"A major mode for displaying the directory tree in text mode"/. One th
 #+begin_src emacs-lisp :tangle yes
 (use-package ztree
   :ensure t)
+#+end_src
+
+* Crux
+
+A powerful collection of utility functions.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package crux
+  :ensure t
+  :bind (("C-c b" . crux-cleanup-buffer-or-region)
+         ("C-c D" . crux-delete-file-and-buffer)
+         ("C-c k" . crux-kill-buffer-truename)))
 #+end_src
 
 * Various minor tweaks
