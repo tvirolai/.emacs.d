@@ -103,9 +103,20 @@ The cursor may blink. Not in image buffers though.
 
 #+begin_src emacs-lisp :tangle yes
 (blink-cursor-mode t)
-(add-hook 'image-mode-hook (lambda ()
-                             (setq-local blink-cursor-mode nil)
-                             (internal-show-cursor nil nil)))
+
+(defun disable-cursor-for-viewing ()
+  (setq-local cursor-type nil)
+  (blink-cursor-mode -1))
+
+(defun restore-cursor ()
+  (kill-local-variable 'cursor-type)
+  (blink-cursor-mode 1))
+
+(add-hook 'image-mode-hook #'disable-cursor-for-viewing)
+(add-hook 'reader-mode-hook #'disable-cursor-for-viewing)
+
+;; Restore when exiting
+(add-hook 'change-major-mode-hook #'restore-cursor)
 #+end_src
 
 Disable unnecessary stuff.
@@ -117,7 +128,7 @@ Disable unnecessary stuff.
 (setq inhibit-startup-screen t)
 (setq ring-bell-function 'ignore)
 (setq use-short-answers t)
-(setq initial-scratch-message "")
+;; (setq initial-scratch-message "")
 #+end_src
 
 Set 10MB as the limit for garbage collection.
@@ -567,6 +578,17 @@ A mode for reading epub files.
   (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
 #+end_src
 
+** Emacs reader
+
+[[https://codeberg.org/divyaranjan/emacs-reader][Emacs Reader]] aims to be an all-in-one reading solution for various filetypes.
+
+#+begin_src emacs-lisp :tangle yes
+(setq package-vc-allow-build-commands t)
+(use-package reader
+  :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
+            :make "all"))
+#+end_src
+
 ** Openwith
 
 Open PDF files in the GUI default application from Dired. PDF-tools is slow and clunky so I prefer this approach.
@@ -953,7 +975,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "ö") 'save-buffer)
 (evil-define-key 'normal 'global (kbd "ä") 'delete-other-windows)
 ;; Grep across open buffers by setting "." as the file regex.
-(evil-define-key 'normal 'global (kbd "M-ä") 'multi-occur-in-matching-buffers)
+(evil-define-key 'normal 'global (kbd "M-ä") 'multi-occur-in-this-mode)
 (evil-define-key 'normal 'global (kbd "C-ä") 'split-window-right)
 (evil-define-key 'normal 'global (kbd "C-ö") 'split-window-below)
 (evil-define-key 'normal 'global (kbd "Ö") 'xref-find-definitions)
@@ -1944,11 +1966,11 @@ Use 4 spaces as the default indentation level.
           (org-open-at-point)
         (progn
           (let ((state (org-get-todo-state)))
+            (message state)
             (cond
              ((string= state "TODO") (org-todo "DOING"))
              ((string= state "DOING") (org-todo "DONE"))
-             ((string= state "DONE") (org-todo "TODO"))
-             (t (org-todo))))))))
+             ((string= state "DONE") (org-todo "TODO"))))))))
 
   (evil-define-key 'normal org-mode-map
     (kbd "RET") #'tv/org-todo-toggle-or-open-link))
@@ -2408,6 +2430,7 @@ Use ansi-colors in shell.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package eshell
+  :after quotient
   :hook ((eshell-mode . hide-mode-line-mode)
          (eshell-mode . (lambda ()
                           (setenv "TERM" "xterm-256color")
@@ -2416,6 +2439,8 @@ Use ansi-colors in shell.
                           (setq-local corfu-auto nil)
                           (setq-local corfu-preview-current nil)
                           (setq-local completion-at-point-functions '(pcomplete-completions-at-point cape-file)))))
+  :custom
+  (eshell-banner-message (quotient-generate-quote))
   :init
   (setq eshell-scroll-to-bottom-on-input 'all
         eshell-error-if-no-glob t
@@ -2918,88 +2943,30 @@ When doing lots of base64 encoding and decoding, it's more ergonomical to proces
 Insert a random 4-line quote from a corpus file on top of the scratch buffer. The corpus on my work laptop is a file containing all the lyrics of Manowar, on the private machine I have the screenplay for The Room.
 
 #+begin_src emacs-lisp :tangle yes
-(defvar tv/scratch-message "")
-(defvar scratch-message-beg-marker (make-marker))
-(defvar scratch-message-end-marker (make-marker))
-(defvar lyric-file (if work-laptop-p
-                       "etc/manowar.txt"
-                     "etc/room.txt"))
+;; (use-package quotient
+;;   :load-path "~/dev/quotient"
+;;   :bind (("C-c ä" . quotient-set-scratch-message)) ;; Manually reset the scratch message
+;;   :custom
+;;   (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
+;;   (quotient-quote-length 4) ;; The default
+;;   ;; (initial-scratch-message quotient-current-quote)
+;;   ;; :config
+;;   ;; (setq initial-scratch-message quotient-current-quote)
+;;   ;; :hook
+;;   ;; (
+;;   ;;  ;; (after-init . quotient-set-scratch-message)
+;;   ;;  )
+;;   )
 
-(defun slurp (f)
-  (with-temp-buffer
-    (insert-file-contents f)
-    (buffer-substring-no-properties
-     (point-min)
-     (point-max))))
-
-(defun get-quote (rows)
-  (let* ((count (length rows))
-         (quote-length 4)
-         (start-index (random (- count quote-length)))
-         (res (seq-subseq rows start-index (+ start-index quote-length))))
-    (if (seq-filter (lambda (x)
-                      (string-match-p "^\\(?:0\\|[1-9][0-9]*\\)" x))
-                    res)
-        (get-quote rows)
-      (mapconcat 'identity res "\n"))))
-
-(defun tv/generate-quote ()
-  (if (file-exists-p (expand-file-name lyric-file
-                                       user-emacs-directory))
-      (get-quote
-       (split-string
-        (slurp (expand-file-name lyric-file
-                                 user-emacs-directory)) "\n" t))
-    (message "Lyrics not found!")))
-
-;; From https://github.com/thisirs/scratch-message/blob/master/scratch-message.el
-(defun tv/scratch-message-insert (message)
-  "Replace or insert the message MESSAGE in the scratch buffer.
-
-If there is no previous message, insert MESSAGE at the end of the
-buffer, make sure we are on a beginning of a line and add three
-newlines at the end of the message."
-  (if (get-buffer "*scratch*")
-      (with-current-buffer "*scratch*"
-        (let ((bm (buffer-modified-p)))
-          (if (and (marker-position scratch-message-beg-marker)
-                   (marker-position scratch-message-end-marker))
-              (delete-region scratch-message-beg-marker scratch-message-end-marker))
-          (save-excursion
-            (if (marker-position scratch-message-beg-marker)
-                (goto-char (marker-position scratch-message-beg-marker))
-              (goto-char (point-min))
-              (search-forward (or initial-scratch-message "") nil t)
-              (or (bolp) (insert "\n"))
-              (save-excursion (insert "\n\n\n")))
-            (set-marker scratch-message-beg-marker (point))
-            (insert message)
-            (set-marker scratch-message-end-marker (point))
-            (let ((comment-start (or comment-start ";;")))
-              (comment-region scratch-message-beg-marker
-                              scratch-message-end-marker)))
-          (set-buffer-modified-p bm)))
-    (error "No scratch buffer")))
-
-(defun tv/reset-scratch-message ()
-  (interactive)
-  (let ((msg (tv/generate-quote)))
-    (setq tv/scratch-message msg)
-    (tv/scratch-message-insert msg)))
-
-(defun tv/reset-eshell-message ()
-  (let ((props (text-properties-at 0 eshell-banner-message)))
-    (setq eshell-banner-message
-          (propertize (concat (tv/generate-quote) "\n\n")
-                      'insert-in-front-hooks
-                      (plist-get props 'insert-in-front-hooks)))))
-
-(setq eshell-banner-message (concat (tv/generate-quote) "\n\n"))
-
-(tv/reset-scratch-message)
-
-(global-set-key (kbd "C-c ä") 'tv/reset-scratch-message)
-(add-hook 'eshell-mode-hook 'tv/reset-eshell-message)
+(use-package quotient
+  :load-path "~/dev/quotient"
+  :custom
+  (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
+  (quotient-quote-length 4)
+  :hook ((after-init . (lambda ()
+                         (setq initial-scratch-message (quotient-generate-quote)))))
+  ;; :bind (("C-c ä" . quotient-set-scratch-message))
+  )
 #+end_src
 
 ** Open a Jira ticket in the browser
@@ -3010,7 +2977,6 @@ newlines at the end of the message."
   (defvar visited-jira-issues '())
 
   (defun tv/jira ()
-    "Open a Jira ticket in browser. Accepts either a prefixed or non-prefixed input."
     (interactive)
     (let* ((ticket-number (if visited-jira-issues
                               (completing-read "Tikettinumero: " visited-jira-issues)
@@ -3082,7 +3048,7 @@ From [[https://lmno.lol/alvaro/emacs-quick-kill-process][Xenodium]].
 
 ** Find and insert all Jira ticket codes at point
 
-Here's a tiny helper function, written using AI (Claude), that automates a tiny bit of my workday. During work, I keep my TODOs in an inbox file. All the references to Jira tickets in that file are ones that I've been working on during the day. At the end of the day, I archive the done / killed tasks. By running this function, I can copy all the ticket numbers in the file to the kill ring / clipboard where they can be pasted to our time tracking software. A bit silly, perhaps, but why not?
+Here's a helper function that automates a tiny bit of my workday. During work, I keep my TODOs in an inbox file. All the references to Jira tickets in that file are ones that I've been working on during the day. At the end of the day, I archive the done / killed tasks. By running this function, I can copy all the ticket numbers in the file to the kill ring / clipboard where they can be pasted to our time tracking software. A bit silly, perhaps, but why not?
 
 #+begin_src emacs-lisp :tangle yes
 (when work-laptop-p
@@ -3094,8 +3060,10 @@ Here's a tiny helper function, written using AI (Claude), that automates a tiny 
       (save-excursion
         (goto-char (point-min))
         (while (re-search-forward "\\(?:UMP\\|MAIJA\\)-[0-9]\\{3,5\\}" nil t)
-          (message (match-string 0))
-          (push (match-string 0) matches)))
+          (let ((entry (match-string 0)))
+            (message entry)
+            (unless (member entry matches)
+              (push (match-string 0) matches)))))
       (kill-new (mapconcat 'identity (nreverse matches) "\n")))))
 #+end_src
 
@@ -3117,4 +3085,26 @@ No Evil mode when playing Tetris.
 #+begin_src emacs-lisp :tangle yes
 (use-package tetris
   :hook (tetris-mode . turn-off-evil-mode))
+#+end_src
+
+** Multi-occur in this mode
+
+From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mastering Emacs]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun get-buffers-matching-mode (mode)
+  "Returns a list of buffers where their major-mode is equal to MODE"
+  (let ((buffer-mode-matches '()))
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (when (eq mode major-mode)
+          (push buf buffer-mode-matches))))
+    buffer-mode-matches))
+
+(defun multi-occur-in-this-mode ()
+  "Show all lines matching REGEXP in buffers with this major mode."
+  (interactive)
+  (multi-occur
+   (get-buffers-matching-mode major-mode)
+   (car (occur-read-primary-args))))
 #+end_src
