@@ -3124,24 +3124,6 @@ Trying out this Email thing and see how it works out. For now I've copied/modifi
   :defer t
   :commands (notmuch notmuch-mua-new-mail))
 
-;;; Account settings
-(use-package notmuch
-  :defer t
-  :config
-  (let ((prv (prot-common-auth-get-field "prv-gandi" :user))
-        (pub (prot-common-auth-get-field "pub-gandi" :user))
-        (inf (prot-common-auth-get-field "inf-gandi" :user))
-        (box (prot-common-auth-get-field "prot-gandi" :user)))
-    (setq notmuch-identities
-          (mapcar (lambda (str)
-                    (format "%s <%s>" user-full-name str))
-                  (list prv pub inf box))
-          notmuch-fcc-dirs
-          `((,prv . "gandi/Sent")
-            (,inf . "gandi/Sent")
-            (,pub . "gandi/Sent")
-            (,box . "gandi/Sent")))))
-
 ;;;; General UI
 (use-package notmuch
   :defer t
@@ -3189,11 +3171,7 @@ Trying out this Email thing and see how it works out. For now I've copied/modifi
             :query "tag:unread and tag:package"
             :sort-order newest-first
             :key ,(kbd "p"))
-          ;; My coaching job: <https://protesilaos.com/coach/>.
-          ( :name "🏆 unread coaching"
-            :query "tag:unread and tag:coach"
-            :sort-order newest-first
-            :key ,(kbd "c")))))
+          )))
 
 ;;;; Tags
 (use-package notmuch
