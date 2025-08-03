@@ -2796,7 +2796,7 @@ Trying out this Email thing and see how it works out. For now I've copied/modifi
           ("authors" . "%-20s  ")
           ((("tree" . "%s")
             ("subject" . "%s"))
-           . " %-80s  ")
+           . " %-20s  ")
           ("tags" . "(%s)")))
   (setq notmuch-search-line-faces
         '(("unread" . notmuch-search-unread-face)
@@ -2807,8 +2807,8 @@ Trying out this Email thing and see how it works out. For now I've copied/modifi
                  :query "tag:unread and tag:inbox"
                  :sort-order newest-first
                  :key ,(kbd "u"))
-          (:name "unread packages"
-                 :query "tag:unread and tag:package"
+          (:name "undeleted in inbox"
+                 :query "tag:inbox and not tag:deleted"
                  :sort-order newest-first
                  :key ,(kbd "p"))
           (:name "inbox"
