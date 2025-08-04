@@ -2853,6 +2853,7 @@ To automate fetching and indexing new mail, I've set up a cron job that runs at 
         '(("unread" . notmuch-search-unread-face)
           ("flag" . italic)))
   (setq notmuch-show-empty-saved-searches t)
+  (setq notmuch-fcc-dirs "sent +sent +new -unread")
   (setq notmuch-saved-searches
         `((:name "all unread (inbox)"
                  :query "tag:unread and tag:inbox"
@@ -2957,6 +2958,11 @@ that and instead tries to complete against dictionary entries."
     (setq notmuch-wash-citation-lines-prefix count
           notmuch-wash-citation-lines-suffix count)))
 
+(defun notmuch-sync-email ()
+  "Manually sync new mail from server and refresh database."
+  (interactive)
+  (async-shell-command "mbsync -a && notmuch new"))
+
 ;;;; Hooks and key bindings
 (use-package notmuch
   :hook
@@ -2967,7 +2973,6 @@ that and instead tries to complete against dictionary entries."
   (remove-hook 'notmuch-search-hook #'notmuch-hl-line-mode) ; Check my `lin' package
   :bind
   ( :map global-map
-    ("C-c m" . notmuch)
     ("C-x m" . notmuch-mua-new-mail) ; override `compose-mail'
     :map notmuch-search-mode-map ; I normally don't use the tree view, otherwise check `notmuch-tree-mode-map'
     ("/" . notmuch-search-filter) ; alias for l
@@ -2979,7 +2984,8 @@ that and instead tries to complete against dictionary entries."
     ("r" . notmuch-show-reply) ; easier to reply to all by default
     ("R" . notmuch-show-reply-sender)
     :map notmuch-hello-mode-map
-    ("C-<tab>" . nil)))
+    ("C-<tab>" . nil)
+    ("§" . notmuch-sync-email)))
 
 ;;; My own tweaks for notmuch (prot-notmuch.el)
 (use-package prot-notmuch
@@ -3263,21 +3269,6 @@ When doing lots of base64 encoding and decoding, it's more ergonomical to proces
 Insert a random 4-line quote from a corpus file on top of the scratch buffer. The corpus on my work laptop is a file containing all the lyrics of Manowar, on the private machine I have the screenplay for The Room.
 
 #+begin_src emacs-lisp :tangle yes
-;; (use-package quotient
-;;   :load-path "~/dev/quotient"
-;;   :bind (("C-c ä" . quotient-set-scratch-message)) ;; Manually reset the scratch message
-;;   :custom
-;;   (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
-;;   (quotient-quote-length 4) ;; The default
-;;   ;; (initial-scratch-message quotient-current-quote)
-;;   ;; :config
-;;   ;; (setq initial-scratch-message quotient-current-quote)
-;;   ;; :hook
-;;   ;; (
-;;   ;;  ;; (after-init . quotient-set-scratch-message)
-;;   ;;  )
-;;   )
-
 (use-package quotient
   :load-path "~/dev/quotient"
   :custom
@@ -3285,7 +3276,7 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
   (quotient-quote-length 4)
   :hook ((after-init . (lambda ()
                          (setq initial-scratch-message (quotient-as-comment (quotient-generate-quote))))))
-  ;; :bind (("C-c ä" . quotient-set-scratch-message))
+  ;; :bind ("C-c ä" . quotient-set-scratch-message)
   )
 #+end_src
 
