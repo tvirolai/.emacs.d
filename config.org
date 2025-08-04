@@ -2760,7 +2760,58 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
 
 * Email
 
+** Introduction
+
 Trying out this Email thing and see how it works out. For now I've copied/modified the config from [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs-modules/prot-emacs-email.el][Prot]], I'll be tweaking it to my own liking if I can get my head around it.
+
+Anyway, the thing with email in Emacs is that it can't really fetch or send mail. Instead, it calls command-line utilities, which need to be configured properly, to do the heavy lifting. Emacs is used for what it does best - editing, searching and managing text.
+
+I use [[https://isync.sourceforge.io/mbsync.html][mbsync]] for fetching mail, [[https://notmuchmail.org/][notmuch]] for indexing and processing it and =smtpmail= for sending it.
+
+My =.mbsyncrc= config file looks like this:
+
+#+begin_src
+IMAPAccount kapsi
+Host mail.kapsi.fi
+User my-username
+Pass my-password
+Port 993
+TLSType IMAPS
+
+IMAPStore kapsi-remote
+Account kapsi
+
+MaildirStore kapsi-local
+Path ~/mail/kapsi/
+Inbox ~/mail/kapsi/INBOX
+SubFolders Verbatim
+
+Channel kapsi
+Near :kapsi-remote:
+Far :kapsi-local:
+Patterns *
+Create Far
+Sync All
+Expunge None
+SyncState ~/mail/imap-transfer
+#+end_src
+
+One thing to tweak here would be to replace the =Pass= parameter with =PassCmd=, which runs a command to get the password to use for authentication, which would be more secure. Since I wasn't immediately able to figure out how to make =gpg= decryption from =pass= store work with cron, it's like that for now.
+
+As to the =.authinfo.gpg= that stores the credentials for sending mail, it looks like this (after decryption):
+
+#+begin_src
+machine kapsi port 465 login my-username password my-password
+#+end_src
+
+To automate fetching and indexing new mail, I've set up a cron job that runs at a five-minute interval:
+
+#+begin_src
+*/5 * * * * /opt/homebrew/bin/mbsync -a
+*/5 * * * * /opt/homebrew/bin/notmuch new
+#+end_src
+
+** Config
 
 #+begin_src emacs-lisp :tangle yes
 (use-package notmuch
