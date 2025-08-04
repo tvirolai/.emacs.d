@@ -1124,7 +1124,7 @@ Use LSP when editing shell scripts.
 
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'bash-ts-mode-hook #'lsp)
-(setq sh-basic-offset 2)
+(setq sh-basic-offset 4)
 #+end_src
 
 [[https://github.com/bats-core/bats-core][Bats]] is a testing framework for Bash. =.bats=-files should be considered as Bash files.
@@ -2439,8 +2439,8 @@ Use ansi-colors in shell.
                           (setq-local corfu-auto nil)
                           (setq-local corfu-preview-current nil)
                           (setq-local completion-at-point-functions '(pcomplete-completions-at-point cape-file)))))
-  ;; :custom
-  ;; (eshell-banner-message (quotient-generate-quote))
+  :custom
+  (eshell-banner-message (concat (quotient-generate-quote) "\n\n"))
   :init
   (setq eshell-scroll-to-bottom-on-input 'all
         eshell-error-if-no-glob t
@@ -3227,15 +3227,15 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
 ;;   ;;  )
 ;;   )
 
-;; (use-package quotient
-;;   :load-path "~/dev/quotient"
-;;   :custom
-;;   (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
-;;   (quotient-quote-length 4)
-;;   :hook ((after-init . (lambda ()
-;;                          (setq initial-scratch-message (quotient-generate-quote)))))
-;;   ;; :bind (("C-c ä" . quotient-set-scratch-message))
-;;   )
+(use-package quotient
+  :load-path "~/dev/quotient"
+  :custom
+  (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
+  (quotient-quote-length 4)
+  :hook ((after-init . (lambda ()
+                         (setq initial-scratch-message (quotient-as-comment (quotient-generate-quote))))))
+  ;; :bind (("C-c ä" . quotient-set-scratch-message))
+  )
 #+end_src
 
 ** Open a Jira ticket in the browser
