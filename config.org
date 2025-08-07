@@ -355,7 +355,7 @@ Let's try out Fontaine for setting up fonts.
            :fixed-pitch-serif-width nil
            :fixed-pitch-serif-height 1.2
 
-           :variable-pitch-family "SF Pro"
+           :variable-pitch-family "IBM Plex Sans"
            :variable-pitch-weight nil
            :variable-pitch-slant nil
            :variable-pitch-width nil
@@ -2787,8 +2787,8 @@ Inbox ~/mail/kapsi/INBOX
 SubFolders Verbatim
 
 Channel kapsi
-Near :kapsi-remote:
-Far :kapsi-local:
+Near :kapsi-local:
+Far :kapsi-remote:
 Patterns *
 Create Far
 Sync All
@@ -2810,6 +2810,8 @@ To automate fetching and indexing new mail, I've set up a cron job that runs at 
 */5 * * * * /opt/homebrew/bin/mbsync -a
 */5 * * * * /opt/homebrew/bin/notmuch new
 #+end_src
+
+I do not want to setup any notifications for mail.
 
 ** Config
 
@@ -2863,6 +2865,10 @@ To automate fetching and indexing new mail, I've set up a cron job that runs at 
                  :query "tag:inbox and not tag:deleted"
                  :sort-order newest-first
                  :key ,(kbd "p"))
+          (:name "sent"
+                 :query "tag:sent"
+                 :sort-order newest-first
+                 :key ,(kbd "ö"))
           (:name "inbox"
                  :query "tag:inbox"
                  :sort-order newest-first
@@ -2872,7 +2878,7 @@ To automate fetching and indexing new mail, I've set up a cron job that runs at 
 (use-package notmuch
   :defer t
   :config
-  (setq notmuch-archive-tags nil ; I do not archive email
+  (setq notmuch-archive-tags nil
         notmuch-message-replied-tags '("+replied")
         notmuch-message-forwarded-tags '("+forwarded")
         notmuch-show-mark-read-tags '("-unread")
@@ -2961,7 +2967,8 @@ that and instead tries to complete against dictionary entries."
 (defun notmuch-sync-email ()
   "Manually sync new mail from server and refresh database."
   (interactive)
-  (async-shell-command "mbsync -a && notmuch new"))
+  (async-shell-command "mbsync -a && notmuch new")
+  (notmuch-refresh-all-buffers))
 
 ;;;; Hooks and key bindings
 (use-package notmuch
@@ -3082,7 +3089,7 @@ that and instead tries to complete against dictionary entries."
   (setq smtpmail-smtp-server "mail.kapsi.fi")
   (setq smtpmail-smtp-service 587)
   (setq smtpmail-stream-type 'starttls))
-#+end_src
+        #+end_src
 
 * Helpful
 
@@ -3400,7 +3407,7 @@ No Evil mode when playing Tetris.
 
 ** Multi-occur in this mode
 
-From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mastering Emacs]].
+From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mastering Emacs]]. This provides an easy way to grep for a phrase in the open buffers that are in the same mode as the one you're currently in.
 
 #+begin_src emacs-lisp :tangle yes
 (defun get-buffers-matching-mode (mode)
