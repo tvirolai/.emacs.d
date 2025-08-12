@@ -2868,6 +2868,14 @@ I do not want to setup any notifications for mail.
                  :query "tag:unread and tag:inbox"
                  :sort-order newest-first
                  :key ,(kbd "u"))
+          (:name "work"
+                 :query "tag:inbox and tag:work"
+                 :sort-order newest-first
+                 :key ,(kbd "z"))
+          (:name "flagged"
+                 :query "tag:inbox and tag:flagged"
+                 :sort-order newest-first
+                 :key ,(kbd "x"))
           (:name "undeleted in inbox"
                  :query "tag:inbox and not tag:deleted"
                  :sort-order newest-first
@@ -2892,11 +2900,6 @@ I do not want to setup any notifications for mail.
         notmuch-draft-tags '("+draft")
         notmuch-draft-folder "drafts"
         notmuch-draft-save-plaintext 'ask)
-
-  ;; Also see `notmuch-tagging-keys' in the `prot-notmuch' section
-  ;; further below.
-  ;;
-  ;; All emoji are cosmetic.  The tags are just the text.
   (setq notmuch-tag-formats
         '(("unread" (propertize tag 'face 'notmuch-tag-unread))
           ("flag" (propertize tag 'face 'notmuch-tag-flagged)
@@ -2965,11 +2968,7 @@ that and instead tries to complete against dictionary entries."
   (setq notmuch-wash-wrap-lines-length 120)
   (setq notmuch-unthreaded-show-out nil)
   (setq notmuch-message-headers '("To" "Cc" "Subject" "Date"))
-  (setq notmuch-message-headers-visible t)
-
-  (let ((count most-positive-fixnum)) ; I don't like the buttonisation of long quotes
-    (setq notmuch-wash-citation-lines-prefix count
-          notmuch-wash-citation-lines-suffix count)))
+  (setq notmuch-message-headers-visible t))
 
 (defun notmuch-sync-email ()
   "Manually sync new mail from server and refresh database."
@@ -3289,9 +3288,9 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
   (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
   (quotient-quote-length 4)
   :hook ((after-init . (lambda ()
-                         (setq initial-scratch-message (quotient-as-comment (quotient-generate-quote))))))
-  ;; :bind (("C-c ä" . quotient-display-random-quote))
-  )
+                         (setq initial-scratch-message (quotient-generate-quote 'comment)))))
+  :bind (("C-c ä" . quotient-set-scratch-message))
+  :commands (quotient-set-scratch-message quotient-generate-quote)) ;; These declarations are needed when loading from a local path.
 #+end_src
 
 ** Open a Jira ticket in the browser
