@@ -566,47 +566,15 @@ A bit wider line spacing than the default.
 (setq-default line-spacing 0.15)
 #+end_src
 
-** Nov.el mode
-
-A mode for reading epub files.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package nov
-  :ensure t
-  :defer t
-  :config
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode)))
-#+end_src
-
 ** Emacs reader
 
-[[https://codeberg.org/divyaranjan/emacs-reader][Emacs Reader]] aims to be an all-in-one reading solution for various filetypes.
+[[https://codeberg.org/divyaranjan/emacs-reader][Emacs Reader]] aims to be an all-in-one reading solution for various filetypes. It seems to work very well.
 
 #+begin_src emacs-lisp :tangle yes
 (setq package-vc-allow-build-commands t)
 (use-package reader
   :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
             :make "all"))
-#+end_src
-
-** Openwith
-
-Open PDF files in the GUI default application from Dired. PDF-tools is slow and clunky so I prefer this approach.
-
-#+begin_src emacs-lisp :tangle yes
-;; (use-package openwith
-;;   :ensure t
-;;   :config
-;;   (setq openwith-associations '(("\\.pdf\\'" "open" (file))))
-;;   (openwith-mode t))
-#+end_src
-
-** PDF-tools
-
-#+begin_src emacs-lisp :tangle yes
-(use-package pdf-tools
-  :ensure t
-  :custom (pdf-view-use-scaling nil))
 #+end_src
 
 ** Olivetti mode
@@ -1328,7 +1296,9 @@ Elisp keybindings.
                                 (setq-local corfu-auto nil)
                                 (corfu-mode))))
 
-(add-hook 'emacs-lisp-mode-hook #'flycheck-mode)
+(add-hook 'emacs-lisp-mode-hook #'(lambda ()
+                                    (unless (string= (buffer-name) "*scratch*")
+                                      (flycheck-mode))))
 #+end_src
 
 ** Typescript
@@ -1984,10 +1954,10 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
 (use-package denote
   :defer t
   :ensure t
-  ;; :init
-  ;; (denote-rename-buffer-mode 1) ;; This seems to cause freezes when trying to open files. EDIT: Maybe not anymore, trying it out again.
-  ;; :custom-face
-  ;; (denote-faces-link ((t (:slant italic))))
+  :init
+  (denote-rename-buffer-mode 1) ;; This seems to cause freezes when trying to open files. EDIT: Maybe not anymore, trying it out again.
+  :custom-face
+  (denote-faces-link ((t (:slant italic))))
   :hook
   (dired-mode . denote-dired-mode)
   :config
@@ -2439,10 +2409,9 @@ Use ansi-colors in shell.
                           (setq-local corfu-auto nil)
                           (setq-local corfu-preview-current nil)
                           (setq-local completion-at-point-functions '(pcomplete-completions-at-point cape-file)))))
-  :custom
-  (eshell-banner-message (concat (quotient-generate-quote) "\n\n"))
   :init
   (setq eshell-scroll-to-bottom-on-input 'all
+        eshell-banner-message (quotient-generate-quote 'eshell)
         eshell-error-if-no-glob t
         eshell-hist-ignoredups t
         evil-set-initial-state 'insert
@@ -3282,15 +3251,18 @@ When doing lots of base64 encoding and decoding, it's more ergonomical to proces
 Insert a random 4-line quote from a corpus file on top of the scratch buffer. The corpus on my work laptop is a file containing all the lyrics of Manowar, on the private machine I have the screenplay for The Room.
 
 #+begin_src emacs-lisp :tangle yes
+(straight-use-package 'use-package)
+
 (use-package quotient
-  :load-path "~/dev/quotient"
+  ;; :load-path "~/dev/quotient"
+  :ensure t
+  :straight (quotient :type git :host github :repo "tvirolai/quotient")
   :custom
   (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
   (quotient-quote-length 4)
   :hook ((after-init . (lambda ()
                          (setq initial-scratch-message (quotient-generate-quote 'comment)))))
-  :bind (("C-c ä" . quotient-set-scratch-message))
-  :commands (quotient-set-scratch-message quotient-generate-quote)) ;; These declarations are needed when loading from a local path.
+  :bind (("C-c ä" . quotient-set-scratch-message)))
 #+end_src
 
 ** Open a Jira ticket in the browser
