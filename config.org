@@ -968,6 +968,12 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 #+end_src
 
+Bind a comfortable global key combination for =other-window= as =M-x o= is too long for such a common thing.
+
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "M-o") #'other-window)
+#+end_src
+
 Prevent the "Text is read only" message when pressing backspace in minibuffer ([[https://emacs.stackexchange.com/questions/66589/how-to-prevent-text-is-read-only-when-in-minibuffer?newreg=e978077fa67744548d4395e6d7a973b5][source]]).
 
 #+begin_src emacs-lisp :tangle yes
@@ -3089,6 +3095,24 @@ Ztree is /"A major mode for displaying the directory tree in text mode"/. One th
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ztree
+  :ensure t)
+#+end_src
+
+* Package development helpers
+
+Tools to aid with package development.
+
+** package-lint
+
+#+begin_src emacs-lisp :tangle yes
+(use-package package-lint
+  :ensure t)
+#+end_src
+
+** pkg-lint
+
+#+begin_src emacs-lisp :tangle yes
+(use-package pkg-info
   :ensure t)
 #+end_src
 
