@@ -216,6 +216,9 @@ Create a directory for savefiles if it doesn't exist.
 #+begin_src emacs-lisp :tangle yes
 (defconst tv-savefile-dir (expand-file-name "etc/savefile" user-emacs-directory))
 
+(unless (file-exists-p "etc")
+  (make-directory "etc"))
+
 (unless (file-exists-p tv-savefile-dir)
   (make-directory tv-savefile-dir))
 #+end_src
@@ -314,6 +317,7 @@ Let's try out Fontaine for setting up fonts.
 #+begin_src emacs-lisp :tangle yes
 (use-package fontaine
   :ensure t
+  :bind ("C-c ö" . fontaine-toggle-preset)
   :hook
   ((after-init . fontaine-mode)
    (after-init . (lambda ()
@@ -3244,7 +3248,7 @@ From [[https://emacsredux.com/blog/2013/03/27/copy-filename-to-the-clipboard/][b
 
 ** Base64 wrappers
 
-When doing lots of base64 encoding and decoding, it's more ergonomical to process a word under point with a single command rather than always define a region first.
+When doing lots of base64 encoding and decoding, it's more ergonomical to process a word under point with a single command than always define a region first.
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/apply-fn-to-word-under-point (fn)
