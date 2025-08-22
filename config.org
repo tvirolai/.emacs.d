@@ -65,29 +65,6 @@ Configure repos.
 (use-package quelpa-use-package :ensure t)
 #+end_src
 
-Enable =straight.el=.
-
-#+begin_src emacs-lisp :tangle yes
-(defvar bootstrap-version)
-
-(let ((bootstrap-file
-       (expand-file-name
-        "straight/repos/straight.el/bootstrap.el"
-        (or (bound-and-true-p straight-base-dir)
-            user-emacs-directory)))
-      (bootstrap-version 7))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-;; (setq straight-base-dir (expand-file-name "etc" user-emacs-directory))
-#+end_src
-
 Configure =use-package=.
 
 #+begin_src emacs-lisp :tangle yes
@@ -531,15 +508,6 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
                              (when (cl-search config-file (buffer-name))
                                (electric-pair-mode)
                                (display-line-numbers-mode))))
-#+end_src
-
-** Presentation-mode
-
-Presentation mode scales font sizes up, which is very useful when showing things in meetings etc.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package presentation
-  :ensure t)
 #+end_src
 
 ** Rainbow-mode
@@ -1667,8 +1635,9 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
   (bind-key "\t" 'hippie-expand yas-minor-mode-map))
 
 (use-package doom-snippets
-  :after yasnippet
-  :straight (doom-snippets :type git :host github :repo "doomemacs/snippets" :files ("*.el" "*")))
+  :if (file-directory-p "~/dev/snippets")
+  :load-path "~/dev/snippets"
+  :after yasnippet)
 #+end_src
 
 * History
@@ -2371,7 +2340,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   :defer
   :ensure t
   :config
-  (setq rmh-elfeed-org-files (list "~/Dropbox/org/elfeed.org")))
+  (setq rmh-elfeed-org-files (list "~/elfeed.org")))
 
 (defun tv/elfeed-mark-all-as-read ()
   "Mark all elfeed items as read."
@@ -2414,6 +2383,7 @@ Use ansi-colors in shell.
   :hook ((eshell-mode . hide-mode-line-mode)
          (eshell-mode . (lambda ()
                           (setenv "TERM" "xterm-256color")
+                          (setq eshell-banner-message (quotient-generate-quote 'eshell))
                           (setq-local completion-styles '(basic))
                           (setq-local corfu-count 10)
                           (setq-local corfu-auto nil)
@@ -2860,7 +2830,7 @@ I do not want to setup any notifications for mail.
                  :sort-order newest-first
                  :key ,(kbd "p"))
           (:name "sent"
-                 :query "tag:sent"
+                 :query "tag:sent and not tag:deleted"
                  :sort-order newest-first
                  :key ,(kbd "ö"))
           (:name "inbox"
@@ -3279,18 +3249,16 @@ When doing lots of base64 encoding and decoding, it's more ergonomical to proces
 Insert a random 4-line quote from a corpus file on top of the scratch buffer. The corpus on my work laptop is a file containing all the lyrics of Manowar, on the private machine I have the screenplay for The Room.
 
 #+begin_src emacs-lisp :tangle yes
-(straight-use-package 'use-package)
-
 (use-package quotient
-  ;; :load-path "~/dev/quotient"
-  :ensure t
-  :straight (quotient :type git :host github :repo "tvirolai/quotient")
+  :if (file-directory-p "~/dev/quotient")
+  :load-path "~/dev/quotient"
   :custom
   (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
   (quotient-quote-length 4)
   :hook ((after-init . (lambda ()
                          (setq initial-scratch-message (quotient-generate-quote 'comment)))))
-  :bind (("C-c ä" . quotient-set-scratch-message)))
+  :bind (("C-c ä" . quotient-set-scratch-message))
+  :commands (quotient-set-scratch-message quotient-display-random-quote quotient-generate-quote))
 #+end_src
 
 ** Open a Jira ticket in the browser
