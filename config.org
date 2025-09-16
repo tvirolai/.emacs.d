@@ -1313,6 +1313,7 @@ Elisp keybindings.
 #+begin_src emacs-lisp :tangle yes
 (use-package typescript-mode
   :ensure t
+  :hook (tsx-ts-mode . (lambda () (rainbow-delimiters-mode -1)))
   :defer
   :custom
   (typescript-indent-level 2))
