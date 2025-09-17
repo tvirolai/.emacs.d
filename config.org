@@ -1310,13 +1310,23 @@ Elisp keybindings.
 
 ** Typescript
 
+Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=, so it needs to be disabled in it.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package typescript-mode
   :ensure t
-  :hook (tsx-ts-mode . (lambda () (rainbow-delimiters-mode -1)))
+  :hook ((tsx-ts-mode . (lambda () (rainbow-delimiters-mode -1)))
+         (tsx-ts-mode . prettier-js-mode)
+         (tsx-ts-mode . 'lsp))
   :defer
   :custom
   (typescript-indent-level 2))
+#+end_src
+
+Setup prettier.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package prettier-js)
 #+end_src
 
 ** Java
@@ -1827,7 +1837,7 @@ Use 4 spaces as the default indentation level.
     (kbd "§") #'verb-send-request-on-point-other-window-stay)
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-insert-heading-respect-content t)
-  (setq org-directory "~/Dropbox/org/")
+  (setq org-directory "~/org/")
   (setq org-default-notes-file (concat org-directory "inbox.org"))
   (setq org-work-notes-file (concat org-directory "work.org"))
   (setq org-archive-location "archive/Archive_%s::")
@@ -2360,6 +2370,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   (elfeed-org)
   :config
   (setq elfeed-search-filter "@2-week-ago +unread")
+  (setq elfeed-search-title-max-width 120)
   (evil-define-key 'normal elfeed-search-mode-map
     (kbd "M-RET") #'elfeed-search-browse-url
     (kbd "DEL") #'tv/elfeed-mark-read
@@ -2370,7 +2381,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   :defer
   :ensure t
   :config
-  (setq rmh-elfeed-org-files (list "~/elfeed.org")))
+  (setq rmh-elfeed-org-files (list (concat org-directory "elfeed.org"))))
 
 (defun tv/elfeed-mark-all-as-read ()
   "Mark all elfeed items as read."
