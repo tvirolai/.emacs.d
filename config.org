@@ -1329,6 +1329,17 @@ Setup prettier.
 (use-package prettier-js)
 #+end_src
 
+Use smartparens.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package smartparens
+  :ensure smartparens  ;; install the package
+  :hook (prog-mode) ;; add `smartparens-mode` to these hooks
+  :config
+  ;; load default config
+  (require 'smartparens-config))
+#+end_src
+
 ** Java
 
 #+begin_src emacs-lisp :tangle yes
@@ -1365,11 +1376,13 @@ Setup prettier.
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-mode
   :hook ((lsp-mode . lsp-enable-which-key-integration))
-  :config (setq lsp-completion-enable-additional-text-edit nil
-                lsp-lens-enable t
-                lsp-auto-guess-root t
-                lsp-headerline-breadcrumb-enable nil
-                lsp-modeline-code-actions-enable t))
+  :config
+  (setq lsp-completion-enable-additional-text-edit nil
+        lsp-lens-enable t
+        lsp-auto-guess-root t
+        lsp-headerline-breadcrumb-enable nil
+        lsp-modeline-code-actions-enable t)
+  (push 'jsts-ls lsp-disabled-clients))
 #+end_src
 
 * Eldoc
