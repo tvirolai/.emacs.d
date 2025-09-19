@@ -59,7 +59,7 @@ Is this the work laptop or something else?
 
 #+begin_src emacs-lisp :tangle yes
 (defconst work-laptop-p
-  (equal (system-name) "siilim211207.local"))
+  (equal (system-name) "G140450"))
 #+end_src
 
 Set configuration file name for later reference.
@@ -1317,8 +1317,9 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
   :ensure t
   :hook ((tsx-ts-mode . (lambda () (rainbow-delimiters-mode -1)))
          (tsx-ts-mode . prettier-js-mode)
-         (tsx-ts-mode . 'lsp))
+         (tsx-ts-mode . lsp))
   :defer
+  :mode ("\\.mjml" . html-mode)
   :custom
   (typescript-indent-level 2))
 #+end_src
@@ -1338,6 +1339,18 @@ Use smartparens.
   :config
   ;; load default config
   (require 'smartparens-config))
+#+end_src
+
+** JavaScript
+
+#+begin_src emacs-lisp :tangle yes
+;; (use-package js-ts-mode
+;;   :ensure t
+;;   :hook ((js-ts-mode-hook . prettier-js-mode)
+;;          (js-ts-mode-hook . lsp))
+;;   :defer
+;;   :custom
+;;   (js-indent-level 2))
 #+end_src
 
 ** Java
@@ -3307,7 +3320,7 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
   :if (file-directory-p "~/dev/quotient")
   :load-path "~/dev/quotient"
   :custom
-  (quotient-corpus "etc/manowar.txt") ;; This needs to be under your Emacs directory.
+  (quotient-corpus (expand-file-name "etc/manowar.txt" user-emacs-directory)) ;; This needs to be under your Emacs directory.
   (quotient-quote-length 4)
   :hook ((after-init . (lambda ()
                          (setq initial-scratch-message (quotient-generate-quote 'comment)))))
