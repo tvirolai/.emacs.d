@@ -76,9 +76,7 @@ Configure path.
   :init
   (when (memq window-system '(mac ns x))
     (require 'exec-path-from-shell)
-    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS" "VARMA_GPG_SYMMETRIC_PASSPHRASE"
-                   "CLAUDE_API_KEY" "KAPSI_PASS"
-                   "VARMA_GPG_SYMMETRIC_PASSPHRASE_PROD" "VARMA_ARTIFACTORY_USERNAME" "VARMA_ARTIFACTORY_PASSWORD" "VARMA_ELAMA_BOT_USERNAME" "VARMA_ELAMA_BOT_PASSWORD"))
+    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS" "KAPSI_PASS" "OPENAI_API_KEY"))
       (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
 #+end_src
@@ -575,6 +573,7 @@ A bit wider line spacing than the default.
 (use-package reader
   :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
             :make "all"))
+(add-to-list 'load-path "~/dev/emacs-reader")
 #+end_src
 
 ** Olivetti mode
@@ -1033,15 +1032,10 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 
 #+begin_src emacs-lisp :tangle yes
 (use-package gptel
-  :if work-laptop-p
   :ensure t
   :defer
   :config
-  (setq
-   gptel-model 'claude-3-7-sonnet-20250219
-   gptel-backend (gptel-make-anthropic "Claude"
-                   :stream t
-                   :key (getenv "CLAUDE_API_KEY"))))
+  (setq gptel-api-key (getenv "OPENAI_API_KEY")))
 #+end_src
 
 * Media playback
@@ -1315,12 +1309,16 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
 #+begin_src emacs-lisp :tangle yes
 (use-package typescript-mode
   :ensure t
-  :hook ((tsx-ts-mode . (lambda () (rainbow-delimiters-mode -1)))
+  :hook ((tsx-ts-mode . (lambda ()
+                          (rainbow-delimiters-mode -1)
+                          (corfu-mode -1))) ;; Clashes with LSP.
          (tsx-ts-mode . prettier-js-mode)
          (tsx-ts-mode . lsp))
   :defer
   :mode ("\\.mjml" . html-mode)
+  :mode ("\\.js" . tsx-ts-mode)
   :custom
+  (js-indent-level 2)
   (typescript-indent-level 2))
 #+end_src
 
@@ -1344,7 +1342,7 @@ Use smartparens.
 ** JavaScript
 
 #+begin_src emacs-lisp :tangle yes
-;; (use-package js-ts-mode
+;; (use-package js-mode
 ;;   :ensure t
 ;;   :hook ((js-ts-mode-hook . prettier-js-mode)
 ;;          (js-ts-mode-hook . lsp))
@@ -2001,8 +1999,6 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   :ensure t
   :init
   (denote-rename-buffer-mode 1) ;; This seems to cause freezes when trying to open files. EDIT: Maybe not anymore, trying it out again.
-  :custom-face
-  (denote-faces-link ((t (:slant italic))))
   :hook
   (dired-mode . denote-dired-mode)
   :config
@@ -2450,7 +2446,7 @@ Use ansi-colors in shell.
   :hook ((eshell-mode . hide-mode-line-mode)
          (eshell-mode . (lambda ()
                           (setenv "TERM" "xterm-256color")
-                          (setq eshell-banner-message (quotient-generate-quote 'eshell))
+                          (setq eshell-banner-message (quotient-generate-excerpt 'eshell))
                           (setq-local completion-styles '(basic))
                           (setq-local corfu-count 10)
                           (setq-local corfu-auto nil)
@@ -2458,7 +2454,7 @@ Use ansi-colors in shell.
                           (setq-local completion-at-point-functions '(pcomplete-completions-at-point cape-file)))))
   :init
   (setq eshell-scroll-to-bottom-on-input 'all
-        eshell-banner-message (quotient-generate-quote 'eshell)
+        eshell-banner-message (quotient-generate-excerpt 'eshell)
         eshell-error-if-no-glob t
         eshell-hist-ignoredups t
         evil-set-initial-state 'insert
@@ -3323,9 +3319,9 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
   (quotient-corpus (expand-file-name "etc/manowar.txt" user-emacs-directory)) ;; This needs to be under your Emacs directory.
   (quotient-quote-length 4)
   :hook ((after-init . (lambda ()
-                         (setq initial-scratch-message (quotient-generate-quote 'comment)))))
+                         (setq initial-scratch-message (quotient-generate-excerpt 'comment)))))
   :bind (("C-c ä" . quotient-set-scratch-message))
-  :commands (quotient-set-scratch-message quotient-display-random-quote quotient-generate-quote))
+  :commands (quotient-set-scratch-message quotient-display-random-excerpt quotient-generate-excerpt))
 #+end_src
 
 ** Open a Jira ticket in the browser
@@ -3342,8 +3338,8 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
                             (read-string "Tikettinumero: ")))
            (parsed-ticket (if (cl-search "-" ticket-number)
                               ticket-number
-                            (concat "UMP-" ticket-number)))
-           (url (concat "https://varmajira.eficode.com/browse/" parsed-ticket)))
+                            (concat "UHMA2-" ticket-number)))
+           (url (concat "https://jira.it.helsinki.fi/browse/" parsed-ticket)))
       (progn
         (push parsed-ticket visited-jira-issues)
         (browse-url url)))))
