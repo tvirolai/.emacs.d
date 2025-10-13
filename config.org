@@ -3312,16 +3312,27 @@ When doing lots of base64 encoding and decoding, it's more ergonomical to proces
 Insert a random 4-line quote from a corpus file on top of the scratch buffer. The corpus on my work laptop is a file containing all the lyrics of Manowar, on the private machine I have the screenplay for The Room.
 
 #+begin_src emacs-lisp :tangle yes
+(defconst quotient-use-local nil)
+
 (use-package quotient
-  :if (file-directory-p "~/dev/quotient")
+  :if (not quotient-use-local)
+  :custom
+  (quotient-corpus (expand-file-name "etc/manowar.txt" user-emacs-directory))
+  :hook ((after-init . (lambda ()
+                         (setq initial-scratch-message (quotient-generate-excerpt 'comment)))))
+  :bind (("C-c ä" . quotient-set-scratch-message)))
+
+(use-package quotient
+  :if (and (file-directory-p "~/dev/quotient")
+           quotient-use-local
   :load-path "~/dev/quotient"
   :custom
-  (quotient-corpus (expand-file-name "etc/manowar.txt" user-emacs-directory)) ;; This needs to be under your Emacs directory.
+  (quotient-corpus (expand-file-name "etc/manowar.txt" user-emacs-directory))
   (quotient-quote-length 4)
   :hook ((after-init . (lambda ()
                          (setq initial-scratch-message (quotient-generate-excerpt 'comment)))))
   :bind (("C-c ä" . quotient-set-scratch-message))
-  :commands (quotient-set-scratch-message quotient-display-random-excerpt quotient-generate-excerpt))
+  :commands (quotient-set-scratch-message quotient-display-random-excerpt quotient-generate-excerpt)))
 #+end_src
 
 ** Open a Jira ticket in the browser
