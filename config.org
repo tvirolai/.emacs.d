@@ -3461,6 +3461,21 @@ No Evil mode when playing Tetris.
   :hook (tetris-mode . turn-off-evil-mode))
 #+end_src
 
+** Query the web
+
+#+begin_src emacs-lisp :tangle yes
+(defvar query-history '())
+
+(defun tv/query-web ()
+  "Perform a web query using eww."
+  (interactive)
+  (let ((query (completing-read "Hakutermi: " query-history)))
+    (progn
+      (push query query-history)
+      (eww (concat "https://leta.mullvad.net/search?engine=google&q="
+                   (string-replace " " "+" query))))))
+#+end_src
+
 ** Multi-occur in this mode
 
 From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mastering Emacs]]. This provides an easy way to grep for a phrase in the open buffers that are in the same mode as the one you're currently in.
