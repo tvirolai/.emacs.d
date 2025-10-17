@@ -299,22 +299,6 @@ Disable custom themes before loading a new one.
 (advice-add 'load-theme :before #'disable-custom-themes)
 #+end_src
 
-Add helpers to switch between themes.
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/load-light-theme ()
-  "Load light theme."
-  (interactive)
-  (load-theme 'modus-operandi t)
-  (set-frame-parameter nil 'ns-appearance 'light))
-
-(defun tv/load-dark-theme ()
-  "Load dark theme."
-  (interactive)
-  (load-theme 'doom-dracula t)
-  (set-frame-parameter nil 'ns-appearance 'dark))
-#+end_src
-
 Let's try out Fontaine for setting up fonts.
 
 #+begin_src emacs-lisp :tangle yes
@@ -385,6 +369,29 @@ Let's try out Fontaine for setting up fonts.
 (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
 #+end_src
+
+Add helpers to switch between themes.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/load-light-theme ()
+  "Load light theme."
+  (interactive)
+  (load-theme 'modus-operandi t)
+  (set-frame-parameter nil 'ns-appearance 'light))
+
+(defun tv/load-dark-theme ()
+  "Load dark theme."
+  (interactive)
+  (load-theme 'doom-dracula t)
+  (set-frame-parameter nil 'ns-appearance 'dark))
+
+(defun tv/load-crap-monitor-settings ()
+  "Settings that are readable with substandard monitors."
+  (interactive)
+  (load-theme 'ef-day t)
+  (fontaine-set-preset 'large))
+#+end_src
+
 
 Tabs should never ever be used for indentation. If they are, they should look silly.
 
@@ -1317,6 +1324,7 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
   :defer
   :mode ("\\.mjml" . html-mode)
   :mode ("\\.js" . tsx-ts-mode)
+  :mode ("\\.ts" . tsx-ts-mode)
   :custom
   (js-indent-level 2)
   (typescript-indent-level 2))
@@ -3410,27 +3418,6 @@ From [[https://lmno.lol/alvaro/emacs-quick-kill-process][Xenodium]].
        :utils "kill"
        :error-autofocus t
        :silent-success t))))
-#+end_src
-
-** Find and insert all Jira ticket codes at point
-
-Here's a helper function that automates a tiny bit of my workday. During work, I keep my TODOs in an inbox file. All the references to Jira tickets in that file are ones that I've been working on during the day. At the end of the day, I archive the done / killed tasks. By running this function, I can copy all the ticket numbers in the file to the kill ring / clipboard where they can be pasted to our time tracking software. A bit silly, perhaps, but why not?
-
-#+begin_src emacs-lisp :tangle yes
-(when work-laptop-p
-
-  (defun tv/kill-ump-numbers ()
-    "Find all UMP-XXXXX or MAIJA-XXXXX strings in the buffer and kill them."
-    (interactive)
-    (let ((matches nil))
-      (save-excursion
-        (goto-char (point-min))
-        (while (re-search-forward "\\(?:UMP\\|MAIJA\\)-[0-9]\\{3,5\\}" nil t)
-          (let ((entry (match-string 0)))
-            (message entry)
-            (unless (member entry matches)
-              (push (match-string 0) matches)))))
-      (kill-new (mapconcat 'identity (nreverse matches) "\n")))))
 #+end_src
 
 ** Write mode
