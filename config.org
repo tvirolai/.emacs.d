@@ -392,6 +392,12 @@ Add helpers to switch between themes.
   (fontaine-set-preset 'large))
 #+end_src
 
+If we're on the work laptop, chances are that we're using some random monitor...
+
+#+begin_src emacs-lisp :tangle yes
+(when work-laptop-p
+  (tv/load-crap-monitor-settings))
+#+end_src
 
 Tabs should never ever be used for indentation. If they are, they should look silly.
 
