@@ -317,7 +317,7 @@ Let's try out Fontaine for setting up fonts.
           (regular) ; like this it uses all the fallback values and is named `regular'
           (medium
            :default-family "JetBrains Mono"
-           :default-height 140
+           :default-height 150
            :fixed-pitch-family "JetBrains Mono"
            :variable-pitch-family "SF Pro")
           (large
@@ -428,10 +428,8 @@ No lockfiles.
 (setq create-lockfiles nil)
 #+end_src
 
-Wrap lines by default. I hate horizontal scrolling.
-
 #+begin_src emacs-lisp :tangle yes
-(setq global-visual-line-mode t)
+(setq global-visual-line-mode nil)
 #+end_src
 
 Make the titlebar transparent.
