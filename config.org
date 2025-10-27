@@ -293,11 +293,10 @@ Let's try out Fontaine for setting up fonts.
           (presentation
            :default-height 180)
           (jumbo
-           :inherit medium
            :default-height 260)
           (t
            :default-family "JetBrains Mono"
-           :default-height 150
+           :default-height (if work-laptop-p 150 140)
 
            :fixed-pitch-family "JetBrains Mono"
            :fixed-pitch-family "JetBrains Mono"
@@ -1972,7 +1971,7 @@ Use 4 spaces as the default indentation level.
   (setq org-appear-autoemphasis   t   ;; Show bold, italics, verbatim, etc.
         org-appear-autolinks      nil   ;; Show links
         org-appear-autosubmarkers t))
-           #+end_src
+#+end_src
 
 ** Evil-org
 
@@ -3330,10 +3329,14 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
 #+begin_src emacs-lisp :tangle yes
 (defconst quotient-use-local nil)
 
+(defconst filename (if work-laptop-p
+                       "etc/manowar.txt"
+                     "etc/room.txt"))
+
 (use-package quotient
   :if (not quotient-use-local)
   :custom
-  (quotient-corpus (expand-file-name "etc/manowar.txt" user-emacs-directory))
+  (quotient-corpus (expand-file-name filename user-emacs-directory))
   :hook ((after-init . (lambda ()
                          (setq initial-scratch-message (quotient-generate-excerpt 'comment)))))
   :bind (("C-c ä" . quotient-set-scratch-message)))
@@ -3343,7 +3346,7 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
            quotient-use-local
   :load-path "~/dev/quotient"
   :custom
-  (quotient-corpus (expand-file-name "etc/manowar.txt" user-emacs-directory))
+  (quotient-corpus (expand-file-name filename user-emacs-directory))
   (quotient-quote-length 4)
   :hook ((after-init . (lambda ()
                          (setq initial-scratch-message (quotient-generate-excerpt 'comment)))))
