@@ -517,6 +517,16 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
                                (display-line-numbers-mode))))
 #+end_src
 
+** Indent-bars
+
+Use indent-bars in programming modes.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package indent-bars
+  :ensure t
+  :hook (prog-mode . indent-bars-mode))
+#+end_src
+
 ** Rainbow-mode
 
 Rainbow mode shows color codes as well as some other values (like the value `red' in CSS) in color.
