@@ -270,17 +270,19 @@ Set keybindings for profiler.
 
 * Appearance
 
-Use =doom-dracula= theme.
+I have been using the =doom-dracula= theme forever, but I'm currently trying out =modus-vivendi= to maximize legibility on bad monitors which I unfortunately have to use quite a bit.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package doom-themes
-  :ensure t
-  :custom
-  (doom-dracula-brighter-modeline t)
-  (doom-dracula-brighter-comments t)
-  (doom-dracula-colorful-headers t)
-  :config
-  (load-theme 'doom-dracula t))
+(load-theme 'modus-vivendi t)
+
+;; (use-package doom-themes
+;;   :ensure t
+;;   :custom
+;;   (doom-dracula-brighter-modeline t)
+;;   (doom-dracula-brighter-comments t)
+;;   (doom-dracula-colorful-headers t)
+;;   :config
+;;   (load-theme 'doom-dracula t))
 #+end_src
 
 Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
@@ -2198,6 +2200,7 @@ Re-indent front-matter. Could be handy if a key longer than the stock ones has b
   ;; (org-agenda-start-with-log-mode '(closed clock state))
   ;; (org-agenda-files (list org-default-notes-file))
   (org-agenda-files (list org-directory))
+  ;; (org-agenda-files (directory-files-recursively org-directory "\\.org$"))
   ;; (org-agenda-todo-ignore-scheduled 'future)
   ;; TODO entries that can't be marked as done b/c of children are shown as dimmed in agenda view
   (org-agenda-dim-blocked-tasks 'invisible)
