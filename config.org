@@ -315,11 +315,6 @@ Let's try out Fontaine for setting up fonts.
         '((small
            :default-height 100)
           (regular) ; like this it uses all the fallback values and is named `regular'
-          (medium
-           :default-family "JetBrains Mono"
-           :default-height 150
-           :fixed-pitch-family "JetBrains Mono"
-           :variable-pitch-family "SF Pro")
           (large
            :default-height 200)
           (presentation
@@ -328,43 +323,16 @@ Let's try out Fontaine for setting up fonts.
            :inherit medium
            :default-height 260)
           (t
-           :default-family "SF Mono"
-           :default-weight regular
-           :default-slant normal
-           :default-width normal
-           :default-height 140
+           :default-family "JetBrains Mono"
+           :default-height 150
 
            :fixed-pitch-family "JetBrains Mono"
-           :fixed-pitch-weight nil
-           :fixed-pitch-slant nil
-           :fixed-pitch-width nil
+           :fixed-pitch-family "JetBrains Mono"
            :fixed-pitch-height 180
-
-           :fixed-pitch-serif-family nil
-           :fixed-pitch-serif-weight nil
-           :fixed-pitch-serif-slant nil
-           :fixed-pitch-serif-width nil
            :fixed-pitch-serif-height 1.2
 
            :variable-pitch-family "IBM Plex Sans"
-           :variable-pitch-weight nil
-           :variable-pitch-slant nil
-           :variable-pitch-width nil
-           :variable-pitch-height 150
-
-           :bold-family nil
-           :bold-slant nil
-           :bold-weight bold
-           :bold-width nil
-           :bold-height 1.0
-
-           :italic-family nil
-           :italic-weight nil
-           :italic-slant italic
-           :italic-width nil
-           :italic-height 1.0
-
-           :line-spacing nil))))
+           :variable-pitch-height 150))))
 
 (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
@@ -395,8 +363,8 @@ Add helpers to switch between themes.
 If we're on the work laptop, chances are that we're using some random monitor...
 
 #+begin_src emacs-lisp :tangle yes
-(when work-laptop-p
-  (tv/load-crap-monitor-settings))
+;; (when work-laptop-p
+;;   (tv/load-crap-monitor-settings))
 #+end_src
 
 Tabs should never ever be used for indentation. If they are, they should look silly.
@@ -1326,9 +1294,9 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
          (tsx-ts-mode . prettier-js-mode)
          (tsx-ts-mode . lsp))
   :defer
-  :mode ("\\.mjml" . html-mode)
-  :mode ("\\.js" . tsx-ts-mode)
-  :mode ("\\.ts" . tsx-ts-mode)
+  :mode (("\\.mjml" . html-mode)
+         ("\\.js" . tsx-ts-mode)
+         ("\\.ts" . tsx-ts-mode))
   :custom
   (js-indent-level 2)
   (typescript-indent-level 2))
