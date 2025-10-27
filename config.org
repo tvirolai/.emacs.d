@@ -543,9 +543,7 @@ Use indent-bars in programming modes.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package indent-bars
-  :ensure t
-  :hook ((prog-mode . indent-bars-mode)
-         (yaml-ts-mode . indent-bars-mode)))
+  :ensure t)
 #+end_src
 
 ** Rainbow-mode
@@ -1325,6 +1323,7 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
                           (rainbow-delimiters-mode -1)
                           (corfu-mode -1))) ;; Clashes with LSP.
          (tsx-ts-mode . prettier-js-mode)
+         (tsx-ts-mode . indent-bars-mode)
          (tsx-ts-mode . lsp))
   :defer
   :mode (("\\.mjml" . html-mode)
@@ -1381,7 +1380,8 @@ Use smartparens.
   :hook ((python-mode . python-black-on-save-mode)
          (python-mode . lsp)
          (python-ts-mode . python-black-on-save-mode)
-         (python-ts-mode . lsp))
+         (python-ts-mode . lsp)
+         (python-ts-mode . indent-bars-mode))
   :config (setq lsp-pylsp-plugins-flake8-ignore '("D103" "D100" "D105")))
 
 ;; (add-hook 'python-mode-hook #'lsp)
@@ -1794,12 +1794,13 @@ Enable =recentf-mode=.
 ** YAML
 
 #+begin_src emacs-lisp :tangle yes
-(use-package yaml-ts-mode
+(use-package yaml-mode
   :ensure nil
-  :hook (yaml-ts-mode . display-line-numbers-mode)
+  :hook ((yaml-mode . display-line-numbers-mode)
+         (yaml-mode . indent-bars-mode))
   :mode
-  ("\\.yml\\'" . yaml-ts-mode)
-  ("\\.yaml\\'" . yaml-ts-mode))
+  ("\\.yml\\'" . yaml-mode)
+  ("\\.yaml\\'" . yaml-mode))
 #+end_src
 
 ** XML
