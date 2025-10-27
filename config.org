@@ -270,36 +270,7 @@ Set keybindings for profiler.
 
 * Appearance
 
-I have been using the =doom-dracula= theme forever, but I'm currently trying out =modus-vivendi= to maximize legibility on bad monitors which I unfortunately have to use quite a bit.
-
-#+begin_src emacs-lisp :tangle yes
-(load-theme 'modus-vivendi t)
-
-;; (use-package doom-themes
-;;   :ensure t
-;;   :custom
-;;   (doom-dracula-brighter-modeline t)
-;;   (doom-dracula-brighter-comments t)
-;;   (doom-dracula-colorful-headers t)
-;;   :config
-;;   (load-theme 'doom-dracula t))
-#+end_src
-
-Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
-
-#+begin_src emacs-lisp :tangle yes
-(use-package ef-themes
-  :ensure t)
-#+end_src
-
-Disable custom themes before loading a new one.
-
-#+begin_src emacs-lisp :tangle yes
-(defun disable-custom-themes (&optional theme no-confirm no-enable)
-  (mapc #'disable-theme custom-enabled-themes))
-
-(advice-add 'load-theme :before #'disable-custom-themes)
-#+end_src
+** Fonts
 
 Let's try out Fontaine for setting up fonts.
 
@@ -369,12 +340,16 @@ If we're on the work laptop, chances are that we're using some random monitor...
 ;;   (tv/load-crap-monitor-settings))
 #+end_src
 
+** Tabs
+
 Tabs should never ever be used for indentation. If they are, they should look silly.
 
 #+begin_src emacs-lisp :tangle yes
 (setq-default tab-width 8)
 (setq-default indent-tabs-mode nil)
 #+end_src
+
+** Miscellaneous configuration
 
 Require a newline at the end.
 
@@ -426,6 +401,8 @@ Suppress compilation warnings.
 (setq native-comp-async-report-warnings-errors nil)
 #+end_src
 
+** Mode line
+
 Moody, a mode line.
 
 #+begin_src emacs-lisp :tangle yes
@@ -442,7 +419,14 @@ Moody, a mode line.
   (minions-mode-line-delimiters '("" . ""))
   :config
   (minions-mode +1))
+
+(use-package hide-mode-line
+  :ensure t)
 #+end_src
+
+#+end_src
+
+** Ultra-scroll
 
 Scroll smoothly when using a mouse or trackpad. While this for me equals basically never, the [[https://github.com/jdtsmith/ultra-scroll][ultra-scroll]] package seems to be great.
 
@@ -463,10 +447,7 @@ Scroll smoothly when using a mouse or trackpad. While this for me equals basical
   (pixel-scroll-precision-mode))
 #+end_src
 
-#+begin_src emacs-lisp :tangle yes
-(use-package hide-mode-line
-  :ensure t)
-#+end_src
+** Symbol-overlay
 
 Use [[https://github.com/wolray/symbol-overlay][symbol-overlay]] mode to highlight symbols matching the one under the cursor.
 
@@ -475,6 +456,8 @@ Use [[https://github.com/wolray/symbol-overlay][symbol-overlay]] mode to highlig
   :ensure t
   :hook (prog-mode . symbol-overlay-mode))
 #+end_src
+
+** Spacious-padding
 
 Use =spacious-padding=.
 
@@ -485,6 +468,8 @@ Use =spacious-padding=.
   :hook (after-init . spacious-padding-mode))
 #+end_src
 
+** Line numbers
+
 Setup line numbers.
 
 #+begin_src emacs-lisp :tangle yes
@@ -493,6 +478,18 @@ Setup line numbers.
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (add-hook 'conf-mode-hook #'display-line-numbers-mode)
 #+end_src
+
+We don't want line numbers to be shown in org-mode buffers, apart from this one. Here, also =electric-pair-mode= should be enabled.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'org-mode-hook #'(lambda ()
+                             (interactive)
+                             (when (cl-search config-file (buffer-name))
+                               (electric-pair-mode)
+                               (display-line-numbers-mode))))
+#+end_src
+
+** Missing parent folders
 
 Create missing parent folders automatically. Source: [[https://github.com/bbatsov/emacs.d/blob/master/init.el][bbatsov]].
 
@@ -507,14 +504,37 @@ Create missing parent folders automatically. Source: [[https://github.com/bbatso
 (add-to-list 'find-file-not-found-functions #'er-auto-create-missing-dirs)
 #+end_src
 
-We don't want line numbers to be shown in org-mode buffers, apart from this one. Here, also =electric-pair-mode= should be enabled.
+** Themes
+
+I have been using the =doom-dracula= theme forever, but I'm currently trying out =modus-vivendi= to maximize legibility on bad monitors which I unfortunately have to use quite a bit.
 
 #+begin_src emacs-lisp :tangle yes
-(add-hook 'org-mode-hook #'(lambda ()
-                             (interactive)
-                             (when (cl-search config-file (buffer-name))
-                               (electric-pair-mode)
-                               (display-line-numbers-mode))))
+(load-theme 'modus-vivendi t)
+
+;; (use-package doom-themes
+;;   :ensure t
+;;   :custom
+;;   (doom-dracula-brighter-modeline t)
+;;   (doom-dracula-brighter-comments t)
+;;   (doom-dracula-colorful-headers t)
+;;   :config
+;;   (load-theme 'doom-dracula t))
+#+end_src
+
+Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ef-themes
+  :ensure t)
+#+end_src
+
+Disable custom themes before loading a new one.
+
+#+begin_src emacs-lisp :tangle yes
+(defun disable-custom-themes (&optional theme no-confirm no-enable)
+  (mapc #'disable-theme custom-enabled-themes))
+
+(advice-add 'load-theme :before #'disable-custom-themes)
 #+end_src
 
 ** Indent-bars
@@ -524,7 +544,8 @@ Use indent-bars in programming modes.
 #+begin_src emacs-lisp :tangle yes
 (use-package indent-bars
   :ensure t
-  :hook (prog-mode . indent-bars-mode))
+  :hook ((prog-mode . indent-bars-mode)
+         (yaml-ts-mode . indent-bars-mode)))
 #+end_src
 
 ** Rainbow-mode
