@@ -2216,7 +2216,34 @@ Re-indent front-matter. Could be handy if a key longer than the stock ones has b
              (org-front-matter-p))
     (align-org-front-matter)))
 
-(advice-add 'save-buffer :before #'maybe-align-org-front-matter)
+;; (advice-add 'save-buffer :before #'maybe-align-org-front-matter)
+#+end_src
+
+*** Add key to front matter
+
+Helpers for adding new elements to front matter.
+
+#+begin_src emacs-lisp :tangle yes
+(defun add-to-front-matter (key value)
+  "Add a new element (#+KEY: VALUE) to org mode front matter."
+  (save-excursion
+    (goto-char (point-min))
+    (re-search-forward "^\\($\\|[^#]\\)" nil t)
+    (insert (concat  "#+" key ": " value "\n"))
+    (align-org-front-matter)))
+
+(defun insert-to-front-matter ()
+  "Prompt for input and insert the result to front matter."
+  (interactive)
+  (let ((key (read-string "Key: "))
+        (value (downcase (read-string "Value: "))))
+    (add-to-front-matter key value)))
+
+(defun add-book-author ()
+  "Add a #+book_author: element into front matter."
+  (interactive)
+  (let ((author-name (read-string "Author name: ")))
+    (add-to-front-matter "book_author" author-name)))
 #+end_src
 
 ** Org Agenda
