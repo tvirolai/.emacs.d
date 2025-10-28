@@ -294,9 +294,11 @@ Let's try out Fontaine for setting up fonts.
            :default-height 180)
           (jumbo
            :default-height 260)
+          (regular-minus
+           :default-height 140)
           (t
            :default-family "JetBrains Mono"
-           :default-height (if work-laptop-p 150 140)
+           :default-height 170
 
            :fixed-pitch-family "JetBrains Mono"
            :fixed-pitch-family "JetBrains Mono"
@@ -2173,10 +2175,10 @@ setting `denote-rename-confirmations' to a nil value)."
 
 *** Align front matter
 
-Re-indent front-matter. Could be handy if a key longer than the stock ones has been added. Used AI (Claude) for this one.
+Re-indent front-matter. Could be handy if a key longer than the stock ones has been added.
 
 #+begin_src emacs-lisp :tangle yes
-(defun tv/align-org-front-matter ()
+(defun align-org-front-matter ()
   "Align key-value pairs in Org Mode front matter."
   (interactive)
   (save-excursion
@@ -2185,12 +2187,10 @@ Re-indent front-matter. Could be handy if a key longer than the stock ones has b
                               (re-search-forward "^\\($\\|[^#]\\)" nil t)
                               (point)))
           (keys nil))
-      ;; First pass: collect all keys and find max length
       (while (re-search-forward "^#\\+\\([A-Za-z_]+\\):" front-matter-end t)
         (push (match-string-no-properties 1) keys))
       (when keys
         (let ((max-length (apply #'max (mapcar #'length keys))))
-          ;; Second pass: realign all front matter
           (goto-char (point-min))
           (while (re-search-forward "^#\\+\\([A-Za-z_]+\\):\\s-*\\(.*\\)" front-matter-end t)
             (let* ((key (match-string-no-properties 1))
@@ -2199,8 +2199,24 @@ Re-indent front-matter. Could be handy if a key longer than the stock ones has b
               (replace-match (format "#\+%s:%s%s"
                                      key
                                      (make-string padding ?\s)
-                                     val))))))))
-  (message "Front matter aligned."))
+                                     val)))))))))
+
+(defun org-front-matter-p ()
+  "Check whether the file has org front matter."
+  (save-excursion
+    (goto-char (point-min))
+    (and (string= "#" (char-to-string (char-after)))
+         (progn
+           (forward-char)
+           (string= "+" (char-to-string (char-after)))))))
+
+(defun maybe-align-org-front-matter (&rest _)
+  "Align front matter if the file is an org file with front matter."
+  (when (and (derived-mode-p 'org-mode)
+             (org-front-matter-p))
+    (align-org-front-matter)))
+
+(advice-add 'save-buffer :before #'maybe-align-org-front-matter)
 #+end_src
 
 ** Org Agenda
