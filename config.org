@@ -275,6 +275,11 @@ Set keybindings for profiler.
 Let's try out Fontaine for setting up fonts.
 
 #+begin_src emacs-lisp :tangle yes
+(setq default-height
+      (if work-laptop-p
+          170
+        140))
+
 (use-package fontaine
   :ensure t
   :bind ("C-c ö" . fontaine-toggle-preset)
@@ -282,10 +287,11 @@ Let's try out Fontaine for setting up fonts.
   ((after-init . fontaine-mode)
    (after-init . (lambda ()
                    ;; Set last preset or fall back to desired style from `fontaine-presets'.
-                   (fontaine-set-preset (or (fontaine-restore-latest-preset) 'regular)))))
+                   (fontaine-set-preset (or (fontaine-restore-latest-preset)
+                                            'regular)))))
   :config
   (setq fontaine-presets
-        '((small
+        `((small
            :default-height 100)
           (regular) ; like this it uses all the fallback values and is named `regular'
           (large
@@ -295,10 +301,10 @@ Let's try out Fontaine for setting up fonts.
           (jumbo
            :default-height 260)
           (regular-minus
-           :default-height 140)
+           :default-height ,default-height)
           (t
            :default-family "JetBrains Mono"
-           :default-height 170
+           :default-height 140
 
            :fixed-pitch-family "JetBrains Mono"
            :fixed-pitch-family "JetBrains Mono"
@@ -2343,13 +2349,6 @@ Enable dragging and dropping images to org documents. Note that the command-line
   :ensure t
   :config
   (setq-default org-download-image-dir (concat org-directory "assets")))
-#+end_src
-
-** Org-modern mode
-
-#+begin_src emacs-lisp :tangle yes
-(use-package org-modern
-  :ensure t)
 #+end_src
 
 ** Copy articles from web to org
