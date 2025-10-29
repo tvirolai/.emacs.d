@@ -1296,7 +1296,7 @@ to this hack to run the indentation and capitalization for the whole buffer."
 
 ** Emacs Lisp
 
-Elisp keybindings.
+*** Elisp keybindings.
 
 #+begin_src emacs-lisp :tangle yes
 (evil-define-key 'normal emacs-lisp-mode-map
@@ -1317,6 +1317,14 @@ Elisp keybindings.
 (add-hook 'emacs-lisp-mode-hook #'(lambda ()
                                     (unless (string= (buffer-name) "*scratch*")
                                       (flycheck-mode))))
+#+end_src
+
+*** erefactor
+
+#+begin_src emacs-lisp :tangle yes
+(use-package erefactor
+  :ensure t
+  :defer t)
 #+end_src
 
 ** Typescript
@@ -3544,7 +3552,7 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
 (defun grep-symbol-at-point ()
   "Grep symbol at point."
   (interactive)
-  (projectile-grep (thing-at-point 'symbol t)))
+  (projectile-ripgrep (thing-at-point 'symbol t)))
 
 (global-set-key (kbd "C-c p g") 'grep-symbol-at-point)
 #+end_src
