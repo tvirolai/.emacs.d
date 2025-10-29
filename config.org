@@ -3541,8 +3541,10 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
 ** Grep for the symbol at point
 
 #+begin_src emacs-lisp :tangle yes
-(global-set-key (kbd "C-c p g")
-                (lambda ()
-                  (interactive)
-                  (projectile-grep (thing-at-point 'symbol t))))
+(defun grep-symbol-at-point ()
+  "Grep symbol at point."
+  (interactive)
+  (projectile-grep (thing-at-point 'symbol t)))
+
+(global-set-key (kbd "C-c p g") 'grep-symbol-at-point)
 #+end_src
