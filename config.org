@@ -277,7 +277,7 @@ Let's try out Fontaine for setting up fonts.
 #+begin_src emacs-lisp :tangle yes
 (setq default-height
       (if work-laptop-p
-          170
+          160
         140))
 
 (use-package fontaine
@@ -301,10 +301,10 @@ Let's try out Fontaine for setting up fonts.
           (jumbo
            :default-height 260)
           (regular-minus
-           :default-height ,default-height)
+           :default-height 130)
           (t
            :default-family "JetBrains Mono"
-           :default-height 140
+           :default-height ,default-height
 
            :fixed-pitch-family "JetBrains Mono"
            :fixed-pitch-family "JetBrains Mono"
@@ -3536,4 +3536,13 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
   (multi-occur
    (get-buffers-matching-mode major-mode)
    (car (occur-read-primary-args))))
+#+end_src
+
+** Grep for the symbol at point
+
+#+begin_src emacs-lisp :tangle yes
+(global-set-key (kbd "C-c p g")
+                (lambda ()
+                  (interactive)
+                  (projectile-grep (thing-at-point 'symbol t))))
 #+end_src
