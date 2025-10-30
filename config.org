@@ -1829,6 +1829,8 @@ Use 4 spaces as the default indentation level.
 
 * Org mode
 
+** General config
+
 #+begin_src emacs-lisp :tangle yes
 (use-package org
   :ensure nil
@@ -1987,6 +1989,15 @@ Use 4 spaces as the default indentation level.
   (setq org-appear-autoemphasis   t   ;; Show bold, italics, verbatim, etc.
         org-appear-autolinks      nil   ;; Show links
         org-appear-autosubmarkers t))
+#+end_src
+
+** Additional org export backends
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ox-jira
+  :ensure t
+  :config
+  (add-to-list 'org-export-backends 'ox-jira))
 #+end_src
 
 ** Evil-org
