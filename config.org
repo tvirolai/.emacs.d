@@ -544,6 +544,13 @@ Disable custom themes before loading a new one.
 (advice-add 'load-theme :before #'disable-custom-themes)
 #+end_src
 
+Trying a retro-green theme out as well.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package green-is-the-new-black-theme
+  :ensure t)
+#+end_src
+
 ** Indent-bars
 
 Use indent-bars in programming modes.
@@ -3561,7 +3568,7 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
 
 #+begin_src emacs-lisp :tangle yes
 (defun grep-symbol-at-point ()
-  "Grep symbol at point."
+  "Grep symbol at point, in project context."
   (interactive)
   (projectile-ripgrep (thing-at-point 'symbol t)))
 
