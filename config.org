@@ -3388,11 +3388,12 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
 (defconst quotient-use-local nil)
 
 (defconst filename (if work-laptop-p
-                       "etc/manowar.txt"
-                     "etc/room.txt"))
+                       "etc/corpora/manowar.txt"
+                     "etc/corpora/room.txt"))
 
 (use-package quotient
-  :if (not quotient-use-local)
+  :if (and (not quotient-use-local)
+           (file-exists-p (expand-file-name filename user-emacs-directory)))
   :custom
   (quotient-corpus (expand-file-name filename user-emacs-directory))
   :hook ((after-init . (lambda ()
