@@ -2639,7 +2639,9 @@ any directory proferred by `consult-dir'."
   :ensure t
   :defer
   :custom
+  (vterm-send-key "<escape>")
   (vterm-max-scrollback 100000)
+  (evil-set-initial-state 'vterm-mode 'insert)
   :config
   (setq vterm-shell "/bin/zsh")
   (setq vterm-kill-buffer-on-exit t)
@@ -2647,7 +2649,9 @@ any directory proferred by `consult-dir'."
   (setq vterm-keymap-exceptions nil))
 #+end_src
 
-* Configure epg-pinentry-mode
+* Secrets and encryption
+
+** Configure epg-pinentry-mode
 
 This is needed for =pass= and =epa=.
 
@@ -2655,7 +2659,7 @@ This is needed for =pass= and =epa=.
 (setq epg-pinentry-mode 'loopback)
 #+end_src
 
-* Pass
+** Pass
 
 Use the =pass= package to interact with the similarly named Linux password manager.
 
@@ -2666,17 +2670,6 @@ Use the =pass= package to interact with the similarly named Linux password manag
   :config
   (require 'auth-source-pass)
   (auth-source-pass-enable))
-#+end_src
-
-
-* File info
-
-Show information about the file under editing.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package file-info
-  :ensure t
-  :bind (("C-c f" . 'file-info-show)))
 #+end_src
 
 * EWW
@@ -2739,7 +2732,7 @@ When there are unsaved changes and the user tries to exit Emacs, it asks whether
 Found this [[https://eugene-andrienko.com/en/it/2025/06/30/my-emacs-configuration-common.html#rc-emacs-cursor-minibuffer][here]].
 
 #+begin_src emacs-lisp :tangle yes
-                                        ; If asked to save buffer on C-x C-c - show diff of changes with d key
+; If asked to save buffer on C-x C-c - show diff of changes with d key
 (add-to-list 'save-some-buffers-action-alist
              '("d" (lambda (buffer)
                      (diff-buffer-with-file (buffer-file-name buffer)))
@@ -3236,6 +3229,13 @@ Tools to aid with package development.
   :ensure t)
 #+end_src
 
+** edebug
+
+#+begin_src emacs-lisp :tangle yes
+(use-package edebug
+  :ensure t)
+#+end_src
+
 * Crux
 
 A powerful collection of utility functions.
@@ -3248,17 +3248,7 @@ A powerful collection of utility functions.
          ("C-c k" . crux-kill-buffer-truename)))
 #+end_src
 
-* Various minor tweaks
-
-** Pull GPG passphrases from environment variables to Emacs registers
-
-Read a GPG passphrase from environment variable to a register for easier access.
-
-#+begin_src emacs-lisp :tangle yes
-(when work-laptop-p
-  (set-register ?o (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNF")))
-  (set-register ?p (getenv (base64-decode-string "VkFSTUFfR1BHX1NZTU1FVFJJQ19QQVNTUEhSQVNFX1BST0Q="))))
-#+end_src
+* Various convenience functions and other miscellaneous stuff
 
 ** Jump to scratch buffer
 
@@ -3573,4 +3563,14 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
   (projectile-ripgrep (thing-at-point 'symbol t)))
 
 (global-set-key (kbd "C-c p g") 'grep-symbol-at-point)
+#+end_src
+
+** File info
+
+Show information about the file under editing.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package file-info
+  :ensure t
+  :bind (("C-c f" . 'file-info-show)))
 #+end_src
