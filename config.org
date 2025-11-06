@@ -1062,6 +1062,17 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
   (setq gptel-api-key (getenv "OPENAI_API_KEY")))
 #+end_src
 
+** Claude Code
+
+#+begin_src emacs-lisp :tangle yes
+(use-package claude-code-ide
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :bind ("C-c C-'" . claude-code-ide-menu)
+  :config
+  (setq claude-code-ide-use-side-window nil)
+  (claude-code-ide-emacs-tools-setup))
+#+end_src
+
 * Media playback
 
 ** Ready player mode
@@ -1999,6 +2010,8 @@ Use 4 spaces as the default indentation level.
 #+end_src
 
 ** Additional org export backends
+
+*** Jira markdown
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ox-jira
