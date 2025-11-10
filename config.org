@@ -1442,6 +1442,15 @@ Use smartparens.
   (push 'jsts-ls lsp-disabled-clients))
 #+end_src
 
+** lsp-sonarlint
+
+#+begin_src emacs-lisp :tangle yes
+(use-package lsp-sonarlint
+  :custom
+  (lsp-sonarlint-auto-download t))
+#+end_src
+
+
 * Eldoc
 
 #+begin_src emacs-lisp :tangle yes
@@ -2690,7 +2699,15 @@ Use the =pass= package to interact with the similarly named Linux password manag
 Disable images.
 
 #+begin_src emacs-lisp :tangle yes
-(setq shr-inhibit-images t)
+(use-package eww
+  :ensure nil
+  :defer t
+  :config
+  (setq
+   shr-inhibit-images t
+   shr-indentation 2
+   eww-auto-rename-buffer 'url
+   shr-width 80))
 #+end_src
 
 * Dired
