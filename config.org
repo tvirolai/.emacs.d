@@ -2242,7 +2242,7 @@ the changes made to the file: perform them outright (same as
 setting `denote-rename-confirmations' to a nil value)."
   (declare (interactive-only t))
   (interactive nil dired-mode)
-  (let ((denote--used-ids (denote--get-all-used-ids))
+  (let ((denote-used-identifiers (denote--get-all-used-ids))
         (denote-rename-confirmations nil)
         (title ""))
     (if-let* ((marks (dired-get-marked-files)))
@@ -2253,7 +2253,7 @@ setting `denote-rename-confirmations' to a nil value)."
                            title
                            (format "Rename `%s' with TITLE (empty to remove)"
                                    (propertize (file-relative-name file) 'face 'denote-faces-prompt-current-name)))))
-            (denote--rename-file file title (denote-extract-keywords-from-path file) "" (denote--generate-date-for-rename file)))
+            (denote--rename-file file title (denote-extract-keywords-from-path file) "" (denote--generate-date-for-rename file) ""))
           (denote-update-dired-buffers))
       (user-error "No marked files; aborting"))))
 #+end_src
