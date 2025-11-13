@@ -462,7 +462,7 @@ Moody, a mode line.
 
 ** Ultra-scroll
 
-Scroll smoothly when using a mouse or trackpad. While this for me equals basically never, the [[https://github.com/jdtsmith/ultra-scroll][ultra-scroll]] package seems to be great.
+Scroll smoothly when using a mouse or trackpad.
 
 #+begin_src emacs-lisp :tangle yes
 ;; (package-vc-install '(ultra-scroll :vc-backend Git :url  "https://github.com/jdtsmith/ultra-scroll"))
@@ -545,14 +545,15 @@ I have been using the =doom-dracula= theme forever, but I'm currently trying out
 #+begin_src emacs-lisp :tangle yes
 (load-theme 'modus-vivendi t)
 
-;; (use-package doom-themes
-;;   :ensure t
-;;   :custom
-;;   (doom-dracula-brighter-modeline t)
-;;   (doom-dracula-brighter-comments t)
-;;   (doom-dracula-colorful-headers t)
-;;   :config
-;;   (load-theme 'doom-dracula t))
+(use-package doom-themes
+  :ensure t
+  :custom
+  (doom-dracula-brighter-modeline t)
+  (doom-dracula-brighter-comments t)
+  (doom-dracula-colorful-headers t)
+  :config
+  ;; (load-theme 'doom-dracula t)
+  )
 #+end_src
 
 Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
@@ -745,7 +746,11 @@ Vim keybindings here.
   (setq evil-respect-visual-line-mode nil)
   (evil-add-command-properties #'flymake-goto-next-error :jump t)
   (evil-add-command-properties #'evil-scroll-up :jump t)
-  (evil-add-command-properties #'consult-grep :jump t))
+  (evil-add-command-properties #'consult-grep :jump t)
+  (setq evil-normal-state-cursor '("white" box)
+        evil-insert-state-cursor '("green" bar)
+        evil-visual-state-cursor '("white" box)
+        evil-emacs-state-cursor '("orange" box))
 
 (use-package undo-fu
   :ensure t
@@ -1060,6 +1065,13 @@ Window management. Source: [[https://www.masteringemacs.org/article/demystifying
   (interactive)
   (set-window-dedicated-p (selected-window)
                           (not (window-dedicated-p (selected-window)))))
+#+end_src
+
+Window split threshold.
+
+#+begin_src emacs-lisp :tangle yes
+(setq split-width-threshold 160
+      split-height-threshold nil)
 #+end_src
 
 Easy buffer switching.
