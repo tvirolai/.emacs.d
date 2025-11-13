@@ -543,8 +543,6 @@ Create missing parent folders automatically. Source: [[https://github.com/bbatso
 I have been using the =doom-dracula= theme forever, but I'm currently trying out =modus-vivendi= to maximize legibility on bad monitors which I unfortunately have to use quite a bit.
 
 #+begin_src emacs-lisp :tangle yes
-(load-theme 'modus-vivendi t)
-
 (use-package doom-themes
   :ensure t
   :custom
@@ -561,6 +559,14 @@ Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
 #+begin_src emacs-lisp :tangle yes
 (use-package ef-themes
   :ensure t)
+#+end_src
+
+Choose theme.
+
+#+begin_src emacs-lisp :tangle yes
+(load-theme (if work-laptop-p
+                'modus-vivendi
+              'ef-elea-dark) t)
 #+end_src
 
 Disable custom themes before loading a new one.
@@ -750,7 +756,7 @@ Vim keybindings here.
   (setq evil-normal-state-cursor '("white" box)
         evil-insert-state-cursor '("green" bar)
         evil-visual-state-cursor '("white" box)
-        evil-emacs-state-cursor '("orange" box))
+        evil-emacs-state-cursor '("orange" box)))
 
 (use-package undo-fu
   :ensure t
