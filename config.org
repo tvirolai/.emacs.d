@@ -753,10 +753,11 @@ Vim keybindings here.
   (evil-add-command-properties #'flymake-goto-next-error :jump t)
   (evil-add-command-properties #'evil-scroll-up :jump t)
   (evil-add-command-properties #'consult-grep :jump t)
-  (setq evil-normal-state-cursor '("white" box)
-        evil-insert-state-cursor '("green" bar)
-        evil-visual-state-cursor '("white" box)
-        evil-emacs-state-cursor '("orange" box)))
+  ;; (setq evil-normal-state-cursor '("white" box)
+  ;;       evil-insert-state-cursor '("green" bar)
+  ;;       evil-visual-state-cursor '("white" box)
+  ;;       evil-emacs-state-cursor '("orange" box))
+  )
 
 (use-package undo-fu
   :ensure t
