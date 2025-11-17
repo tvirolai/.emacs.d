@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: Org question
+# key: ?
+# --
+** Question
+$0
+
+** Answer
