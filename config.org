@@ -1795,11 +1795,12 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
   (yas-global-mode)
   (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
   (setq yas-key-syntaxes '("w_" "w_." "^ "))
-  (setq own-snippets-dir "snippets")
+  (setq own-snippets-dir (expand-file-name "snippets" user-emacs-directory))
   (setq yas-expand-only-for-last-commands nil)
   (yas-global-mode 1)
   (bind-key "\t" 'hippie-expand yas-minor-mode-map)
-  (yas-load-directory own-snippets-dir))
+  (add-to-list 'yas-snippet-dirs 'own-snippets-dir)
+  (yas-load-directory own-snippets-dir t))
 
 (use-package doom-snippets
   :if (file-directory-p "~/dev/snippets")

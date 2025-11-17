@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# name: Tiketti
+# key: tiketti
+# --
+* $0
+
+- Tiketti:
+
+** Tutkinta
