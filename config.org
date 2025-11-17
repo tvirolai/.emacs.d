@@ -1181,6 +1181,7 @@ Use LSP when editing shell scripts.
 
 #+begin_src emacs-lisp :tangle yes
 (add-to-list 'auto-mode-alist '("\\.bats\\'" . bash-ts-mode))
+(add-to-list 'auto-mode-alist '("\\.sh\\.j2" . bash-ts-mode))
 #+end_src
 
 ** Clojure
@@ -1885,10 +1886,14 @@ Enable =recentf-mode=.
 (use-package yaml-mode
   :ensure nil
   :hook ((yaml-mode . display-line-numbers-mode)
-         (yaml-mode . indent-bars-mode))
+         (yaml-ts-mode . display-line-numbers-mode)
+         (yaml-mode . indent-bars-mode)
+         (yaml-ts-mode . indent-bars-mode))
   :mode
   ("\\.yml\\'" . yaml-mode)
-  ("\\.yaml\\'" . yaml-mode))
+  ("\\.yaml\\'" . yaml-mode)
+  ("\\.yml\\.j2" . yaml-mode)
+  ("\\.yaml\\.j2" . yaml-mode))
 #+end_src
 
 ** XML
