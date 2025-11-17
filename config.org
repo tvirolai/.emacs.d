@@ -2026,7 +2026,8 @@ Use 4 spaces as the default indentation level.
   (setq org-export-with-smart-quotes t)  ; Use smart quotes
   (setq org-export-with-sub-superscripts nil)  ; No superscripts
   ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
-  :hook ((org-mode . visual-line-mode)
+  :hook (
+         (org-mode . visual-line-mode)
          ;;(org-mode . org-indent-mode)
          ))
 
@@ -2129,7 +2130,7 @@ I use =denote= for note taking and personal knowledge management. I migrated fro
   (dired-mode . denote-dired-mode)
   :config
   (setq denote-org-store-link-to-heading t)
-  (setq denote-directory (concat org-directory "notes"))
+  (setq denote-directory (concat org-directory "/notes"))
   (setq denote-backlinks-show-context nil)
   :bind (:map global-map
               (("C-c n b" . denote-find-backlink)
