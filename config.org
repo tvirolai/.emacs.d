@@ -1392,7 +1392,7 @@ to this hack to run the indentation and capitalization for the whole buffer."
   :defer t)
 #+end_src
 
-** Typescript
+** Typescript / JS
 
 Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=, so it needs to be disabled in it.
 
@@ -1429,18 +1429,6 @@ Use smartparens.
   :config
   ;; load default config
   (require 'smartparens-config))
-#+end_src
-
-** JavaScript
-
-#+begin_src emacs-lisp :tangle yes
-;; (use-package js-mode
-;;   :ensure t
-;;   :hook ((js-ts-mode-hook . prettier-js-mode)
-;;          (js-ts-mode-hook . lsp))
-;;   :defer
-;;   :custom
-;;   (js-indent-level 2))
 #+end_src
 
 ** Java
@@ -1485,6 +1473,8 @@ Use smartparens.
         lsp-lens-enable t
         lsp-auto-guess-root t
         lsp-headerline-breadcrumb-enable nil
+        ;; Silence the 'LSP server exited, do you want to restart it' prompt when killing buffers.
+        lsp-restart 'ignore
         lsp-modeline-code-actions-enable t)
   (push 'jsts-ls lsp-disabled-clients))
 #+end_src
@@ -2765,6 +2755,7 @@ Disable images.
    shr-inhibit-images t
    shr-indentation 2
    eww-auto-rename-buffer 'url
+   browse-url-browser-function 'eww-browse-url
    shr-width 80))
 #+end_src
 
