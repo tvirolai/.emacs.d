@@ -1546,7 +1546,8 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
 (use-package ripgrep
   :ensure t
   :config
-  (evil-define-key 'normal 'global "Ä" #'consult-ripgrep))
+  (evil-define-key 'normal 'global "Ä" #'consult-ripgrep)
+  (evil-define-key 'normal 'global (kbd "s-ä") #'projectile-ripgrep))
 #+end_src
 
 * Wgrep
