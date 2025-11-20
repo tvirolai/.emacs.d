@@ -898,7 +898,16 @@ This maybe fixes some indentation issues in org mode.
 
 * Version control
 
-Magit is the Git package.
+** Git gutter
+
+#+begin_src emacs-lisp :tangle yes
+(use-package git-gutter
+  :ensure t
+  :defer
+  :hook (after-init . global-git-gutter-mode))
+#+end_src
+
+** Magit
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/kill-magit-diff-buffer-in-current-repo (&rest _)
@@ -917,6 +926,7 @@ Magit is the Git package.
 (use-package magit
   :defer
   :ensure t
+  :after git-gutter
   :config
   (add-hook 'git-commit-setup-hook
             (lambda ()
@@ -931,12 +941,11 @@ Magit is the Git package.
     "q" #'tv/mu-magit-kill-buffers)
   (add-hook 'magit-post-refresh-hook
             #'git-gutter:update-all-windows))
+#+end_src
 
-(use-package git-gutter
-  :ensure t
-  :defer
-  :hook (after-init . global-git-gutter-mode))
+** Git timemachine
 
+#+begin_src emacs-lisp :tangle yes
 (use-package git-timemachine
   :ensure t
   :defer
@@ -1164,7 +1173,6 @@ Sort =ibuffer= by project.
                           (unless (eq ibuffer-sorting-mode 'alphabetic)
                             (ibuffer-do-sort-by-alphabetic)))))
 #+end_src
-
 
 * Programming languages
 
@@ -1487,7 +1495,6 @@ Use smartparens.
   (lsp-sonarlint-auto-download t))
 #+end_src
 
-
 * Eldoc
 
 #+begin_src emacs-lisp :tangle yes
@@ -1538,7 +1545,8 @@ Pick up formatting settings from =.editorconfig= files.
   (editorconfig-mode 1))
 #+end_src
 
-* Ripgrep
+* Grepping
+** Ripgrep
 
 Ripgrep package is needed for =projectile-ripgrep= to be usable.
 
@@ -1550,7 +1558,7 @@ Ripgrep package is needed for =projectile-ripgrep= to be usable.
   (evil-define-key 'normal 'global (kbd "s-ä") #'projectile-ripgrep))
 #+end_src
 
-* Wgrep
+** Wgrep
 
 Writable grep. This makes possible to use workflows for search and replace like:
 
@@ -1800,7 +1808,6 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 #+end_src
 
 * History
-
 ** Save-place-mode
 
 Remember and restore the last cursor location of opened files.
@@ -1846,6 +1853,18 @@ Enable =recentf-mode=.
         ;; disable recentf-cleanup on Emacs start, because it can cause
         ;; problems with remote files
         recentf-auto-cleanup 'never))
+#+end_src
+
+** Winner
+
+#+begin_src emacs-lisp :tangle yes
+(use-package winner
+  :ensure nil
+  :hook after-init
+  :commands (winner-undo winnner-redo)
+  :custom
+  (winner-boring-buffers '("*Completions*" "*Help*" "*Apropos*"
+                           "*Buffer List*" "*info*" "*Compile-Log*")))
 #+end_src
 
 * File formats
@@ -2743,6 +2762,13 @@ Use the =pass= package to interact with the similarly named Linux password manag
   (auth-source-pass-enable))
 #+end_src
 
+** Ansible vault
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ansible-vault
+  :ensure t)
+#+end_src
+
 * EWW
 
 Disable images.
@@ -2803,20 +2829,6 @@ Install [[https://github.com/Fuco1/dired-narrow][dired-narrow]].
 #+begin_src emacs-lisp :tangle yes
 (use-package dired-narrow
   :ensure t)
-#+end_src
-
-* Show diff for unsaved changes
-
-When there are unsaved changes and the user tries to exit Emacs, it asks whether I want to save them. With this snippet in the config, it also shows /what/ the said changes are, which should be helpful.
-
-Found this [[https://eugene-andrienko.com/en/it/2025/06/30/my-emacs-configuration-common.html#rc-emacs-cursor-minibuffer][here]].
-
-#+begin_src emacs-lisp :tangle yes
-; If asked to save buffer on C-x C-c - show diff of changes with d key
-(add-to-list 'save-some-buffers-action-alist
-             '("d" (lambda (buffer)
-                     (diff-buffer-with-file (buffer-file-name buffer)))
-               "Show diff of changes"))
 #+end_src
 
 * Transient
@@ -2912,18 +2924,6 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
 (use-package transpose-frame
   :ensure t
   :after transient)
-#+end_src
-
-* Winner
-
-#+begin_src emacs-lisp :tangle yes
-(use-package winner
-  :ensure nil
-  :hook after-init
-  :commands (winner-undo winnner-redo)
-  :custom
-  (winner-boring-buffers '("*Completions*" "*Help*" "*Apropos*"
-                           "*Buffer List*" "*info*" "*Compile-Log*")))
 #+end_src
 
 * Email
@@ -3282,7 +3282,22 @@ that and instead tries to complete against dictionary entries."
   (global-set-key (kbd "C-c C-d") #'helpful-at-point))
 #+end_src
 
-* Ztree
+* Diffing
+** Show diff for unsaved changes
+
+When there are unsaved changes and the user tries to exit Emacs, it asks whether I want to save them. With this snippet in the config, it also shows /what/ the said changes are, which should be helpful.
+
+Found this [[https://eugene-andrienko.com/en/it/2025/06/30/my-emacs-configuration-common.html#rc-emacs-cursor-minibuffer][here]].
+
+#+begin_src emacs-lisp :tangle yes
+; If asked to save buffer on C-x C-c - show diff of changes with d key
+(add-to-list 'save-some-buffers-action-alist
+             '("d" (lambda (buffer)
+                     (diff-buffer-with-file (buffer-file-name buffer)))
+               "Show diff of changes"))
+#+end_src
+
+** Ztree
 
 Ztree is /"A major mode for displaying the directory tree in text mode"/. One thing I sometimes need is =ztree-diff= for generating a diff of two directories.
 
