@@ -1995,6 +1995,7 @@ Use 4 spaces as the default indentation level.
     (kbd "M-K") #'org-shiftmetaup
     (kbd "M-J") #'org-shiftmetadown
     (kbd "§") #'verb-send-request-on-point-other-window-stay)
+  ;; Include the time in timestamps by default.
   (setq org-time-stamp-formats '("<%Y-%m-%d %a %H:%M>" . "<%Y-%m-%d %a %H:%M>"))
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-insert-heading-respect-content t)
@@ -3681,4 +3682,16 @@ Show information about the file under editing.
 (use-package file-info
   :ensure t
   :bind (("C-c f" . 'file-info-show)))
+#+end_src
+
+** Trigger manual recompile
+
+Recompile all installed dependencies. From [[https://www.reddit.com/r/emacs/comments/1gmjpn1/how_to_compile_all_packages_to_native_code/][r/emacs]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun native-recompile ()
+  "Prune eln cache and native recompile everything on `package-user-dir'."
+  (interactive)
+  (native-compile-prune-cache)
+  (native-compile-async package-user-dir 'recursively))
 #+end_src
