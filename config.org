@@ -3695,3 +3695,12 @@ Recompile all installed dependencies. From [[https://www.reddit.com/r/emacs/comm
   (native-compile-prune-cache)
   (native-compile-async package-user-dir 'recursively))
 #+end_src
+
+** Wasabi
+
+Trying this out.
+
+#+begin_src emacs-lisp :tangle yes
+;; (use-package wasabi
+;;   :vc (:url "https://github.com/xenodium/wasabi"))
+#+end_src
