@@ -1534,6 +1534,17 @@ This makes etags work, i.e. allows us to jump to definitions.
   (push "build" counsel-etags-ignore-directories))
 #+end_src
 
+* Dumb jump
+
+Let's try [[https://github.com/jacktasia/dumb-jump][this]] out.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package dumb-jump
+  :ensure t
+  :config
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+#+end_src
+
 * Editorconfig
 
 Pick up formatting settings from =.editorconfig= files.
@@ -1984,6 +1995,7 @@ Use 4 spaces as the default indentation level.
     (kbd "M-K") #'org-shiftmetaup
     (kbd "M-J") #'org-shiftmetadown
     (kbd "§") #'verb-send-request-on-point-other-window-stay)
+  (setq org-time-stamp-formats '("<%Y-%m-%d %a %H:%M>" . "<%Y-%m-%d %a %H:%M>"))
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-insert-heading-respect-content t)
   (setq org-directory "~/org/")
