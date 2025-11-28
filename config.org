@@ -740,6 +740,7 @@ Vim keybindings here.
   ;; no vim insert bindings
   :config
   (evil-mode 1)
+  (setopt evil-disable-insert-state-bindings t)
   ;; (evil-set-undo-system 'vundo)
   ;; (evil-set-undo-system 'undo-tree)
   (evil-set-undo-system 'undo-redo)
@@ -753,10 +754,7 @@ Vim keybindings here.
   (evil-add-command-properties #'flymake-goto-next-error :jump t)
   (evil-add-command-properties #'evil-scroll-up :jump t)
   (evil-add-command-properties #'consult-grep :jump t)
-  ;; (setq evil-normal-state-cursor '("white" box)
-  ;;       evil-insert-state-cursor '("green" bar)
-  ;;       evil-visual-state-cursor '("white" box)
-  ;;       evil-emacs-state-cursor '("orange" box))
+  ;; (setq evil-emacs-state-cursor '("orange" box))
   )
 
 (use-package undo-fu
