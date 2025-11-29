@@ -2816,7 +2816,9 @@ Disable images.
          (dired-mode . hl-line-mode)
          (dired-mode . ready-player-mode))
   :bind (:map dired-mode-map
-              ("C-c C-e" . wdired-change-to-wdired-mode))
+              ("C-c C-e" . wdired-change-to-wdired-mode)
+              :map global-map
+              ("C-M-ä" . dired-jump))
   :custom
   (dired-kill-when-opening-new-dired-buffer t) ;; Without this, each directory level opens in its own buffer.
   (dired-do-revert-buffer t)
