@@ -2636,16 +2636,20 @@ Use ansi-colors in shell.
                           (setq-local corfu-auto nil)
                           (setq-local corfu-preview-current nil)
                           (setq-local completion-at-point-functions '(pcomplete-completions-at-point cape-file)))))
+  :bind (:map eshell-mode-map
+              ("C-M-l" . 'next-buffer)
+              ("C-M-h" . 'previous-buffer))
   :init
   (setq eshell-scroll-to-bottom-on-input 'all
         eshell-banner-message (quotient-generate-excerpt 'eshell)
         eshell-error-if-no-glob t
         eshell-hist-ignoredups t
-        evil-set-initial-state 'insert
         eshell-save-history-on-exit t
         eshell-prefer-lisp-functions nil
         eshell-directory-name (expand-file-name "etc/eshell" user-emacs-directory)
-        eshell-destroy-buffer-when-process-dies t))
+        eshell-destroy-buffer-when-process-dies t)
+  :config
+  (evil-set-initial-state 'eshell-mode 'emacs))
 #+end_src
 
 Eshell aliases.
@@ -2729,21 +2733,26 @@ any directory proferred by `consult-dir'."
                     (consult-dir--pick "Switch directory: ")))))
      (t (eshell/cd (if regexp (eshell-find-previous-directory regexp)
                      (completing-read "cd: " eshell-dirs)))))))
-    #+end_src
+#+end_src
 
 ** Vterm
 
 #+begin_src emacs-lisp :tangle yes
 (use-package vterm
   :hook ((vterm-mode . hide-mode-line-mode)
-         (vterm-mode . (lambda () (setq-local global-hl-line-mode nil))))
+         (vterm-mode . (lambda ()
+                         (setq-local global-hl-line-mode nil))))
   :ensure t
   :defer
+  :bind (:map vterm-mode-map
+              ("C-M-l" . 'next-buffer)
+              ("C-M-h" . 'previous-buffer))
   :custom
   (vterm-send-key "<escape>")
   (vterm-max-scrollback 100000)
-  (evil-set-initial-state 'vterm-mode 'insert)
   :config
+  (evil-set-initial-state 'vterm-mode 'emacs)
+  (evil-set-initial-state 'term-mode 'emacs)
   (setq vterm-shell "/bin/zsh")
   (setq vterm-kill-buffer-on-exit t)
   (setq vterm-max-scrollback 100000)
@@ -2984,7 +2993,7 @@ machine kapsi port 465 login my-username password my-password
 To automate fetching and indexing new mail, I've set up a cron job that runs at a five-minute interval:
 
 #+begin_src bash
-*/5 * * * * . $HOME/check-mail.sh
+,*/5 * * * * . $HOME/check-mail.sh
 #+end_src
 
 Here the =check-mail.sh= script looks like this.
@@ -3274,7 +3283,7 @@ that and instead tries to complete against dictionary entries."
   (setq smtpmail-smtp-server "mail.kapsi.fi")
   (setq smtpmail-smtp-service 587)
   (setq smtpmail-stream-type 'starttls))
-        #+end_src
+#+end_src
 
 * Helpful
 
@@ -3301,7 +3310,7 @@ When there are unsaved changes and the user tries to exit Emacs, it asks whether
 Found this [[https://eugene-andrienko.com/en/it/2025/06/30/my-emacs-configuration-common.html#rc-emacs-cursor-minibuffer][here]].
 
 #+begin_src emacs-lisp :tangle yes
-; If asked to save buffer on C-x C-c - show diff of changes with d key
+                                        ; If asked to save buffer on C-x C-c - show diff of changes with d key
 (add-to-list 'save-some-buffers-action-alist
              '("d" (lambda (buffer)
                      (diff-buffer-with-file (buffer-file-name buffer)))
@@ -3509,14 +3518,14 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
 (use-package quotient
   :if (and (file-directory-p "~/dev/quotient")
            quotient-use-local
-  :load-path "~/dev/quotient"
-  :custom
-  (quotient-corpus (expand-file-name filename user-emacs-directory))
-  (quotient-quote-length 4)
-  :hook ((after-init . (lambda ()
-                         (setq initial-scratch-message (quotient-generate-excerpt 'comment)))))
-  :bind (("C-c ä" . quotient-set-scratch-message))
-  :commands (quotient-set-scratch-message quotient-display-random-excerpt quotient-generate-excerpt)))
+           :load-path "~/dev/quotient"
+           :custom
+           (quotient-corpus (expand-file-name filename user-emacs-directory))
+           (quotient-quote-length 4)
+           :hook ((after-init . (lambda ()
+                                  (setq initial-scratch-message (quotient-generate-excerpt 'comment)))))
+           :bind (("C-c ä" . quotient-set-scratch-message))
+           :commands (quotient-set-scratch-message quotient-display-random-excerpt quotient-generate-excerpt)))
 #+end_src
 
 ** Open a Jira ticket in the browser
