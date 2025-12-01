@@ -997,6 +997,7 @@ A handful of bindings inspired by Doom Emacs / Spacemacs.
 (define-key evil-normal-state-map (kbd "SPC") my-leader-map)
 (define-key my-leader-map "b" 'list-buffers)
 (define-key evil-normal-state-map (kbd "SPC h") help-map)
+(define-key evil-normal-state-map (kbd "SPC o") 'evil-jump-forward)
 (define-key my-leader-map (kbd "RET") 'consult-bookmark)
 (define-key my-leader-map "<" 'consult-buffer)
 (define-key my-leader-map "z" 'consult-recent-file)
