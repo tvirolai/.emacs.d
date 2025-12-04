@@ -1124,6 +1124,7 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
   :bind ("C-c C-'" . claude-code-ide-menu)
   :config
   (setq claude-code-ide-use-side-window nil)
+  (evil-set-initial-state 'vterm-mode 'insert)
   (claude-code-ide-emacs-tools-setup))
 #+end_src
 
@@ -1421,11 +1422,15 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
   (typescript-indent-level 2))
 #+end_src
 
+*** Prettier
+
 Setup prettier.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package prettier-js)
 #+end_src
+
+*** Smartparens
 
 Use smartparens.
 
@@ -1441,9 +1446,9 @@ Use smartparens.
 ** Java
 
 #+begin_src emacs-lisp :tangle yes
-(use-package lsp-java :config (add-hook 'java-mode-hook 'lsp))
-(use-package dap-mode :after lsp-mode :config (dap-auto-configure-mode))
-(use-package dap-java :ensure nil)
+(use-package lsp-java
+  :hook ((java-ts-mode . lsp)
+         (java-ts-mode . dap-auto-configure-mode)))
 #+end_src
 
 ** Python
@@ -1925,6 +1930,13 @@ Use 4 spaces as the default indentation level.
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'nxml-mode-hook #'display-line-numbers-mode)
 (setq nxml-child-indent 4 nxml-attribute-indent 4)
+#+end_src
+
+** Nginx
+
+#+begin_src emacs-lisp :tangle yes
+(use-package nginx-mode
+  :ensure t)
 #+end_src
 
 * Org mode
