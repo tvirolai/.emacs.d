@@ -1493,8 +1493,11 @@ Use smartparens.
 
 ** lsp-sonarlint
 
+Doesn't work.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-sonarlint
+  :ensure t
   :custom
   (lsp-sonarlint-auto-download t))
 #+end_src
