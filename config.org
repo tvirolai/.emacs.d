@@ -957,7 +957,7 @@ Use =which-key=, in minibuffer.
 #+begin_src emacs-lisp :tangle yes
 (use-package which-key
   :ensure t
-  :hook (after-init . which-key-mode)
+  ;; :hook (after-init . which-key-mode)
   :custom
   (which-key-idle-delay 0.5)
   :config
@@ -1448,7 +1448,8 @@ Use smartparens.
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-java
   :hook ((java-ts-mode . lsp)
-         (java-ts-mode . dap-auto-configure-mode)))
+         (java-ts-mode . dap-auto-configure-mode)
+         (java-ts-mode . indent-bars-mode)))
 #+end_src
 
 ** Python
@@ -1493,13 +1494,12 @@ Use smartparens.
 
 ** lsp-sonarlint
 
-Doesn't work.
-
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-sonarlint
   :ensure t
   :custom
-  (lsp-sonarlint-auto-download t))
+  (lsp-sonarlint-auto-download t)
+  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode)))
 #+end_src
 
 * Eldoc
@@ -1924,6 +1924,20 @@ Enable =recentf-mode=.
   ("\\.yaml\\'" . yaml-mode)
   ("\\.yml\\.j2" . yaml-mode)
   ("\\.yaml\\.j2" . yaml-mode))
+#+end_src
+
+** JSON
+
+*** consult-jq
+
+Interactively query / filter large JSON files.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package consult-jq
+  :vc (:url "https://github.com/bigbuger/consult-jq.git" :branch "master")
+  :ensure t
+  :init
+  (setq consult-jq-completion-styles '(basic partial-completion)))
 #+end_src
 
 ** XML
@@ -2479,10 +2493,36 @@ Helpers for adding new elements to front matter.
       "   ")))
 #+end_src
 
+** Org present
+
+Configuration adapted from [[https://systemcrafters.net/emacs-tips/presentations-with-org-present/][System Crafters]].
+
 #+begin_src emacs-lisp :tangle yes
 (use-package org-present
   :ensure t
   :defer)
+
+(use-package visual-fill-column
+  :ensure t
+  :defer)
+
+;; Configure fill width
+(setq visual-fill-column-width 110
+      visual-fill-column-center-text t)
+
+(defun my/org-present-start ()
+  ;; Center the presentation and wrap lines
+  (visual-fill-column-mode 1)
+  (visual-line-mode 1))
+
+(defun my/org-present-end ()
+  ;; Stop centering the document
+  (visual-fill-column-mode 0)
+  (visual-line-mode 0))
+
+;; Register hooks with org-present
+(add-hook 'org-present-mode-hook 'my/org-present-start)
+(add-hook 'org-present-mode-quit-hook 'my/org-present-end)
 #+end_src
 
 Enable dragging and dropping images to org documents. Note that the command-line utility =pngpaste= must be installed for this to work.
@@ -3719,13 +3759,4 @@ Recompile all installed dependencies. From [[https://www.reddit.com/r/emacs/comm
   (interactive)
   (native-compile-prune-cache)
   (native-compile-async package-user-dir 'recursively))
-#+end_src
-
-** Wasabi
-
-Trying this out.
-
-#+begin_src emacs-lisp :tangle yes
-;; (use-package wasabi
-;;   :vc (:url "https://github.com/xenodium/wasabi"))
 #+end_src
