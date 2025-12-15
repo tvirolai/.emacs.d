@@ -86,7 +86,7 @@ Configure repos.
 #+begin_src emacs-lisp :tangle yes
 (setq package-enable-at-startup nil
       package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+                         ;; ("nongnu" . "https://elpa.nongnu.org/nongnu/")
                          ("melpa" . "https://melpa.org/packages/")
                          ("org" . "https://orgmode.org/elpa/")))
 #+end_src
@@ -1400,6 +1400,15 @@ to this hack to run the indentation and capitalization for the whole buffer."
   :defer t)
 #+end_src
 
+** Common Lisp
+
+#+begin_src emacs-lisp :tangle yes
+(use-package slime
+  :ensure t
+  :config
+  (setq inferior-lisp-program "sbcl"))
+#+end_src
+
 ** Typescript / JS
 
 Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=, so it needs to be disabled in it.
@@ -1493,6 +1502,8 @@ Use smartparens.
 #+end_src
 
 ** lsp-sonarlint
+
+Run Sonarlint in the editor. Thus far only enabled for specific modes.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-sonarlint
@@ -2632,7 +2643,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   (elfeed-org)
   :config
   (setq elfeed-search-filter "@2-week-ago +unread")
-  (setq elfeed-search-title-max-width 120)
+  (setq elfeed-search-title-max-width 160)
   (evil-define-key 'normal elfeed-search-mode-map
     (kbd "M-RET") #'elfeed-search-browse-url
     (kbd "DEL") #'tv/elfeed-mark-read
