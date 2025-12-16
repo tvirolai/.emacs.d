@@ -3292,7 +3292,7 @@ that and instead tries to complete against dictionary entries."
   :ensure nil
   :defer t
   :config
-  (setq auth-sources '("~/.authinfo.gpg")
+  (setq auth-sources '("~/.authinfo" "~/.authinfo.gpg")
         user-full-name "Tuomo Virolainen"
         user-mail-address "tuomo.virolainen@kapsi.fi"))
 
@@ -3353,6 +3353,62 @@ that and instead tries to complete against dictionary entries."
   (setq smtpmail-smtp-service 587)
   (setq smtpmail-stream-type 'starttls))
 #+end_src
+
+* Slack
+
+Slack must be used from Emacs.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package slack
+  :bind (("C-c S K" . slack-stop)
+         ("C-c S c" . slack-select-rooms)
+         ("C-c S u" . slack-select-unread-rooms)
+         ("C-c S U" . slack-user-select)
+         ("C-c S s" . slack-search-from-messages)
+         ("C-c S J" . slack-jump-to-browser)
+         ("C-c S j" . slack-jump-to-app)
+         ("C-c S e" . slack-insert-emoji)
+         ("C-c S E" . slack-message-edit)
+         ("C-c S r" . slack-message-add-reaction)
+         ("C-c S t" . slack-thread-show-or-create)
+         ("C-c S g" . slack-message-redisplay)
+         ("C-c S G" . slack-conversations-list-update-quick)
+         ("C-c S q" . slack-quote-and-reply)
+         ("C-c S Q" . slack-quote-and-reply-with-link)
+         (:map slack-mode-map
+               (("@" . slack-message-embed-mention)
+                ("#" . slack-message-embed-channel)))
+         (:map slack-thread-message-buffer-mode-map
+               (("C-c '" . slack-message-write-another-buffer)
+                ("@" . slack-message-embed-mention)
+                ("#" . slack-message-embed-channel)))
+         (:map slack-message-buffer-mode-map
+               (("C-c '" . slack-message-write-another-buffer)))
+         (:map slack-message-compose-buffer-mode-map
+               (("C-c '" . slack-message-send-from-buffer))))
+  :config
+  (setq slack-render-profile-images-p nil
+        slack-render-image-p nil
+        slack-buffer-emojify nil)
+  (slack-register-team
+     :name "HY"
+     :token (auth-source-pick-first-password
+             :host "helsinkifi.slack.com"
+             :user "tuomo.virolainen@helsinki.fi")
+     :cookie (auth-source-pick-first-password
+             :host "helsinkifi.slack.com"
+             :user "tuomo.virolainen@helsinki.fi^cookie")
+     :full-and-display-names t
+     :default t
+     :subscribed-channels nil ;; using slack-extra-subscribed-channels because I can change it dynamically
+     ))
+
+(use-package alert
+  :commands (alert)
+  :init
+  (setq alert-default-style 'notifier))
+#+end_src
+
 
 * Helpful
 
