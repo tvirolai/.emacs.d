@@ -3391,17 +3391,19 @@ Slack must be used from Emacs.
         slack-render-image-p nil
         slack-buffer-emojify nil)
   (slack-register-team
-     :name "HY"
-     :token (auth-source-pick-first-password
-             :host "helsinkifi.slack.com"
-             :user "tuomo.virolainen@helsinki.fi")
-     :cookie (auth-source-pick-first-password
-             :host "helsinkifi.slack.com"
-             :user "tuomo.virolainen@helsinki.fi^cookie")
-     :full-and-display-names t
-     :default t
-     :subscribed-channels nil ;; using slack-extra-subscribed-channels because I can change it dynamically
-     ))
+   :name "HY"
+   :token (password-store-get "HY-Slack-token")
+   :cookie (password-store-get "HY-Slack-cookie")
+   :full-and-display-names t
+   :subscribed-channels nil)
+  (slack-register-team
+   :name "Rebase"
+   :token (password-store-get "Rebase-Slack-token")
+   :cookie (password-store-get "Rebase-Slack-cookie")
+   :full-and-display-names t
+   :subscribed-channels nil)
+  ;; Set default team after both are registered
+  (slack-change-current-team))
 
 (use-package alert
   :commands (alert)
