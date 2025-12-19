@@ -957,7 +957,7 @@ Use =which-key=, in minibuffer.
 #+begin_src emacs-lisp :tangle yes
 (use-package which-key
   :ensure t
-  ;; :hook (after-init . which-key-mode)
+  :hook (after-init . which-key-mode)
   :custom
   (which-key-idle-delay 0.5)
   :config
@@ -1990,7 +1990,7 @@ Use 4 spaces as the default indentation level.
                         (?C . "#ff9200")
                         (?D . "#747474")))
   (org-todo-keywords
-   '((sequence "TODO(t)" "HOLD(h@/!)" "DOING(g)" "|" "DONE(d)" "KILL(k)")
+   '((sequence "TODO(t)" "HOLD(h@/!)" "DOING(g)" "REVIEW(r)" "|" "DONE(d)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   (org-done ((t (:foreground "PaleGreen"
@@ -3047,7 +3047,7 @@ Channel kapsi
 Near :kapsi-local:
 Far :kapsi-remote:
 Patterns * !Junk
-Create Far
+Create Near
 Sync All
 Expunge None
 SyncState ~/mail/imap-transfer
@@ -3292,7 +3292,7 @@ that and instead tries to complete against dictionary entries."
   :ensure nil
   :defer t
   :config
-  (setq auth-sources '("~/.authinfo" "~/.authinfo.gpg")
+  (setq auth-sources '("~/.authinfo.gpg")
         user-full-name "Tuomo Virolainen"
         user-mail-address "tuomo.virolainen@kapsi.fi"))
 
@@ -3351,7 +3351,9 @@ that and instead tries to complete against dictionary entries."
   (setq send-mail-function #'smtpmail-send-it)
   (setq smtpmail-smtp-server "mail.kapsi.fi")
   (setq smtpmail-smtp-service 587)
-  (setq smtpmail-stream-type 'starttls))
+  (setq smtpmail-stream-type 'starttls)
+  ;; (setq smtpmail-stream-type 'ssl)
+  )
 #+end_src
 
 * Slack
@@ -3375,6 +3377,7 @@ Slack must be used from Emacs.
          ("C-c S G" . slack-conversations-list-update-quick)
          ("C-c S q" . slack-quote-and-reply)
          ("C-c S Q" . slack-quote-and-reply-with-link)
+         ("C-c S a" . slack-all-threads)
          (:map slack-mode-map
                (("@" . slack-message-embed-mention)
                 ("#" . slack-message-embed-channel)))
@@ -3395,7 +3398,7 @@ Slack must be used from Emacs.
    :token (password-store-get "HY-Slack-token")
    :cookie (password-store-get "HY-Slack-cookie")
    :full-and-display-names t
-   :subscribed-channels nil)
+   :subscribed-channels '(opa-eduviewer opa-tech))
   (slack-register-team
    :name "Rebase"
    :token (password-store-get "Rebase-Slack-token")
@@ -3409,6 +3412,36 @@ Slack must be used from Emacs.
   :commands (alert)
   :init
   (setq alert-default-style 'notifier))
+#+end_src
+
+Trying this. Source: https://erichlf.github.io/blog/2020/09/09/how-to-setup-emacs-slack-and-get-notification-in-org-agenda/.
+
+#+begin_src emacs-lisp :tangle yes
+;; setup org-agenda to keep track of unread messages in slack
+;; (alert-define-style
+;;   'my/alert-style :title
+;;   "Make Org headings for messages I receive - Style"
+;;   :notifier
+;;   (lambda (info)
+;;     (when (get-buffer "slack.org") (with-current-buffer "slack.org" (save-buffer)))
+;;     (write-region
+;;       (s-concat
+;;         "* UNREAD "
+;;         (plist-get info :title)
+;;         " : "
+;;         (format "%s %s" (plist-get info :title)
+;;                         (s-truncate 127 (plist-get info :message)))
+;;         "\n"
+;;         (format "<%s>" (format-time-string "%Y-%m-%d %H:%M"))
+;;         "\n")
+;;       nil
+;;       "~/org/slack.org"
+;;       t)))
+
+;; (setq alert-default-style 'message)
+
+;; (add-to-list 'alert-user-configuration
+;;   '(((:category . "slack")) my/alert-style nil))
 #+end_src
 
 
@@ -3828,4 +3861,22 @@ Recompile all installed dependencies. From [[https://www.reddit.com/r/emacs/comm
   (interactive)
   (native-compile-prune-cache)
   (native-compile-async package-user-dir 'recursively))
+#+end_src
+
+** Copy org region to clipboard as markdown
+
+Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Marcin Borkowski]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/org-copy-region-as-markdown ()
+  "Copy the region (in Org) to the system clipboard as Markdown."
+  (interactive)
+  (if (use-region-p)
+      (let* ((region
+	      (buffer-substring-no-properties
+		      (region-beginning)
+		      (region-end)))
+	     (markdown
+	      (org-export-string-as region 'md t '(:with-toc nil))))
+	(gui-set-selection 'CLIPBOARD markdown))))
 #+end_src
