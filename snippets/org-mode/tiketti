@@ -2,8 +2,10 @@
 # name: Tiketti
 # key: tiketti
 # --
-* $0
+* ${2: Tikettinumero}: ${1: Otsikko}
 
-- Tiketti:
+- Tiketti: [[https://jira.it.helsinki.fi/browse/$2][$2]]
 
 ** Tutkinta
+
+$0

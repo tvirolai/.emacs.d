@@ -1510,7 +1510,7 @@ Run Sonarlint in the editor. Thus far only enabled for specific modes.
   :ensure t
   :custom
   (lsp-sonarlint-auto-download t)
-  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode)))
+  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode css-mode)))
 #+end_src
 
 * Eldoc
@@ -2881,7 +2881,8 @@ Disable images.
   :defer t
   :hook ((dired-mode . dired-hide-details-mode)
          (dired-mode . hl-line-mode)
-         (dired-mode . ready-player-mode))
+         ;; (dired-mode . ready-player-mode)
+         )
   :bind (:map dired-mode-map
               ("C-c C-e" . wdired-change-to-wdired-mode)
               :map global-map
