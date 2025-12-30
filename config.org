@@ -16,7 +16,7 @@ Enable lexical binding and spit out the preamble.
 #+begin_src emacs-lisp :tangle yes
 ;;; config.el --- Emacs configuration. -*- lexical-binding: t -*-
 ;;
-;; Copyright (c) 2024-2025 Tuomo Virolainen
+;; Copyright (c) 2024-2026 Tuomo Virolainen
 ;;
 ;; Author: Tuomo Virolainen <tvirolai@soittakaaparanoid.mail.kapsi.fi>
 ;; URL: https://github.com/tvirolai/.emacs.d
@@ -330,7 +330,7 @@ Add helpers to switch between themes.
 (defun tv/load-dark-theme ()
   "Load dark theme."
   (interactive)
-  (load-theme 'doom-dracula t)
+  (load-theme 'modus-vivendi t)
   (set-frame-parameter nil 'ns-appearance 'dark))
 
 (defun tv/load-crap-monitor-settings ()
@@ -2631,6 +2631,15 @@ Excludes lines beginning with * or #. Prints result in echo area."
              word-count page-count reading-time)))
 #+end_src
 
+** org-autolist
+
+A bit more intuitive handling for lists in org mode, see [[https://github.com/calvinwyoung/org-autolist][org-autolist]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-autolist
+  :hook (org-mode . org-autolist-mode))
+#+end_src
+
 * Elfeed
 
 RSS feeds are a convenient way to consume information on a pull-basis from different sources. I can't be bothered to tweak the stock elfeed experience too much.
@@ -3358,8 +3367,6 @@ that and instead tries to complete against dictionary entries."
 #+end_src
 
 * Slack
-
-Slack must be used from Emacs.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package slack
