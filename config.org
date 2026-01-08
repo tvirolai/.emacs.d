@@ -131,7 +131,6 @@ Disable unnecessary stuff.
 (setq inhibit-startup-screen t)
 (setq ring-bell-function 'ignore)
 (setq use-short-answers t)
-;; (setq initial-scratch-message "")
 #+end_src
 
 Set 10MB as the limit for garbage collection.
@@ -1365,6 +1364,18 @@ to this hack to run the indentation and capitalization for the whole buffer."
   (progn
     (kill-local-variable 'indent-line-function)
     (kill-local-variable 'align-mode-rules-list)))
+#+end_src
+
+** Prisma ORM
+
+#+begin_src emacs-lisp :tangle yes
+(use-package prisma-ts-mode
+  :ensure t
+  :mode (("\\.prisma" . prisma-ts-mode)))
+
+(add-to-list
+ 'treesit-language-source-alist
+ '(prisma "https://github.com/victorhqc/tree-sitter-prisma"))
 #+end_src
 
 ** Emacs Lisp
@@ -3451,7 +3462,6 @@ Trying this. Source: https://erichlf.github.io/blog/2020/09/09/how-to-setup-emac
 ;; (add-to-list 'alert-user-configuration
 ;;   '(((:category . "slack")) my/alert-style nil))
 #+end_src
-
 
 * Helpful
 
