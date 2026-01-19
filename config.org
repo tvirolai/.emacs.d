@@ -1508,7 +1508,8 @@ Use smartparens.
         lsp-headerline-breadcrumb-enable nil
         ;; Silence the 'LSP server exited, do you want to restart it' prompt when killing buffers.
         lsp-restart 'ignore
-        lsp-modeline-code-actions-enable t)
+        lsp-modeline-code-actions-enable t
+        lsp-keep-workspace-alive nil)
   (push 'jsts-ls lsp-disabled-clients))
 #+end_src
 
@@ -1516,12 +1517,16 @@ Use smartparens.
 
 Run Sonarlint in the editor. Thus far only enabled for specific modes.
 
+The advice is there to ensure that =lsp-sonarlint= doesn't collect cruft - if the state is not cleaned up, it remembers every project it's ever been open in and starts scanning every one when a project in it's enabled mode is started. This freezes Emacs for a few minutes. It's a workaround, would be nice to find a smarter way.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-sonarlint
   :ensure t
   :custom
   (lsp-sonarlint-auto-download t)
-  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode css-mode)))
+  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode css-ts-mode))
+  :config
+  (advice-add 'save-buffers-kill-emacs :before #'lsp-workspace-remove-all-folders))
 #+end_src
 
 * Eldoc

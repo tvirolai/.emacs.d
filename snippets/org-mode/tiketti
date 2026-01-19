@@ -5,6 +5,7 @@
 * ${2: Tikettinumero}: ${1: Otsikko}
 
 - Tiketti: [[https://jira.it.helsinki.fi/browse/$2][$2]]
+- PR:
 
 ** Tutkinta
 
