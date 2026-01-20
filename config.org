@@ -1127,6 +1127,52 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
   (claude-code-ide-emacs-tools-setup))
 #+end_src
 
+Trying out this snippet from [[https://www.reddit.com/r/emacs/comments/1qcximz/what_ai_service_are_you_using_with_emacs_and_how/][r/emacs.]]
+
+#+begin_src emacs-lisp :tangle yes
+(defvar claude-buffer "*Claude*")
+
+;; Claude session management
+(defun open-claude-buffer ()
+  "Start or switch to a Claude session in a vterm terminal.
+If a *Claude* buffer already exists, switch to it.
+Otherwise, prompt for directory and start claude in vterm."
+  (interactive)
+  (if (get-buffer claude-buffer)
+      ;; Buffer exists, switch to it
+      (switch-to-buffer claude-buffer)
+    ;; Buffer doesn't exist, create new session
+    (let* ((choice (read-char-choice
+                    "Start Claude in: (c)urrent directory or (d)efault ~/Documents/claude-temp/? "
+                    '(?c ?d)))
+           (dir (if (eq choice ?c)
+                    default-directory
+                  (expand-file-name "~/Documents/claude-temp/"))))
+      ;; Ensure the directory exists
+      (unless (file-directory-p dir)
+        (make-directory dir t))
+      ;; Start vterm with claude in the chosen directory
+      (let ((default-directory dir)
+            (vterm-buffer-name claude-buffer))
+        (vterm)
+        ;; Wait for terminal to be ready, then simulate typing "claude" + Enter
+        (run-at-time "0.3 sec" nil
+                     (lambda ()
+                       (when (get-buffer claude-buffer)
+                         (with-current-buffer claude-buffer
+                           (vterm-send-string "claude")
+                           (vterm-send-return)))))))))
+
+(defun ask-claude-code ()
+  "Prompt for input and send it to the Claude buffer."
+  (interactive)
+  (let ((input (read-string "Ask Claude: ")))
+    (when (get-buffer claude-buffer)
+      (with-current-buffer claude-buffer
+        (vterm-send-string input)
+        (vterm-send-return)))))
+#+end_src
+
 * Media playback
 
 ** Ready player mode
