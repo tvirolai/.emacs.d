@@ -1570,9 +1570,7 @@ The advice is there to ensure that =lsp-sonarlint= doesn't collect cruft - if th
   :ensure t
   :custom
   (lsp-sonarlint-auto-download t)
-  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode css-ts-mode))
-  :config
-  (advice-add 'save-buffers-kill-emacs :before #'lsp-workspace-remove-all-folders))
+  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode css-ts-mode)))
 #+end_src
 
 * Eldoc
@@ -2044,7 +2042,8 @@ Use 4 spaces as the default indentation level.
   ;; Disable the underscore-to-subscript thing.
   (org-pretty-entities t)
   (org-log-done 'time)
-  (org-log-into-drawer nil)
+  (org-log-into-drawer t)
+  (org-clock-into-drawer t)
   (org-use-sub-superscripts "{}")
   (org-fold-catch-invisible-edits 'error)
   (org-priority-faces '((?A . "#ff2600")
@@ -2052,7 +2051,7 @@ Use 4 spaces as the default indentation level.
                         (?C . "#ff9200")
                         (?D . "#747474")))
   (org-todo-keywords
-   '((sequence "TODO(t)" "HOLD(h@/!)" "DOING(g)" "REVIEW(r)" "|" "DONE(d)" "KILL(k)")
+   '((sequence "TODO(t!)" "HOLD(h@/!)" "DOING(g!)" "REVIEW(r)" "|" "DONE(d!)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   (org-done ((t (:foreground "PaleGreen"
@@ -2150,10 +2149,7 @@ Use 4 spaces as the default indentation level.
   (setq org-export-with-smart-quotes t)  ; Use smart quotes
   (setq org-export-with-sub-superscripts nil)  ; No superscripts
   ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
-  :hook (
-         (org-mode . visual-line-mode)
-         ;;(org-mode . org-indent-mode)
-         ))
+  :hook ((org-mode . visual-line-mode)))
 
 ;; From elken
 
@@ -3622,6 +3618,7 @@ Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsc
           (buffer-list)))
   (message "Killed other buffers"))
 
+(advice-add 'tv/kill-other-buffers :after #'lsp-workspace-remove-all-folders)
 (global-set-key (kbd "C-c å") 'tv/kill-other-buffers)
 #+end_src
 
