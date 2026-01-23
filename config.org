@@ -1038,7 +1038,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "C-M--") 'ibuffer)
 #+end_src
 
-Bind a comfortable global key combination for =other-window= as =M-x o= is too long for such a common thing.
+Bind a comfortable global key combination for =other-window= as =C-x o= is too long for such a common thing.
 
 #+begin_src emacs-lisp :tangle yes
 (global-set-key (kbd "M-o") #'other-window)
@@ -1171,6 +1171,19 @@ Otherwise, prompt for directory and start claude in vterm."
       (with-current-buffer claude-buffer
         (vterm-send-string input)
         (vterm-send-return)))))
+#+end_src
+
+* Accounting
+
+** Ledger
+
+Let's try this.
+
+#+begin_src emacs-lisp :tangle yes
+;;; Basic configuration
+(use-package ledger-mode
+  :ensure t
+  :defer)
 #+end_src
 
 * Media playback
@@ -2205,6 +2218,15 @@ Use 4 spaces as the default indentation level.
   :ensure t
   :config
   (add-to-list 'org-export-backends 'ox-jira))
+#+end_src
+
+*** Slack
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ox-slack
+  :ensure t
+  :config
+  (add-to-list 'org-export-backends 'ox-slack))
 #+end_src
 
 ** Evil-org
@@ -3417,12 +3439,13 @@ that and instead tries to complete against dictionary entries."
   :ensure nil
   :after message
   :config
+  (setq sendmail-program (executable-find "msmtpq"))
   (setq send-mail-function #'smtpmail-send-it)
   (setq smtpmail-smtp-server "mail.kapsi.fi")
   (setq smtpmail-smtp-service 587)
-  (setq smtpmail-stream-type 'starttls)
+  (setq smtpmail-stream-type 'starttls))
+
   ;; (setq smtpmail-stream-type 'ssl)
-  )
 #+end_src
 
 * Slack
