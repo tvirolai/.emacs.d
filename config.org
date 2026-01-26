@@ -1462,14 +1462,6 @@ to this hack to run the indentation and capitalization for the whole buffer."
                                       (flycheck-mode))))
 #+end_src
 
-*** erefactor
-
-#+begin_src emacs-lisp :tangle yes
-(use-package erefactor
-  :ensure t
-  :defer t)
-#+end_src
-
 ** Common Lisp
 
 #+begin_src emacs-lisp :tangle yes
@@ -1487,11 +1479,11 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
 (use-package typescript-mode
   :ensure t
   :hook ((tsx-ts-mode . (lambda ()
-                          (rainbow-delimiters-mode -1)
-                          (corfu-mode -1))) ;; Clashes with LSP.
+                          (rainbow-delimiters-mode -1)))
          (tsx-ts-mode . prettier-js-mode)
          (tsx-ts-mode . indent-bars-mode)
-         (tsx-ts-mode . lsp))
+         ;; (tsx-ts-mode . lsp) ;; Start manually instead when needed.
+         )
   :defer
   :mode (("\\.mjml" . html-mode)
          ("\\.js" . tsx-ts-mode)
@@ -1559,7 +1551,10 @@ Use smartparens.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-mode
-  :hook ((lsp-mode . lsp-enable-which-key-integration))
+  :hook ((lsp-mode . lsp-enable-which-key-integration)
+         (lsp-mode . (lambda ()
+                       (when (derived-mode-p 'tsx-ts-mode)
+                       (corfu-mode -1))))) ;; Clashes with lsp completion
   :config
   (setq lsp-completion-enable-additional-text-edit nil
         lsp-lens-enable t
@@ -1575,8 +1570,6 @@ Use smartparens.
 ** lsp-sonarlint
 
 Run Sonarlint in the editor. Thus far only enabled for specific modes.
-
-The advice is there to ensure that =lsp-sonarlint= doesn't collect cruft - if the state is not cleaned up, it remembers every project it's ever been open in and starts scanning every one when a project in it's enabled mode is started. This freezes Emacs for a few minutes. It's a workaround, would be nice to find a smarter way.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-sonarlint
@@ -2037,7 +2030,16 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package nginx-mode
-  :ensure t)
+  :ensure t
+  :defer)
+#+end_src
+
+** Asciidoc
+
+#+begin_src emacs-lisp :tangle yes
+(use-package adoc-mode
+  :ensure t
+  :defer)
 #+end_src
 
 * Org mode
@@ -2064,7 +2066,7 @@ Use 4 spaces as the default indentation level.
                         (?C . "#ff9200")
                         (?D . "#747474")))
   (org-todo-keywords
-   '((sequence "TODO(t!)" "HOLD(h@/!)" "DOING(g!)" "REVIEW(r)" "|" "DONE(d!)" "KILL(k)")
+   '((sequence "TODO(t!)" "HOLD(h@/!)" "DOING(g!)" "REVIEW(r!)" "|" "DONE(d!)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   (org-done ((t (:foreground "PaleGreen"
