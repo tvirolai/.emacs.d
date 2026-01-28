@@ -431,32 +431,11 @@ Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
         doom-modeline-unicode-fallback t))
 #+end_src
 
-Moody, a mode line.
-
-#+begin_src emacs-lisp :tangle yes
-;; (use-package moody
-;;   :config
-;;   (moody-replace-mode-line-front-space)
-;;   (moody-replace-mode-line-buffer-identification)
-;;   (moody-replace-vc-mode))
-
-;; (use-package minions
-;;   :ensure t
-;;   :custom
-;;   (minions-mode-line-lighter "…")
-;;   (minions-mode-line-delimiters '("" . ""))
-;;   :config
-;;   (minions-mode +1))
-
-#+end_src
-
 *** Hide modeline
 
 #+begin_src emacs-lisp :tangle yes
 (use-package hide-mode-line
   :ensure t)
-#+end_src
-
 #+end_src
 
 ** Ultra-scroll
@@ -619,18 +598,6 @@ A bit wider line spacing than the default.
 
 #+begin_src emacs-lisp :tangle yes
 (setq-default line-spacing 0.15)
-#+end_src
-
-** Emacs reader
-
-[[https://codeberg.org/divyaranjan/emacs-reader][Emacs Reader]] aims to be an all-in-one reading solution for various filetypes. It seems to work very well.
-
-#+begin_src emacs-lisp :tangle yes
-(setq package-vc-allow-build-commands t)
-(use-package reader
-  :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
-            :make "all"))
-(add-to-list 'load-path "~/dev/emacs-reader")
 #+end_src
 
 ** Olivetti mode
@@ -931,10 +898,6 @@ This maybe fixes some indentation issues in org mode.
                         #'tv/kill-magit-diff-buffer-in-current-repo
                         nil t)))
   (evil-define-key 'normal magit-status-mode-map
-    "C-l" #'evil-window-right
-    "C-h" #'evil-window-left
-    "C-k" #'evil-window-prev
-    "C-j" #'evil-window-next
     "q" #'tv/mu-magit-kill-buffers)
   (add-hook 'magit-post-refresh-hook
             #'git-gutter:update-all-windows))
@@ -1022,14 +985,14 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "M-ö") 'evil-end-of-line) ;; $ is too unwieldy on a Scandinavian keyboard
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
 
-(evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
-(evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
-(evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left) ;; Yes! I did it, rebound C-h. SPC h in normal mode is the alternative.
-(evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
-(evil-define-key 'insert 'global (kbd "C-j") 'evil-window-next)
-(evil-define-key 'insert 'global (kbd "C-k") 'evil-window-prev)
-(evil-define-key 'insert 'global (kbd "C-h") 'evil-window-left)
-(evil-define-key 'insert 'global (kbd "C-l") 'evil-window-right)
+;; (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
+;; (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
+;; (evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left) ;; Yes! I did it, rebound C-h. SPC h in normal mode is the alternative.
+;; (evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
+;; (evil-define-key 'insert 'global (kbd "C-j") 'evil-window-next)
+;; (evil-define-key 'insert 'global (kbd "C-k") 'evil-window-prev)
+;; (evil-define-key 'insert 'global (kbd "C-h") 'evil-window-left)
+;; (evil-define-key 'insert 'global (kbd "C-l") 'evil-window-right)
 
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
