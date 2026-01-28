@@ -3867,7 +3867,7 @@ No Evil mode when playing Tetris.
   (let ((query (completing-read "Hakutermi: " query-history)))
     (progn
       (push query query-history)
-      (eww (concat "https://leta.mullvad.net/search?engine=google&q="
+      (eww (concat "https://html.duckduckgo.com/html?q="
                    (string-replace " " "+" query))))))
 #+end_src
 
