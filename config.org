@@ -2174,6 +2174,14 @@ Use 4 spaces as the default indentation level.
         org-appear-autosubmarkers t))
 #+end_src
 
+** Org modern
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-modern
+  :ensure t
+  :hook (org-mode . org-modern-mode))
+#+end_src
+
 ** Additional org export backends
 
 *** Jira markdown
