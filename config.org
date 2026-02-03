@@ -648,6 +648,16 @@ Make it go away.
 (add-hook 'before-save-hook #'delete-trailing-whitespace)
 #+end_src
 
+Bypass on-save hooks when needed.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/save-buffer-without-hooks ()
+  "Save buffer without running before-save-hook."
+  (interactive)
+  (let ((before-save-hook nil))
+    (save-buffer)))
+#+end_src
+
 ** Sudo edit
 
 #+begin_src emacs-lisp :tangle yes
@@ -1445,7 +1455,7 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
                           (rainbow-delimiters-mode -1)))
          (tsx-ts-mode . prettier-js-mode)
          (tsx-ts-mode . indent-bars-mode)
-         ;; (tsx-ts-mode . lsp) ;; Start manually instead when needed.
+         (tsx-ts-mode . lsp)
          )
   :defer
   :mode (("\\.mjml" . html-mode)
@@ -2005,6 +2015,15 @@ Use 4 spaces as the default indentation level.
   :defer)
 #+end_src
 
+** conf-mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package conf-mode
+  :ensure nil
+  :defer
+  :mode ("hy-config\\'" . conf-space-mode))
+#+end_src
+
 * Org mode
 
 ** General config
@@ -2104,6 +2123,8 @@ Use 4 spaces as the default indentation level.
            (file+headline org-default-notes-file "Notes")
            "- %?"
            :jump-to-captured t)
+          ("J" "Personal Journal" entry (file+datetree "~/org/journal.org")
+           "* %<%R: >%? \n%t" :empty-lines-before 1)
           ("p" "Permanent note" plain
            (file denote-last-path)
            #'denote-org-capture
