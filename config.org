@@ -3981,10 +3981,10 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
   (interactive)
   (if (use-region-p)
       (let* ((region
-	      (buffer-substring-no-properties
-		      (region-beginning)
-		      (region-end)))
-	     (markdown
-	      (org-export-string-as region 'md t '(:with-toc nil))))
-	(gui-set-selection 'CLIPBOARD markdown))))
+              (buffer-substring-no-properties
+               (region-beginning)
+               (region-end)))
+             (markdown
+              (org-export-string-as region 'md t '(:with-toc nil))))
+        (gui-set-selection 'CLIPBOARD markdown))))
 #+end_src
