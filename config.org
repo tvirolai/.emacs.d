@@ -420,9 +420,10 @@ Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
 (use-package doom-modeline
   :after nerd-icons
   :ensure t
-  :init (doom-modeline-mode 1)
+  :hook (after-init . doom-modeline-mode)
   :config
   (setq find-file-visit-truename t
+        doom-modeline-battery nil
         column-number-mode t
         size-indication-mode t
         doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode)
@@ -443,20 +444,13 @@ Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
 Scroll smoothly when using a mouse or trackpad.
 
 #+begin_src emacs-lisp :tangle yes
-;; (package-vc-install '(ultra-scroll :vc-backend Git :url  "https://github.com/jdtsmith/ultra-scroll"))
-
-(defvar us-path "~/dev/ultra-scroll")
-
 (use-package ultra-scroll
-  :if (file-directory-p us-path)
-  :load-path us-path
-  :init (setq scroll-conservatively 101 ; important!
-              scroll-margin 0)
+  :vc (:url "https://github.com/jdtsmith/ultra-scroll")
+  :init
+  (setq scroll-conservatively 3
+        scroll-margin 0)
   :config
   (ultra-scroll-mode 1))
-
-(unless (file-directory-p us-path)
-  (pixel-scroll-precision-mode))
 #+end_src
 
 ** Symbol-overlay
@@ -1599,7 +1593,9 @@ Let's try [[https://github.com/jacktasia/dumb-jump][this]] out.
 (use-package dumb-jump
   :ensure t
   :config
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate))
+  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+  (setq dumb-jump-force-searcher 'rg)
+  (setq xref-show-definitions-function #'xref-show-definitions-completing-read))
 #+end_src
 
 * Editorconfig
@@ -2799,8 +2795,7 @@ Use ansi-colors in shell.
         eshell-directory-name (expand-file-name "etc/eshell" user-emacs-directory)
         eshell-destroy-buffer-when-process-dies t)
   :config
-  ;; (evil-set-initial-state 'eshell-mode 'emacs)
-  )
+  (evil-set-initial-state 'eshell-mode 'emacs))
 #+end_src
 
 Eshell aliases.
@@ -2886,6 +2881,15 @@ any directory proferred by `consult-dir'."
                      (completing-read "cd: " eshell-dirs)))))))
 #+end_src
 
+** Shell
+
+#+begin_src emacs-lisp :tangle yes
+(use-package shell
+  :ensure nil
+  :config
+  (evil-set-initial-state 'shell-mode 'emacs))
+#+end_src
+
 ** Vterm
 
 #+begin_src emacs-lisp :tangle yes
@@ -2902,8 +2906,8 @@ any directory proferred by `consult-dir'."
   (vterm-send-key "<escape>")
   (vterm-max-scrollback 100000)
   :config
-  ;; (evil-set-initial-state 'vterm-mode 'emacs)
-  ;; (evil-set-initial-state 'term-mode 'emacs)
+  (evil-set-initial-state 'vterm-mode 'emacs)
+  (evil-set-initial-state 'term-mode 'emacs)
   (setq vterm-shell "/bin/zsh")
   (setq vterm-kill-buffer-on-exit t)
   (setq vterm-max-scrollback 100000)
@@ -3446,6 +3450,7 @@ that and instead tries to complete against dictionary entries."
 
 #+begin_src emacs-lisp :tangle yes
 (use-package slack
+  :if work-laptop-p
   :bind (("C-c S K" . slack-stop)
          ("C-c S c" . slack-select-rooms)
          ("C-c S u" . slack-select-unread-rooms)
@@ -3553,7 +3558,7 @@ When there are unsaved changes and the user tries to exit Emacs, it asks whether
 Found this [[https://eugene-andrienko.com/en/it/2025/06/30/my-emacs-configuration-common.html#rc-emacs-cursor-minibuffer][here]].
 
 #+begin_src emacs-lisp :tangle yes
-                                        ; If asked to save buffer on C-x C-c - show diff of changes with d key
+;; If asked to save buffer on C-x C-c - show diff of changes with d key
 (add-to-list 'save-some-buffers-action-alist
              '("d" (lambda (buffer)
                      (diff-buffer-with-file (buffer-file-name buffer)))
