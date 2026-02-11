@@ -1140,6 +1140,20 @@ Otherwise, prompt for directory and start claude in vterm."
         (vterm-send-return)))))
 #+end_src
 
+** Agent-shell
+
+#+begin_src emacs-lisp :tangle yes
+(use-package agent-shell
+    :ensure t
+    :ensure-system-package
+    ;; Add agent installation configs here
+    ((claude . "brew install claude-code")
+     (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))
+    :config
+    (setq agent-shell-openai-authentication
+      (agent-shell-openai-make-authentication :login t)))
+#+end_src
+
 * Accounting
 
 ** Ledger
