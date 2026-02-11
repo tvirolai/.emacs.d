@@ -1149,9 +1149,26 @@ Otherwise, prompt for directory and start claude in vterm."
     ;; Add agent installation configs here
     ((claude . "brew install claude-code")
      (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))
+    :custom
+    (agent-shell-transcript-file-path-function #'agent-shell-transcript-path-fn)
     :config
     (setq agent-shell-openai-authentication
       (agent-shell-openai-make-authentication :login t)))
+
+(defun agent-shell-transcript-path-fn ()
+  "Generate a project-specific transcript file path."
+  (let* ((cwd (or (and (fboundp 'agent-shell-cwd) (agent-shell-cwd))
+                  default-directory))
+         (proj (project-current nil cwd))
+         (project-root (if proj (project-root proj) cwd))
+         (project-name (file-name-nondirectory
+                        (directory-file-name project-root)))
+         (dir (expand-file-name
+               (format "transcripts/%s" project-name)
+               "~/.agent-shell/"))
+         (filename (format-time-string "%F-%H-%M-%S.md")))
+    (make-directory dir t)
+    (expand-file-name filename dir)))
 #+end_src
 
 * Accounting
