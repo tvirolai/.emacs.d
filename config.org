@@ -3930,6 +3930,25 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
 (global-set-key (kbd "C-c p g") 'grep-symbol-at-point)
 #+end_src
 
+** Run multi-occur for the symbol at point
+
+#+begin_src emacs-lisp :tangle yes
+(defun occur-symbol-in-open-buffers ()
+  "Search for symbol at point in all open file-visiting buffers using multi-occur."
+  (interactive)
+  (let* ((sym (thing-at-point 'symbol t))
+         (re  (when sym (regexp-quote sym)))
+         (bufs (seq-filter
+                (lambda (b)
+                  (buffer-local-value 'buffer-file-name b))
+                (buffer-list))))
+    (unless sym
+      (user-error "No symbol at point"))
+    (multi-occur bufs re)))
+
+(global-set-key (kbd "C-c o") 'occur-symbol-in-open-buffers)
+#+end_src
+
 ** File info
 
 Show information about the file under editing.
