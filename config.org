@@ -3897,7 +3897,11 @@ No Evil mode when playing Tetris.
                    (string-replace " " "+" query))))))
 #+end_src
 
-** Multi-occur in this mode
+** Multi-occur
+
+Multi-occur is used to grep for text from open buffers. It's a pain to use so I prefer doing it via a wrapper functions.
+
+*** Multi-occur in this mode
 
 From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mastering Emacs]]. This provides an easy way to grep for a phrase in the open buffers that are in the same mode as the one you're currently in.
 
@@ -3919,18 +3923,9 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
    (car (occur-read-primary-args))))
 #+end_src
 
-** Grep for the symbol at point
+*** Run multi-occur for the symbol at point
 
-#+begin_src emacs-lisp :tangle yes
-(defun grep-symbol-at-point ()
-  "Grep symbol at point, in project context."
-  (interactive)
-  (projectile-ripgrep (thing-at-point 'symbol t)))
-
-(global-set-key (kbd "C-c p g") 'grep-symbol-at-point)
-#+end_src
-
-** Run multi-occur for the symbol at point
+Similar logic than [[Grep for the symbol at point]] below, only this one calls =multi-occur= and the other greps.
 
 #+begin_src emacs-lisp :tangle yes
 (defun occur-symbol-in-open-buffers ()
@@ -3946,7 +3941,35 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
       (user-error "No symbol at point"))
     (multi-occur bufs re)))
 
-(global-set-key (kbd "C-c o") 'occur-symbol-in-open-buffers)
+(global-set-key (kbd "C-c o s") 'occur-symbol-in-open-buffers)
+#+end_src
+
+*** Search from open buffers for prompted string
+
+#+begin_src emacs-lisp :tangle yes
+(defun occur-input-in-open-buffers ()
+  "Read input and search for that term in file-visiting buffers using multi-occur."
+  (interactive)
+  (let* ((input (read-string "Hakutermi: "))
+         (input-re (regexp-quote input))
+         (bufs (seq-filter
+                (lambda (b)
+                  (buffer-local-value 'buffer-file-name b))
+                (buffer-list))))
+    (multi-occur bufs input-re)))
+
+(global-set-key (kbd "C-c o i") 'occur-input-in-open-buffers)
+#+end_src
+
+** Grep for the symbol at point
+
+#+begin_src emacs-lisp :tangle yes
+(defun grep-symbol-at-point ()
+  "Grep symbol at point, in project context."
+  (interactive)
+  (projectile-ripgrep (thing-at-point 'symbol t)))
+
+(global-set-key (kbd "C-c p g") 'grep-symbol-at-point)
 #+end_src
 
 ** File info
