@@ -1144,16 +1144,18 @@ Otherwise, prompt for directory and start claude in vterm."
 
 #+begin_src emacs-lisp :tangle yes
 (use-package agent-shell
-    :ensure t
-    :ensure-system-package
-    ;; Add agent installation configs here
-    ((claude . "brew install claude-code")
-     (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))
-    :custom
-    (agent-shell-transcript-file-path-function #'agent-shell-transcript-path-fn)
-    :config
-    (setq agent-shell-openai-authentication
-      (agent-shell-openai-make-authentication :login t)))
+  :if work-laptop-p
+  :defer t
+  :ensure t
+  :ensure-system-package
+  ;; Add agent installation configs here
+  ((claude . "brew install claude-code")
+   (claude-code-acp . "npm install -g @zed-industries/claude-code-acp"))
+  :custom
+  (agent-shell-transcript-file-path-function #'agent-shell-transcript-path-fn)
+  :config
+  (setq agent-shell-openai-authentication
+        (agent-shell-openai-make-authentication :login t)))
 
 (defun agent-shell-transcript-path-fn ()
   "Generate a project-specific transcript file path."
