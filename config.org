@@ -1084,6 +1084,8 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 
 ** Claude Code
 
+While I prefer [[agent-shell]] these days, I keep the config here for now for reference.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package claude-code-ide
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
@@ -1147,6 +1149,7 @@ Otherwise, prompt for directory and start claude in vterm."
   :if work-laptop-p
   :defer t
   :ensure t
+  :bind ("C-c p a" . agent-shell)
   :ensure-system-package
   ;; Add agent installation configs here
   ((claude . "brew install claude-code")
@@ -1155,7 +1158,9 @@ Otherwise, prompt for directory and start claude in vterm."
   (agent-shell-transcript-file-path-function #'agent-shell-transcript-path-fn)
   :config
   (setq agent-shell-openai-authentication
-        (agent-shell-openai-make-authentication :login t)))
+        (agent-shell-openai-make-authentication :login t))
+  (defun shell-maker-welcome-message (config)
+    (quotient-generate-excerpt 'eshell)))
 
 (defun agent-shell-transcript-path-fn ()
   "Generate a project-specific transcript file path."
