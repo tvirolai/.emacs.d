@@ -1,0 +1,96 @@
+
+Archived entries from file /Users/tuomo.virolainen/.config/emacs/config.org
+
+
+* Find and insert all Jira ticket codes at point
+:PROPERTIES:
+:ARCHIVE_TIME: 2025-10-15 Wed 15:16
+:ARCHIVE_FILE: ~/.config/emacs/config.org
+:ARCHIVE_OLPATH: Various minor tweaks
+:ARCHIVE_CATEGORY: config
+:END:
+
+Here's a helper function that automates a tiny bit of my workday. During work, I keep my TODOs in an inbox file. All the references to Jira tickets in that file are ones that I've been working on during the day. At the end of the day, I archive the done / killed tasks. By running this function, I can copy all the ticket numbers in the file to the kill ring / clipboard where they can be pasted to our time tracking software. A bit silly, perhaps, but why not?
+
+#+begin_src emacs-lisp :tangle yes
+(when work-laptop-p
+
+  (defun tv/kill-ump-numbers ()
+    "Find all UMP-XXXXX or MAIJA-XXXXX strings in the buffer and kill them."
+    (interactive)
+    (let ((matches nil))
+      (save-excursion
+        (goto-char (point-min))
+        (while (re-search-forward "\\(?:UMP\\|MAIJA\\)-[0-9]\\{3,5\\}" nil t)
+          (let ((entry (match-string 0)))
+            (message entry)
+            (unless (member entry matches)
+              (push (match-string 0) matches)))))
+      (kill-new (mapconcat 'identity (nreverse matches) "\n")))))
+#+end_src
+
+* Claude Code
+:PROPERTIES:
+:ARCHIVE_TIME: 2026-02-13 Fri 11:23
+:ARCHIVE_FILE: ~/.config/emacs/config.org
+:ARCHIVE_OLPATH: AI
+:ARCHIVE_CATEGORY: config
+:END:
+
+While I prefer [[agent-shell]] these days, I keep the config here for now for reference.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package claude-code-ide
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :bind ("C-c C-'" . claude-code-ide-menu)
+  :config
+  (setq claude-code-ide-use-side-window nil)
+  (evil-set-initial-state 'vterm-mode 'insert)
+  (claude-code-ide-emacs-tools-setup))
+#+end_src
+
+Trying out this snippet from [[https://www.reddit.com/r/emacs/comments/1qcximz/what_ai_service_are_you_using_with_emacs_and_how/][r/emacs.]]
+
+#+begin_src emacs-lisp :tangle yes
+(defvar claude-buffer "*Claude*")
+
+;; Claude session management
+(defun open-claude-buffer ()
+  "Start or switch to a Claude session in a vterm terminal.
+If a *Claude* buffer already exists, switch to it.
+Otherwise, prompt for directory and start claude in vterm."
+  (interactive)
+  (if (get-buffer claude-buffer)
+      ;; Buffer exists, switch to it
+      (switch-to-buffer claude-buffer)
+    ;; Buffer doesn't exist, create new session
+    (let* ((choice (read-char-choice
+                    "Start Claude in: (c)urrent directory or (d)efault ~/Documents/claude-temp/? "
+                    '(?c ?d)))
+           (dir (if (eq choice ?c)
+                    default-directory
+                  (expand-file-name "~/Documents/claude-temp/"))))
+      ;; Ensure the directory exists
+      (unless (file-directory-p dir)
+        (make-directory dir t))
+      ;; Start vterm with claude in the chosen directory
+      (let ((default-directory dir)
+            (vterm-buffer-name claude-buffer))
+        (vterm)
+        ;; Wait for terminal to be ready, then simulate typing "claude" + Enter
+        (run-at-time "0.3 sec" nil
+                     (lambda ()
+                       (when (get-buffer claude-buffer)
+                         (with-current-buffer claude-buffer
+                           (vterm-send-string "claude")
+                           (vterm-send-return)))))))))
+
+(defun ask-claude-code ()
+  "Prompt for input and send it to the Claude buffer."
+  (interactive)
+  (let ((input (read-string "Ask Claude: ")))
+    (when (get-buffer claude-buffer)
+      (with-current-buffer claude-buffer
+        (vterm-send-string input)
+        (vterm-send-return)))))
+#+end_src
