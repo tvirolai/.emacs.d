@@ -1613,6 +1613,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :config
   (evil-collection-define-key 'normal 'wgrep-mode-map
     "d" 'wgrep-mark-deletion
+    "ö" 'wgrep-save-all-buffers
     "U" 'wgrep-remove-all-change))
 #+end_src
 
