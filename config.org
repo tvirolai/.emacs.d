@@ -3996,9 +3996,10 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
 (defun tv/yt-dlp ()
   "Download a video from Youtube. Input is either video id or full url."
   (interactive)
-  (let* ((input (read-string "Id: "))
+  (let* ((input (read-string "Id tai URL: "))
          (url (if (string-search "youtube.com" input)
                   input
-                (format "https://www.youtube.com/watch?v=%s" input))))
-    (async-shell-command (format "cd ~/Desktop/YT && yt-dlp '%s' --no-playlist" url))))
+                (format "https://www.youtube.com/watch?v=%s" input)))
+         (default-directory "~/Desktop/YT"))
+    (async-shell-command (format "yt-dlp '%s' --no-playlist" url))))
 #+end_src
