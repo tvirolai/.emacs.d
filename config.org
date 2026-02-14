@@ -55,6 +55,28 @@ Add personal details.
       user-mail-address (base64-decode-string "dHVvbW8udmlyb2xhaW5lbkBzaWlsaS5jb20="))
 #+end_src
 
+Configure repos.
+
+#+begin_src emacs-lisp :tangle yes
+(setq package-enable-at-startup nil
+      package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
+                         ;; ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+                         ("melpa" . "https://melpa.org/packages/")
+                         ("org" . "https://orgmode.org/elpa/")))
+#+end_src
+
+Configure =use-package=.
+
+#+begin_src emacs-lisp :tangle yes
+(setq use-package-always-ensure t)
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+
+(eval-when-compile (require 'use-package))
+#+end_src
+
+
 Is this the work laptop or something else?
 
 #+begin_src emacs-lisp :tangle yes
@@ -79,27 +101,6 @@ Configure path.
     (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS" "KAPSI_PASS" "OPENAI_API_KEY"))
       (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
-#+end_src
-
-Configure repos.
-
-#+begin_src emacs-lisp :tangle yes
-(setq package-enable-at-startup nil
-      package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ;; ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")))
-#+end_src
-
-Configure =use-package=.
-
-#+begin_src emacs-lisp :tangle yes
-(setq use-package-always-ensure t)
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-
-(eval-when-compile (require 'use-package))
 #+end_src
 
 The cursor may blink. Not in image buffers though.
@@ -663,35 +664,35 @@ Bypass on-save hooks when needed.
 
 Use =tree-sitter=.
 
-#+begin_src emacs-lisp :tangle yes
-(defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
-  (when (< (buffer-size) 1000000)
-    (turn-on-tree-sitter-mode)))
-
-(use-package tree-sitter
-  :ensure nil
-  :hook ((tree-sitter-after-on . tree-sitter-hl-mode)
-         (prog-mode . tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large))
-  :config
-  ;; This makes every node a link to a section of code
-  (setq tree-sitter-debug-jump-buttons t
-        ;; and this highlights the entire sub tree in your code
-        tree-sitter-debug-highlight-jump-region t))
-
-(use-package treesit-auto
-  :ensure t
-  :custom (treesit-auto-install 'prompt)
-  :config
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
-
-(use-package tree-sitter-langs
-  :ensure t
-  :after tree-sitter)
-
-(require 'tree-sitter)
-(require 'tree-sitter-langs)
-#+end_src
+# #+begin_src emacs-lisp :tangle yes
+# (defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
+#   (when (< (buffer-size) 1000000)
+#     (turn-on-tree-sitter-mode)))
+#
+# (use-package tree-sitter
+#   :ensure t
+#   :hook ((tree-sitter-after-on . tree-sitter-hl-mode)
+#          (prog-mode . tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large))
+#   :config
+#   ;; This makes every node a link to a section of code
+#   (setq tree-sitter-debug-jump-buttons t
+#         ;; and this highlights the entire sub tree in your code
+#         tree-sitter-debug-highlight-jump-region t))
+#
+# (use-package treesit-auto
+#   :ensure t
+#   :custom (treesit-auto-install 'prompt)
+#   :config
+#   (treesit-auto-add-to-auto-mode-alist 'all)
+#   (global-treesit-auto-mode))
+#
+# (use-package tree-sitter-langs
+#   :ensure t
+#   :after tree-sitter)
+#
+# (require 'tree-sitter)
+# (require 'tree-sitter-langs)
+# #+end_src
 
 * Evil mode
 
@@ -3987,4 +3988,13 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
              (markdown
               (org-export-string-as region 'md t '(:with-toc nil))))
         (gui-set-selection 'CLIPBOARD markdown))))
+#+end_src
+
+** Download from Youtube
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/yt-dlp ()
+  (interactive)
+  (let ((id (read-string "Id: ")))
+    (async-shell-command (format "yt-dlp 'https://www.youtube.com/watch?v=%s'" id))))
 #+end_src
