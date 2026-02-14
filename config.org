@@ -986,6 +986,7 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "Å") 'consult-org-heading)
 (evil-define-key 'normal 'global (kbd "M-ö") 'evil-end-of-line) ;; $ is too unwieldy on a Scandinavian keyboard
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
+(evil-define-key 'normal 'global (kbd "'") 'evil-search-forward)
 
 ;; (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
 ;; (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
