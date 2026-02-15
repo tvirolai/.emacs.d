@@ -4017,5 +4017,30 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
   "Watch a Youtube video using MPV. Input is either video id or full url."
   (interactive)
   (let ((url (read-and-return-yt-url)))
-    (async-shell-command (format "mpv '%s'" url))))
+    (async-shell-command (format "mpv '%s' " url))))
+#+end_src
+
+** Empv
+
+#+begin_src emacs-lisp :tangle yes
+(use-package empv
+  :ensure t
+  :defer
+  :config
+  (setq empv-invidious-instance 'ivjs))
+#+end_src
+
+** Restart Emacs daemon
+
+Source: https://timothyjohnsonsci.com/writing/2025-12-30-emacs-daemon-restart/.
+
+#+begin_src emacs-lisp :tangle yes
+(defun emacs-restart-daemon ()
+  "Restart the Emacs daemon cleanly."
+  (interactive)
+  (save-some-buffers t)
+  (let ((cmd (concat invocation-directory invocation-name)))
+    (call-process-shell-command
+     (format "%s --daemon &" cmd))
+    (kill-emacs)))
 #+end_src
