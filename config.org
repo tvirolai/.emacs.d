@@ -3999,7 +3999,7 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
 #+begin_src emacs-lisp :tangle yes
 (defun read-and-return-yt-url ()
   (let ((input (read-string "Id tai URL: ")))
-    (if (string-search "youtube.com" input)
+    (if (string-search "youtu" input)
         input
       (format "https://www.youtube.com/watch?v=%s" input))))
 
@@ -4018,7 +4018,7 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
   "Watch a Youtube video using MPV. Input is either video id or full url."
   (interactive)
   (let ((url (read-and-return-yt-url)))
-    (async-shell-command (format "mpv '%s' " url))))
+    (async-shell-command (format "mpv '%s'" url))))
 #+end_src
 
 ** Empv
