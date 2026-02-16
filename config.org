@@ -664,35 +664,35 @@ Bypass on-save hooks when needed.
 
 Use =tree-sitter=.
 
-# #+begin_src emacs-lisp :tangle yes
-# (defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
-#   (when (< (buffer-size) 1000000)
-#     (turn-on-tree-sitter-mode)))
-#
-# (use-package tree-sitter
-#   :ensure t
-#   :hook ((tree-sitter-after-on . tree-sitter-hl-mode)
-#          (prog-mode . tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large))
-#   :config
-#   ;; This makes every node a link to a section of code
-#   (setq tree-sitter-debug-jump-buttons t
-#         ;; and this highlights the entire sub tree in your code
-#         tree-sitter-debug-highlight-jump-region t))
-#
-# (use-package treesit-auto
-#   :ensure t
-#   :custom (treesit-auto-install 'prompt)
-#   :config
-#   (treesit-auto-add-to-auto-mode-alist 'all)
-#   (global-treesit-auto-mode))
-#
-# (use-package tree-sitter-langs
-#   :ensure t
-#   :after tree-sitter)
-#
-# (require 'tree-sitter)
-# (require 'tree-sitter-langs)
-# #+end_src
+ #+begin_src emacs-lisp :tangle yes
+(defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
+  (when (< (buffer-size) 1000000)
+    (turn-on-tree-sitter-mode)))
+
+(use-package tree-sitter
+  :ensure t
+  :hook ((tree-sitter-after-on . tree-sitter-hl-mode)
+         (prog-mode . tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large))
+  :config
+  ;; This makes every node a link to a section of code
+  (setq tree-sitter-debug-jump-buttons t
+        ;; and this highlights the entire sub tree in your code
+        tree-sitter-debug-highlight-jump-region t))
+
+(use-package treesit-auto
+  :ensure t
+  :custom (treesit-auto-install 'prompt)
+  :config
+  (treesit-auto-add-to-auto-mode-alist 'all)
+  (global-treesit-auto-mode))
+
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
+
+(require 'tree-sitter)
+(require 'tree-sitter-langs)
+ #+end_src
 
 * Evil mode
 
