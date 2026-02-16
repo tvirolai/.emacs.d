@@ -1008,6 +1008,7 @@ Bind a comfortable global key combination for =other-window= as =C-x o= is too l
 
 #+begin_src emacs-lisp :tangle yes
 (global-set-key (kbd "M-o") #'other-window)
+(global-set-key (kbd "M-å") #'delete-window)
 #+end_src
 
 Prevent the "Text is read only" message when pressing backspace in minibuffer ([[https://emacs.stackexchange.com/questions/66589/how-to-prevent-text-is-read-only-when-in-minibuffer?newreg=e978077fa67744548d4395e6d7a973b5][source]]).
