@@ -1791,8 +1791,8 @@ Enable Corfu in minibuffers. Source: [[https://github.com/yantar92/emacs-config/
   :ensure t
 
   :bind
-  (("C-." . embark-act)         ;; pick some comfortable binding
-   ("C-;" . embark-dwim)        ;; good alternative: M-.
+  (("C-M-ö" . embark-act)
+   ("C-;" . embark-dwim)
    ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
 
   :init
