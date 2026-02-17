@@ -76,7 +76,6 @@ Configure =use-package=.
 (eval-when-compile (require 'use-package))
 #+end_src
 
-
 Is this the work laptop or something else?
 
 #+begin_src emacs-lisp :tangle yes
@@ -266,7 +265,6 @@ Set keybindings for profiler.
 #+end_src
 
 * Appearance
-
 ** Fonts
 
 Let's try out Fontaine for setting up fonts.
@@ -546,13 +544,6 @@ Disable custom themes before loading a new one.
   (mapc #'disable-theme custom-enabled-themes))
 
 (advice-add 'load-theme :before #'disable-custom-themes)
-#+end_src
-
-Trying a retro-green theme out as well.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package green-is-the-new-black-theme
-  :ensure t)
 #+end_src
 
 ** Indent-bars
@@ -921,7 +912,10 @@ Use =which-key=, in minibuffer.
 #+begin_src emacs-lisp :tangle yes
 (use-package which-key
   :ensure t
-  :hook (after-init . which-key-mode)
+  :hook ((after-init . which-key-mode)
+         (vterm-mode  . (lambda () (which-key-mode -1)))
+         (eshell-mode . (lambda () (which-key-mode -1)))
+         (shell-mode  . (lambda () (which-key-mode -1))))
   :custom
   (which-key-idle-delay 0.5)
   :config
@@ -987,16 +981,6 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "M-ö") 'evil-end-of-line) ;; $ is too unwieldy on a Scandinavian keyboard
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
 (evil-define-key 'normal 'global (kbd "'") 'evil-search-forward)
-
-;; (evil-define-key 'normal 'global (kbd "C-j") 'evil-window-next)
-;; (evil-define-key 'normal 'global (kbd "C-k") 'evil-window-prev)
-;; (evil-define-key 'normal 'global (kbd "C-h") 'evil-window-left) ;; Yes! I did it, rebound C-h. SPC h in normal mode is the alternative.
-;; (evil-define-key 'normal 'global (kbd "C-l") 'evil-window-right)
-;; (evil-define-key 'insert 'global (kbd "C-j") 'evil-window-next)
-;; (evil-define-key 'insert 'global (kbd "C-k") 'evil-window-prev)
-;; (evil-define-key 'insert 'global (kbd "C-h") 'evil-window-left)
-;; (evil-define-key 'insert 'global (kbd "C-l") 'evil-window-right)
-
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
@@ -1428,8 +1412,7 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
                           (rainbow-delimiters-mode -1)))
          (tsx-ts-mode . prettier-js-mode)
          (tsx-ts-mode . indent-bars-mode)
-         (tsx-ts-mode . lsp)
-         )
+         (tsx-ts-mode . lsp))
   :defer
   :mode (("\\.mjml" . html-mode)
          ("\\.js" . tsx-ts-mode)
@@ -1708,7 +1691,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (setq tab-always-indent 'complete))
 #+end_src
 
-Enable Corfu in minibuffers. Source: [[https://github.com/yantar92/emacs-config/blob/master/config.org][Ihor.]]
+Enable Corfu in minibuffers. Source: [[https://github.com/yantar92/emacs-config/blob/master/config.org][Ihor]].
 
 #+begin_src emacs-lisp :tangle yes
 (use-package corfu
