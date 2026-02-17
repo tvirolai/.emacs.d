@@ -913,13 +913,16 @@ Use =which-key=, in minibuffer.
 (use-package which-key
   :ensure t
   :hook ((after-init . which-key-mode)
-         (vterm-mode  . (lambda () (which-key-mode -1)))
-         (eshell-mode . (lambda () (which-key-mode -1)))
-         (shell-mode  . (lambda () (which-key-mode -1))))
+         (vterm-mode  . tv/which-key-inhibit)
+         (eshell-mode . tv/which-key-inhibit)
+         (comint-mode . tv/which-key-inhibit))
   :custom
   (which-key-idle-delay 0.5)
   :config
-  (which-key-setup-minibuffer))
+  (which-key-setup-minibuffer)
+
+  (defun tv/which-key-inhibit ()
+    (setq-local which-key-inhibit t)))
 #+end_src
 
 Make =ESC= quit wherever possible.
