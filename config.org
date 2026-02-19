@@ -4019,6 +4019,17 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
     (async-shell-command (format "mpv '%s'" url))))
 #+end_src
 
+** Download from Yle Areena
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/yle-dl ()
+  "Download a video from Yle Areena. Input is the video url."
+  (interactive)
+  (let* ((url (read-string "URL: "))
+         (default-directory "~/Desktop/YT"))
+    (async-shell-command (format "yle-dl '%s'" url))))
+#+end_src
+
 ** Empv
 
 #+begin_src emacs-lisp :tangle yes
