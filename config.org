@@ -2169,6 +2169,21 @@ Use 4 spaces as the default indentation level.
         org-appear-autosubmarkers t))
 #+end_src
 
+** Org Crypt
+
+#+begin_src emacs-lisp :tangle yes
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+(setq org-tags-exclude-from-inheritance '("crypt"))
+
+(setq org-crypt-key nil)
+;; GPG key to use for encryption.
+;; nil means  use symmetric encryption unconditionally.
+;; "" means use symmetric encryption unless heading sets CRYPTKEY property.
+
+(setq auto-save-default nil)
+#+end_src
+
 ** Org modern
 
 #+begin_src emacs-lisp :tangle yes
