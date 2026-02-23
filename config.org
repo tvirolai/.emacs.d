@@ -1314,25 +1314,12 @@ Haskell configs. Locally remap the =font-lock-keyword-face= attribute, since sla
 ** SQL
 
 #+begin_src emacs-lisp :tangle yes
-(setq sql-postgres-login-params nil)
-
-(setq lsp-sqls-workspace-config-path nil)
-
-(defun tv/maybe-highlight-ms-sql-kws ()
-  "Highlight MS SQL keywords when it's certain that's the dialect we're
-working with."
-  (when (cl-search "umaija" (buffer-file-name))
-    (sql-highlight-ms-keywords)))
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes
 (use-package sql
   :ensure t
   :hook ((sql-mode. lsp))
   :defer
   :config
-  (setq lsp-sqls-workspace-config-path nil)
-  (tv/maybe-highlight-ms-sql-kws))
+  (setq lsp-sqls-workspace-config-path nil))
 #+end_src
 
 Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mode.
@@ -1916,12 +1903,13 @@ Enable =recentf-mode=.
 #+begin_src emacs-lisp :tangle yes
 (use-package dockerfile-mode
   :ensure t
+  :hook ((dockerfile-mode . lsp))
   :defer)
 
 (use-package docker
   :ensure t
   :defer
-  :bdin (:map docker-container-mode-map
+  :bind (:map docker-container-mode-map
               ;; Override evil-mode's binding for ?.
               ("?" . 'docker-container-help))
   :bind ("C-c d" . docker))
