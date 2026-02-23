@@ -1921,6 +1921,9 @@ Enable =recentf-mode=.
 (use-package docker
   :ensure t
   :defer
+  :bdin (:map docker-container-mode-map
+              ;; Override evil-mode's binding for ?.
+              ("?" . 'docker-container-help))
   :bind ("C-c d" . docker))
 #+end_src
 
