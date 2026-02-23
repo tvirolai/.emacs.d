@@ -1030,7 +1030,7 @@ Frame management.
 
 #+begin_src emacs-lisp :tangle yes
 (evil-define-key 'normal 'global (kbd "M-§") 'other-frame)
-(evil-define-key 'normal 'global (kbd "M-n") 'make-frame)
+(evil-define-key 'normal 'global (kbd "C-M-'") 'make-frame)
 (evil-define-key 'normal 'global (kbd "M-°") 'delete-frame)
 #+end_src
 
