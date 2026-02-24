@@ -914,7 +914,16 @@ This maybe fixes some indentation issues in org mode.
 (use-package git-timemachine
   :ensure t
   :defer
-  :bind (("s-g" . git-timemachine)))
+  :bind (("C-c g t" . git-timemachine)))
+#+end_src
+
+** Git-link
+
+#+begin_src emacs-lisp :tangle yes
+(use-package git-link
+  :ensure t
+  :defer
+  :bind (("C-c g l" . git-link)))
 #+end_src
 
 * Keybindings
