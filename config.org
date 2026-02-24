@@ -308,9 +308,27 @@ Let's try out Fontaine for setting up fonts.
 
            :variable-pitch-family "IBM Plex Sans"
            :variable-pitch-height 150))))
+#+end_src
 
-(set-face-attribute 'font-lock-comment-face nil :slant 'italic)
-(set-face-attribute 'font-lock-keyword-face nil :slant 'italic)
+Choose theme. Ensure that the customizations are done after loading the theme.
+
+#+begin_src emacs-lisp :tangle yes
+(defun gui-setup ()
+  (when (display-graphic-p)
+    (load-theme (if work-laptop-p
+                    'modus-vivendi
+                  'ef-elea-dark) t)
+    (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+    (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)))
+
+;; Normal startup
+(add-hook 'emacs-startup-hook #'gui-setup)
+
+;; Daemon frames
+(add-hook 'after-make-frame-functions
+          (lambda (frame)
+            (with-selected-frame frame
+              (gui-setup))))
 #+end_src
 
 Add helpers to switch between themes.
@@ -529,14 +547,6 @@ Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
   :ensure t)
 #+end_src
 
-Choose theme.
-
-#+begin_src emacs-lisp :tangle yes
-(load-theme (if work-laptop-p
-                'modus-vivendi
-              'ef-elea-dark) t)
-#+end_src
-
 Disable custom themes before loading a new one.
 
 #+begin_src emacs-lisp :tangle yes
@@ -622,7 +632,7 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
 #+begin_src emacs-lisp :tangle yes
 (use-package winpulse
   :vc (:url "https://github.com/xenodium/winpulse"
-       :rev :newest)
+            :rev :newest)
   :custom
   (winpulse-brightness 20)
   :config
@@ -667,7 +677,7 @@ Bypass on-save hooks when needed.
 
 Use =tree-sitter=.
 
- #+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle yes
 (defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
   (when (< (buffer-size) 1000000)
     (turn-on-tree-sitter-mode)))
@@ -695,7 +705,7 @@ Use =tree-sitter=.
 
 (require 'tree-sitter)
 (require 'tree-sitter-langs)
- #+end_src
+#+end_src
 
 * Evil mode
 
@@ -1026,8 +1036,8 @@ Prevent the "Text is read only" message when pressing backspace in minibuffer ([
   "Do as `backward-delete-char' but stop at read-only text."
   (interactive "p\nP")
   (unless (or (get-text-property (point) 'read-only)
-          (eq (point) (point-min))
-          (get-text-property (1- (point)) 'read-only))
+              (eq (point) (point-min))
+              (get-text-property (1- (point)) 'read-only))
     (setq n (min (- (point) (point-min)) n))
     (setq n (- (point) (previous-single-property-change (point) 'read-only nil (- (point) n))))
     (backward-delete-char n killflag)))
@@ -1494,7 +1504,7 @@ Use smartparens.
   :hook ((lsp-mode . lsp-enable-which-key-integration)
          (lsp-mode . (lambda ()
                        (when (derived-mode-p 'tsx-ts-mode)
-                       (corfu-mode -1))))) ;; Clashes with lsp completion
+                         (corfu-mode -1))))) ;; Clashes with lsp completion
   :config
   (setq lsp-completion-enable-additional-text-edit nil
         lsp-lens-enable t
@@ -3436,7 +3446,7 @@ that and instead tries to complete against dictionary entries."
   (setq smtpmail-smtp-service 587)
   (setq smtpmail-stream-type 'starttls))
 
-  ;; (setq smtpmail-stream-type 'ssl)
+;; (setq smtpmail-stream-type 'ssl)
 #+end_src
 
 * Slack
