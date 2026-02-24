@@ -1048,9 +1048,9 @@ Prevent the "Text is read only" message when pressing backspace in minibuffer ([
 Frame management.
 
 #+begin_src emacs-lisp :tangle yes
-(evil-define-key 'normal 'global (kbd "M-§") 'other-frame)
-(evil-define-key 'normal 'global (kbd "C-M-'") 'make-frame)
-(evil-define-key 'normal 'global (kbd "M-°") 'delete-frame)
+(global-set-key (kbd "M-§") 'other-frame)
+(global-set-key (kbd "C-M-'") 'make-frame)
+(global-set-key (kbd "M-°") 'delete-frame)
 #+end_src
 
 Window management. Source: [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager][Mastering Emacs]].
