@@ -2884,6 +2884,22 @@ any directory proferred by `consult-dir'."
                      (completing-read "cd: " eshell-dirs)))))))
 #+end_src
 
+** Eat
+
+Trying the eat terminal emulator. It's used under the hood by at least [[Docker][Docker]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package eat
+  :ensure t
+  :defer
+  :init
+  ;; Let Emacs handle M-o in semi-char mode (Meta-o)
+  (add-to-list 'eat-semi-char-non-bound-keys [?\e ?o])
+  :config
+  ;; Now bind it normally
+  (keymap-set eat-mode-map "M-o" #'other-window))
+#+end_src
+
 ** Shell
 
 #+begin_src emacs-lisp :tangle yes
