@@ -1107,7 +1107,7 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 
 ** Ledger
 
-Let's try this.
+Let's try plain text accounting.
 
 #+begin_src emacs-lisp :tangle yes
 ;;; Basic configuration
