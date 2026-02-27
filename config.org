@@ -3904,6 +3904,8 @@ No Evil mode when playing Tetris.
 
 ** Query the web
 
+*** Custom implementation
+
 After writing this, I've found out that there's this thing called =counsel-search=.
 
 #+begin_src emacs-lisp :tangle yes
@@ -3919,7 +3921,15 @@ After writing this, I've found out that there's this thing called =counsel-searc
                    (string-replace " " "+" query))))))
 #+end_src
 
-** Multi-occur
+*** counsel-search
+
+Set this to enable firing random queries instead of just selecting from the suggested alternatives.
+
+#+begin_src emacs-lisp :tangle yes
+(setq ivy-use-selectable-prompt t)
+#+end_src
+
+** multi-occur
 
 Multi-occur is used to grep for text from open buffers. It's a pain to use so I prefer doing it via a wrapper functions.
 
