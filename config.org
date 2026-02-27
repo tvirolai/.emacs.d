@@ -3906,7 +3906,7 @@ No Evil mode when playing Tetris.
 
 *** Custom implementation
 
-After writing this, I've found out that there's this thing called =counsel-search=.
+Query the web using EWW. After writing this, I've found out that there's this thing called =counsel-search=.
 
 #+begin_src emacs-lisp :tangle yes
 (defvar query-history '())
@@ -3923,7 +3923,7 @@ After writing this, I've found out that there's this thing called =counsel-searc
 
 *** counsel-search
 
-Set this to enable firing random queries instead of just selecting from the suggested alternatives.
+Set this to enable firing random queries instead of just selecting from the suggested alternatives. This performs the query using the default browser.
 
 #+begin_src emacs-lisp :tangle yes
 (setq ivy-use-selectable-prompt t)
