@@ -484,7 +484,7 @@ Use =spacious-padding=.
 #+begin_src emacs-lisp :tangle yes
 (use-package spacious-padding
   :ensure t
-  :defer
+  :defer t
   :hook (after-init . spacious-padding-mode))
 #+end_src
 
@@ -882,7 +882,7 @@ This maybe fixes some indentation issues in org mode.
 #+begin_src emacs-lisp :tangle yes
 (use-package git-gutter
   :ensure t
-  :defer
+  :defer t
   :hook (after-init . global-git-gutter-mode))
 #+end_src
 
@@ -903,7 +903,7 @@ This maybe fixes some indentation issues in org mode.
     (mapc #'kill-buffer buffers)))
 
 (use-package magit
-  :defer
+  :defer t
   :ensure t
   :after git-gutter
   :config
@@ -923,7 +923,7 @@ This maybe fixes some indentation issues in org mode.
 #+begin_src emacs-lisp :tangle yes
 (use-package git-timemachine
   :ensure t
-  :defer
+  :defer t
   :bind (("C-c g t" . git-timemachine)))
 #+end_src
 
@@ -932,7 +932,7 @@ This maybe fixes some indentation issues in org mode.
 #+begin_src emacs-lisp :tangle yes
 (use-package git-link
   :ensure t
-  :defer
+  :defer t
   :bind (("C-c g l" . git-link)))
 #+end_src
 
@@ -1096,7 +1096,7 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 (use-package gptel
   :if (getenv "OPENAI_API_KEY")
   :ensure t
-  :defer
+  :defer t
   :config
   (setq gptel-api-key (getenv "OPENAI_API_KEY")))
 #+end_src
@@ -1147,7 +1147,7 @@ Let's try this.
 ;;; Basic configuration
 (use-package ledger-mode
   :ensure t
-  :defer)
+  :defer t)
 #+end_src
 
 * Media playback
@@ -1159,7 +1159,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 #+begin_src emacs-lisp :tangle yes
 (use-package ready-player
   :ensure t
-  :defer
+  :defer t
   :custom
   (ready-player-my-media-collection-location "/Volumes/Musumusa/musa/Music/")
   (ready-player-ask-for-project-sustainability nil)
@@ -1177,7 +1177,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 #+begin_src emacs-lisp :tangle yes
 (use-package flycheck
   :ensure t
-  :defer
+  :defer t
   :bind (:map flycheck-mode-map
               ("C-c C-n" . flycheck-next-error)
               ("C-c C-p" . flycheck-previous-error)))
@@ -1297,7 +1297,7 @@ Configure [[https://github.com/ericdallo/jet.el][jet.el]].
 #+begin_src emacs-lisp :tangle yes
 (use-package jet
   :ensure t
-  :defer)
+  :defer t)
 #+end_src
 
 Set keybindings.
@@ -1318,7 +1318,7 @@ Haskell configs. Locally remap the =font-lock-keyword-face= attribute, since sla
 #+begin_src emacs-lisp :tangle yes
 (use-package haskell-mode
   :ensure t
-  :defer
+  :defer t
   :hook ((haskell-mode . lsp)
          (haskell-mode . (lambda ()
                            (setq lsp-enable-completion-at-point nil)
@@ -1327,7 +1327,7 @@ Haskell configs. Locally remap the =font-lock-keyword-face= attribute, since sla
 (use-package lsp-haskell
   :after haskell-mode
   :ensure t
-  :defer)
+  :defer t)
 #+end_src
 
 ** SQL
@@ -1336,7 +1336,7 @@ Haskell configs. Locally remap the =font-lock-keyword-face= attribute, since sla
 (use-package sql
   :ensure t
   :hook ((sql-mode. lsp))
-  :defer
+  :defer t
   :config
   (setq lsp-sqls-workspace-config-path nil))
 #+end_src
@@ -1347,7 +1347,7 @@ Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mod
 (use-package sql-indent
   :ensure t
   :after sql
-  :defer)
+  :defer t)
 #+end_src
 
 Sqlup-mode capitalizes SQL keywords automatically. Note that is has a [[https://github.com/Trevoke/sqlup-mode.el/issues/69][bug]] which might accidentally capitalize quoted strings. This has bitten me previously but I currently sometimes use this to format selections of SQL.
@@ -1356,7 +1356,7 @@ Sqlup-mode capitalizes SQL keywords automatically. Note that is has a [[https://
 (use-package sqlup-mode
   :ensure t
   :after sql
-  :defer)
+  :defer t)
 #+end_src
 
 Custom functions for formatting SQL code.
@@ -1434,7 +1434,7 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
          (tsx-ts-mode . prettier-js-mode)
          (tsx-ts-mode . indent-bars-mode)
          (tsx-ts-mode . lsp))
-  :defer
+  :defer t
   :mode (("\\.mjml" . html-mode)
          ("\\.js" . tsx-ts-mode)
          ("\\.ts" . tsx-ts-mode))
@@ -1540,7 +1540,7 @@ Run Sonarlint in the editor. Thus far only enabled for specific modes.
 #+begin_src emacs-lisp :tangle yes
 (use-package verb
   :ensure t
-  :defer)
+  :defer t)
 #+end_src
 
 * No littering
@@ -1923,16 +1923,16 @@ Enable =recentf-mode=.
 (use-package dockerfile-mode
   :ensure t
   :hook ((dockerfile-mode . lsp))
-  :defer)
+  :defer t)
 
 (use-package docker
   :ensure t
-  :defer
-  :bind (:map docker-container-mode-map
-              ;; Override evil-mode's binding for ?.
-              ("?" . 'docker-container-help))
-  :bind ("C-c d" . docker))
-#+end_src
+  :defer t
+  :bind (("C-c d" . docker)
+         (:map docker-container-mode-map
+               ;; Override evil-mode's binding for ?.
+               ("?" . docker-container-help))))
+  #+end_src
 
 ** Markdown
 
@@ -1988,7 +1988,7 @@ Use 4 spaces as the default indentation level.
 #+begin_src emacs-lisp :tangle yes
 (use-package nginx-mode
   :ensure t
-  :defer)
+  :defer t)
 #+end_src
 
 ** Asciidoc
@@ -1996,7 +1996,7 @@ Use 4 spaces as the default indentation level.
 #+begin_src emacs-lisp :tangle yes
 (use-package adoc-mode
   :ensure t
-  :defer)
+  :defer t)
 #+end_src
 
 ** conf-mode
@@ -2004,7 +2004,7 @@ Use 4 spaces as the default indentation level.
 #+begin_src emacs-lisp :tangle yes
 (use-package conf-mode
   :ensure nil
-  :defer
+  :defer t
   :mode ("hy-config\\'" . conf-space-mode))
 #+end_src
 
@@ -2160,13 +2160,13 @@ Use 4 spaces as the default indentation level.
 
 (use-package hl-todo
   :ensure t
-  :defer
+  :defer t
   :hook ((org-mode . hl-todo-mode)
          (prog-mode . hl-todo-mode)))
 
 (use-package org-appear
   :ensure t
-  :defer
+  :defer t
   :after org
   :custom
   (org-appear-autoemphasis t)
@@ -2584,11 +2584,11 @@ Configuration adapted from [[https://systemcrafters.net/emacs-tips/presentations
 #+begin_src emacs-lisp :tangle yes
 (use-package org-present
   :ensure t
-  :defer)
+  :defer t)
 
 (use-package visual-fill-column
   :ensure t
-  :defer)
+  :defer t)
 
 ;; Configure fill width
 (setq visual-fill-column-width 110
@@ -2719,7 +2719,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
 
 #+begin_src emacs-lisp :tangle yes
 (use-package elfeed
-  :defer
+  :defer t
   :ensure t
   :init
   (elfeed-org)
@@ -2733,7 +2733,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
     "§" #'elfeed-update))
 
 (use-package elfeed-org
-  :defer
+  :defer t
   :ensure t
   :config
   (setq rmh-elfeed-org-files (list (concat org-directory "elfeed.org"))))
@@ -2891,7 +2891,7 @@ Trying the eat terminal emulator. It's used under the hood by at least [[Docker]
 #+begin_src emacs-lisp :tangle yes
 (use-package eat
   :ensure t
-  :defer
+  :defer t
   :init
   ;; Let Emacs handle M-o in semi-char mode (Meta-o)
   (add-to-list 'eat-semi-char-non-bound-keys [?\e ?o])
@@ -2918,7 +2918,7 @@ Trying the eat terminal emulator. It's used under the hood by at least [[Docker]
          (vterm-mode . (lambda ()
                          (setq-local global-hl-line-mode nil))))
   :ensure t
-  :defer
+  :defer t
   :bind (:map vterm-mode-map
               ("C-M-l" . 'next-buffer)
               ("C-M-h" . 'previous-buffer))
@@ -3016,7 +3016,7 @@ Disable images.
 
 (use-package all-the-icons-dired
   :ensure t
-  :defer
+  :defer t
   :hook (dired-mode . all-the-icons-dired-mode)
   :custom
   (all-the-icons-dired-monochrome nil))
@@ -3128,7 +3128,7 @@ Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
 
 ** Introduction
 
-Trying out this Email thing and see how it works out. For now I've copied/modified the config from [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs-modules/prot-emacs-email.el][Prot]], I'll be tweaking it to my own liking if I can get my head around it.
+Trying out this email thing and see how it works out. For now I've copied/modified the config from [[https://github.com/protesilaos/dotfiles/blob/master/emacs/.emacs.d/prot-emacs-modules/prot-emacs-email.el][Prot]], I'll be tweaking it to my own liking if I can get my head around it.
 
 Anyway, the thing with email in Emacs is that it can't really fetch or send mail. Instead, it calls command-line utilities, which need to be configured properly, to do the heavy lifting. Emacs is used for what it does best - editing, searching and managing text.
 
@@ -4009,7 +4009,7 @@ Similar logic than [[Grep for the symbol at point]] below, only this one calls =
 #+begin_src emacs-lisp :tangle yes
 (use-package x509-mode
   :ensure t
-  :defer)
+  :defer t)
 #+end_src
 
 ** File info
@@ -4095,7 +4095,7 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
 #+begin_src emacs-lisp :tangle yes
 (use-package empv
   :ensure t
-  :defer
+  :defer t
   :config
   (setq empv-invidious-instance 'ivjs))
 #+end_src
