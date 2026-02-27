@@ -4004,6 +4004,14 @@ Similar logic than [[Grep for the symbol at point]] below, only this one calls =
 (global-set-key (kbd "C-c p g") 'grep-symbol-at-point)
 #+end_src
 
+** X509-mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package x509-mode
+  :ensure t
+  :defer)
+#+end_src
+
 ** File info
 
 Show information about the file under editing.
