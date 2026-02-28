@@ -1332,11 +1332,12 @@ to this hack to run the indentation and capitalization for the whole buffer."
 
 #+begin_src emacs-lisp :tangle yes
 (use-package prisma-ts-mode
-  :mode (("\\.prisma" . prisma-ts-mode)))
-
-(add-to-list
- 'treesit-language-source-alist
- '(prisma "https://github.com/victorhqc/tree-sitter-prisma"))
+  :defer t
+  :mode (("\\.prisma" . prisma-ts-mode))
+  :config
+  (add-to-list
+   'treesit-language-source-alist
+   '(prisma "https://github.com/victorhqc/tree-sitter-prisma")))
 #+end_src
 
 ** Emacs Lisp
