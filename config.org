@@ -590,30 +590,6 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
   :custom (olivetti-body-width 94))
 #+end_src
 
-** Pulse
-
-#+begin_src emacs-lisp :tangle yes
-;; (use-package pulse
-;;   :ensure nil
-;;   :init
-;;   (defun pulse-line (&rest _)
-;;     "Pulse the current line."
-;;     (pulse-momentary-highlight-one-line (point)))
-
-;;   (dolist (command '(scroll-up-command
-;;                      scroll-down-command
-;;                      evil-scroll-up
-;;                      evil-scroll-down
-;;                      windmove-left
-;;                      windmove-right
-;;                      windmove-up
-;;                      windmove-down
-;;                      move-to-window-line-top-bottom
-;;                      recenter-top-bottom
-;;                      other-window))
-;;     (advice-add command :after #'pulse-line)))
-#+end_src
-
 ** Winpulse
 
 #+begin_src emacs-lisp :tangle yes
