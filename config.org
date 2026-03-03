@@ -2689,12 +2689,12 @@ Use ansi-colors in shell.
                           (setq-local corfu-count 10)
                           (setq-local corfu-auto nil)
                           (setq-local corfu-preview-current nil)
-                          (setq-local completion-at-point-functions '(pcomplete-completions-at-point cape-file)))))
-  :bind ((:map eshell-mode-map
-               ("C-M-l" . 'next-buffer)
-               ("C-M-h" . 'previous-buffer))
-         (:map eshell-hist-mode-map
-               ("C-c C-l" . 'consult-history)))
+                          (setq-local completion-at-point-functions '(pcomplete-completions-at-point cape-file))))
+         (eshell-hist-mode . (lambda ()
+                               (define-key eshell-hist-mode-map (kbd "C-c C-l") #'consult-history))))
+  :bind (:map eshell-mode-map
+              ("C-M-l" . 'next-buffer)
+              ("C-M-h" . 'previous-buffer))
   :init
   (setq eshell-scroll-to-bottom-on-input 'all
         eshell-banner-message (quotient-generate-excerpt 'eshell)
