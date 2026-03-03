@@ -2794,11 +2794,7 @@ Trying the eat terminal emulator. It's used under the hood by at least [[Docker]
 #+begin_src emacs-lisp :tangle yes
 (use-package eat
   :defer t
-  :init
-  ;; Let Emacs handle M-o in semi-char mode (Meta-o)
-  (add-to-list 'eat-semi-char-non-bound-keys [?\e ?o])
   :config
-  ;; Now bind it normally
   (keymap-set eat-mode-map "M-o" #'other-window)
   (evil-set-initial-state 'eat-mode 'emacs))
 #+end_src
@@ -2807,6 +2803,7 @@ Trying the eat terminal emulator. It's used under the hood by at least [[Docker]
 
 #+begin_src emacs-lisp :tangle yes
 (use-package shell
+  :defer t
   :ensure nil
   :config
   (evil-set-initial-state 'shell-mode 'emacs))
@@ -3881,12 +3878,15 @@ Similar logic than [[Grep for the symbol at point]] below, only this one calls =
 ** Grep for the symbol at point
 
 #+begin_src emacs-lisp :tangle yes
-(defun grep-symbol-at-point ()
+(defun grep-symbol-or-region-at-point ()
   "Grep symbol at point, in project context."
   (interactive)
-  (projectile-ripgrep (thing-at-point 'symbol t)))
+  (let ((query (if (use-region-p)
+      (buffer-substring-no-properties (region-beginning) (region-end))
+      (thing-at-point 'symbol t))))
+    (projectile-ripgrep query)))
 
-(global-set-key (kbd "C-c p g") 'grep-symbol-at-point)
+(global-set-key (kbd "C-c p g") 'grep-symbol-or-region-at-point)
 #+end_src
 
 ** X509-mode
