@@ -3882,8 +3882,8 @@ Similar logic than [[Grep for the symbol at point]] below, only this one calls =
   "Grep symbol at point, in project context."
   (interactive)
   (let ((query (if (use-region-p)
-      (buffer-substring-no-properties (region-beginning) (region-end))
-      (thing-at-point 'symbol t))))
+                   (buffer-substring-no-properties (region-beginning) (region-end))
+                 (thing-at-point 'symbol t))))
     (projectile-ripgrep query)))
 
 (global-set-key (kbd "C-c p g") 'grep-symbol-or-region-at-point)
