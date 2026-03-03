@@ -1031,7 +1031,6 @@ Jump to previous positions from the mark ring by repeating the command.
 #+end_src
 
 * AI
-
 ** Gptel
 
 Let's try whether this could be useful. Gptel is a light-weight LLM client supporting multiple backends.
@@ -1111,6 +1110,56 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
     (set-fontset-font t nil "SF Pro Display" nil 'append)
     (ready-player-macos-use-sf-symbols)))
 #+end_src
+
+** Video streaming
+
+*** Download from Youtube
+
+#+begin_src emacs-lisp :tangle yes
+(defun read-and-return-yt-url ()
+  (let ((input (read-string "Id tai URL: ")))
+    (if (string-search "youtu" input)
+        input
+      (format "https://www.youtube.com/watch?v=%s" input))))
+
+(defun tv/yt-dlp ()
+  "Download a video from Youtube. Input is either video id or full url."
+  (interactive)
+  (let* ((url (read-and-return-yt-url))
+         (default-directory "~/Desktop/YT"))
+    (async-shell-command (format "yt-dlp '%s' --no-playlist" url))))
+#+end_src
+
+*** Watch from Youtube
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/watch-yt ()
+  "Watch a Youtube video using MPV. Input is either video id or full url."
+  (interactive)
+  (let ((url (read-and-return-yt-url)))
+    (async-shell-command (format "mpv '%s'" url))))
+#+end_src
+
+*** Download from Yle Areena
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/yle-dl ()
+  "Download a video from Yle Areena. Input is the video url."
+  (interactive)
+  (let* ((url (read-string "URL: "))
+         (default-directory "~/Desktop/YT"))
+    (async-shell-command (format "yle-dl '%s'" url))))
+#+end_src
+
+*** Empv
+
+#+begin_src emacs-lisp :tangle yes
+(use-package empv
+  :defer t
+  :config
+  (setq empv-invidious-instance 'ivjs))
+#+end_src
+
 
 * Flycheck
 
@@ -1317,8 +1366,6 @@ to this hack to run the indentation and capitalization for the whole buffer."
 #+end_src
 
 ** Emacs Lisp
-
-*** Elisp keybindings.
 
 #+begin_src emacs-lisp :tangle yes
 (evil-define-key 'normal emacs-lisp-mode-map
@@ -2838,6 +2885,13 @@ Use the =pass= package to interact with the similarly named Linux password manag
 (use-package ansible-vault)
 #+end_src
 
+** X509-mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package x509-mode
+  :defer t)
+#+end_src
+
 * EWW
 
 Disable images.
@@ -3753,15 +3807,6 @@ Enable nice settings for reading or writing.
       (display-line-numbers-mode))))
 #+end_src
 
-** Tetris
-
-No Evil mode when playing Tetris.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package tetris
-  :hook (tetris-mode . turn-off-evil-mode))
-#+end_src
-
 ** Query the web
 
 *** Custom implementation
@@ -3867,13 +3912,6 @@ Similar logic than [[Grep for the symbol at point]] below, only this one calls =
 (global-set-key (kbd "C-c p g") 'grep-symbol-or-region-at-point)
 #+end_src
 
-** X509-mode
-
-#+begin_src emacs-lisp :tangle yes
-(use-package x509-mode
-  :defer t)
-#+end_src
-
 ** File info
 
 Show information about the file under editing.
@@ -3913,53 +3951,6 @@ Source: [[https://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard][Ma
         (gui-set-selection 'CLIPBOARD markdown))))
 #+end_src
 
-** Download from Youtube
-
-#+begin_src emacs-lisp :tangle yes
-(defun read-and-return-yt-url ()
-  (let ((input (read-string "Id tai URL: ")))
-    (if (string-search "youtu" input)
-        input
-      (format "https://www.youtube.com/watch?v=%s" input))))
-
-(defun tv/yt-dlp ()
-  "Download a video from Youtube. Input is either video id or full url."
-  (interactive)
-  (let* ((url (read-and-return-yt-url))
-         (default-directory "~/Desktop/YT"))
-    (async-shell-command (format "yt-dlp '%s' --no-playlist" url))))
-#+end_src
-
-** Watch from Youtube
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/watch-yt ()
-  "Watch a Youtube video using MPV. Input is either video id or full url."
-  (interactive)
-  (let ((url (read-and-return-yt-url)))
-    (async-shell-command (format "mpv '%s'" url))))
-#+end_src
-
-** Download from Yle Areena
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/yle-dl ()
-  "Download a video from Yle Areena. Input is the video url."
-  (interactive)
-  (let* ((url (read-string "URL: "))
-         (default-directory "~/Desktop/YT"))
-    (async-shell-command (format "yle-dl '%s'" url))))
-#+end_src
-
-** Empv
-
-#+begin_src emacs-lisp :tangle yes
-(use-package empv
-  :defer t
-  :config
-  (setq empv-invidious-instance 'ivjs))
-#+end_src
-
 ** Restart Emacs daemon
 
 Source: https://timothyjohnsonsci.com/writing/2025-12-30-emacs-daemon-restart/.
@@ -3973,4 +3964,12 @@ Source: https://timothyjohnsonsci.com/writing/2025-12-30-emacs-daemon-restart/.
     (call-process-shell-command
      (format "%s --daemon &" cmd))
     (kill-emacs)))
+#+end_src
+** Tetris
+
+No Evil mode when playing Tetris.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package tetris
+  :hook (tetris-mode . turn-off-evil-mode))
 #+end_src
