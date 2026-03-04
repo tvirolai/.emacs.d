@@ -1955,6 +1955,18 @@ Use 4 spaces as the default indentation level.
   :mode ("hy-config\\'" . conf-space-mode))
 #+end_src
 
+** Emacs reader
+
+#+begin_src emacs-lisp :tangle yes
+(defconst emacs-reader-path "~/dev/emacs-reader")
+
+(use-package reader
+  :defer t
+  :if (file-directory-p emacs-reader-path)
+  :vc t
+  :load-path emacs-reader-path)
+#+end_src
+
 * Org mode
 
 ** General config
