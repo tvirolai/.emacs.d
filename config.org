@@ -69,6 +69,7 @@ Configure =use-package=.
 
 #+begin_src emacs-lisp :tangle yes
 (setq use-package-always-ensure t)
+(setq use-package-compute-statistics t)
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
@@ -315,9 +316,13 @@ Choose theme. Ensure that the customizations are done after loading the theme.
   (when (display-graphic-p)
     (load-theme (if work-laptop-p
                     'modus-vivendi
-                  'ef-elea-dark) t)
-    (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
-    (set-face-attribute 'font-lock-keyword-face nil :slant 'italic)))
+                  'ef-elea-dark) t)))
+
+(defun add-italics (&optional theme no-confirm no-enable)
+  (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
+  (set-face-attribute 'font-lock-keyword-face nil :slant 'italic))
+
+(advice-add 'load-theme :after #'add-italics)
 
 ;; Normal startup
 (add-hook 'emacs-startup-hook #'gui-setup)
@@ -1225,6 +1230,7 @@ Configure the necessary packages.
       (mode 1))))
 
 (use-package clojure-mode
+  :defer t
   :config
   (define-clojure-indent
    (returning 1)
@@ -1236,11 +1242,13 @@ Configure the necessary packages.
    (PUT 2)))
 
 (use-package inf-clojure
+  :defer t
   :config
   (add-hook 'inf-clojure-mode-hook #'paredit-mode)
   (add-hook 'inf-clojure-mode-hook #'rainbow-delimiters-mode))
 
 (use-package cider
+  :defer t
   :config
   (setq nrepl-log-messages t)
   (add-hook 'cider-repl-mode-hook #'paredit-mode)
@@ -1491,10 +1499,11 @@ Use smartparens.
 
 ** lsp-sonarlint
 
-Run Sonarlint in the editor. Thus far only enabled for specific modes.
+Run Sonarlint in the editor.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-sonarlint
+  :defer t
   :custom
   (lsp-sonarlint-auto-download t)
   (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode css-ts-mode)))
@@ -2164,6 +2173,7 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ox-jira
+  :defer t
   :config
   (add-to-list 'org-export-backends 'ox-jira))
 #+end_src
@@ -2172,6 +2182,7 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ox-slack
+  :defer t
   :config
   (add-to-list 'org-export-backends 'ox-slack))
 #+end_src
@@ -2180,6 +2191,7 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package evil-org
+  :defer t
   :after org
   :hook (org-mode . evil-org-mode)
   :config
@@ -2766,6 +2778,7 @@ Use syntax highlighting in =eshell=.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package eshell-syntax-highlighting
+  :defer t
   :config
   (eshell-syntax-highlighting-global-mode +1)
   :init
@@ -3522,7 +3535,8 @@ Found this [[https://eugene-andrienko.com/en/it/2025/06/30/my-emacs-configuratio
 Ztree is /"A major mode for displaying the directory tree in text mode"/. One thing I sometimes need is =ztree-diff= for generating a diff of two directories.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package ztree)
+(use-package ztree
+  :defer t)
 #+end_src
 
 * Package development helpers
@@ -3532,13 +3546,15 @@ Tools to aid with package development.
 ** package-lint
 
 #+begin_src emacs-lisp :tangle yes
-(use-package package-lint)
+(use-package package-lint
+  :defer t)
 #+end_src
 
 ** pkg-lint
 
 #+begin_src emacs-lisp :tangle yes
-(use-package pkg-info)
+(use-package pkg-info
+  :defer t)
 #+end_src
 
 ** edebug
