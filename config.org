@@ -55,6 +55,21 @@ Add personal details.
       user-mail-address (base64-decode-string "dHVvbW8udmlyb2xhaW5lbkBzaWlsaS5jb20="))
 #+end_src
 
+Is this the work laptop or something else?
+
+#+begin_src emacs-lisp :tangle yes
+(defconst work-laptop-p
+  (equal (system-name) "G140450"))
+#+end_src
+
+Set configuration file name for later reference.
+
+#+begin_src emacs-lisp :tangle yes
+(defconst config-file "config.org")
+#+end_src
+
+** Package management
+
 Configure repos.
 
 #+begin_src emacs-lisp :tangle yes
@@ -77,18 +92,7 @@ Configure =use-package=.
 (eval-when-compile (require 'use-package))
 #+end_src
 
-Is this the work laptop or something else?
-
-#+begin_src emacs-lisp :tangle yes
-(defconst work-laptop-p
-  (equal (system-name) "G140450"))
-#+end_src
-
-Set configuration file name for later reference.
-
-#+begin_src emacs-lisp :tangle yes
-(defconst config-file "config.org")
-#+end_src
+** Path
 
 Configure path.
 
@@ -102,25 +106,7 @@ Configure path.
     (exec-path-from-shell-initialize)))
 #+end_src
 
-The cursor may blink. Not in image buffers though.
-
-#+begin_src emacs-lisp :tangle yes
-(blink-cursor-mode t)
-
-(defun disable-cursor-for-viewing ()
-  (setq-local cursor-type nil)
-  (blink-cursor-mode -1))
-
-(defun restore-cursor ()
-  (kill-local-variable 'cursor-type)
-  (blink-cursor-mode 1))
-
-(add-hook 'image-mode-hook #'disable-cursor-for-viewing)
-(add-hook 'reader-mode-hook #'disable-cursor-for-viewing)
-
-;; Restore when exiting
-(add-hook 'change-major-mode-hook #'restore-cursor)
-#+end_src
+** Disable useless settings
 
 Disable unnecessary stuff.
 
@@ -132,6 +118,8 @@ Disable unnecessary stuff.
 (setq ring-bell-function 'ignore)
 (setq use-short-answers t)
 #+end_src
+
+** General things
 
 Set 10MB as the limit for garbage collection.
 
@@ -194,6 +182,8 @@ Mac-specific settings.
 (global-set-key (kbd "<C-wheel-down>") 'ignore)
 #+end_src
 
+** UTF-8
+
 UTF-8 should be preferred everywhere.
 
 #+begin_src emacs-lisp :tangle yes
@@ -205,6 +195,8 @@ UTF-8 should be preferred everywhere.
 (set-keyboard-coding-system 'utf-8)
 #+end_src
 
+** Highlight current line
+
 Highlight the current line.
 
 #+begin_src emacs-lisp :tangle yes
@@ -213,14 +205,7 @@ Highlight the current line.
   (global-hl-line-mode +1))
 #+end_src
 
-Create a directory for savefiles if it doesn't exist.
-
-#+begin_src emacs-lisp :tangle yes
-(defconst tv-savefile-dir (expand-file-name "etc/savefile" user-emacs-directory))
-
-(unless (file-exists-p tv-savefile-dir)
-  (make-directory tv-savefile-dir))
-#+end_src
+** Savefiles and backups
 
 Put backup files under =etc/.tmp/=.
 
@@ -235,17 +220,19 @@ Put backup files under =etc/.tmp/=.
       `((".*" ,temporary-file-directory t)))
 #+end_src
 
+Store miscellaneous files under =/etc=.
+
+#+begin_src emacs-lisp :tangle yes
+(setq bookmark-default-file (expand-file-name "etc/bookmarks" user-emacs-directory))
+#+end_src
+
+** Custom.el
+
 Dump custom settings in a separate file.
 
 #+begin_src emacs-lisp :tangle yes
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file t)
-#+end_src
-
-Store miscellaneous files under =/etc=.
-
-#+begin_src emacs-lisp :tangle yes
-(setq bookmark-default-file (expand-file-name "etc/bookmarks" user-emacs-directory))
 #+end_src
 
 Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is useful for example when yanking stuff from the kill-ring using M-y.
@@ -254,17 +241,30 @@ Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is us
 (setq enable-recursive-minibuffers t)
 #+end_src
 
-Set keybindings for profiler.
+* Appearance
+
+** Cursor
+
+The cursor may blink. Not in image buffers though.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package profiler
-  :bind
-  ("C-x P r"  . profiler-report)
-  ("C-x P 1"  . profiler-start)
-  ("C-x P 0"  . profiler-stop))
+(blink-cursor-mode t)
+
+(defun disable-cursor-for-viewing ()
+  (setq-local cursor-type nil)
+  (blink-cursor-mode -1))
+
+(defun restore-cursor ()
+  (kill-local-variable 'cursor-type)
+  (blink-cursor-mode 1))
+
+(add-hook 'image-mode-hook #'disable-cursor-for-viewing)
+(add-hook 'reader-mode-hook #'disable-cursor-for-viewing)
+
+;; Restore when exiting
+(add-hook 'change-major-mode-hook #'restore-cursor)
 #+end_src
 
-* Appearance
 ** Fonts
 
 Let's try out Fontaine for setting up fonts.
@@ -356,13 +356,6 @@ Add helpers to switch between themes.
   (fontaine-set-preset 'large))
 #+end_src
 
-If we're on the work laptop, chances are that we're using some random monitor...
-
-#+begin_src emacs-lisp :tangle yes
-;; (when work-laptop-p
-;;   (tv/load-crap-monitor-settings))
-#+end_src
-
 ** Tabs
 
 Tabs should never ever be used for indentation. If they are, they should look silly.
@@ -424,9 +417,9 @@ Suppress compilation warnings.
 (setq native-comp-async-report-warnings-errors nil)
 #+end_src
 
-** Mode line
+** Modeline
 
-*** Doom modeline.
+*** Doom modeline
 
 Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
 
@@ -872,6 +865,8 @@ This maybe fixes some indentation issues in org mode.
 
 ** Git timemachine
 
+Travel back in time.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package git-timemachine
   :defer t
@@ -879,6 +874,8 @@ This maybe fixes some indentation issues in org mode.
 #+end_src
 
 ** Git-link
+
+Generate a link to Github (or whatever the project uses) directly from code.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package git-link
@@ -1033,6 +1030,16 @@ Jump to previous positions from the mark ring by repeating the command.
 
 #+begin_src emacs-lisp :tangle yes
 (setq set-mark-command-repeat-pop t)
+#+end_src
+
+Set keybindings for profiler.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package profiler
+  :bind
+  ("C-x P r"  . profiler-report)
+  ("C-x P 1"  . profiler-start)
+  ("C-x P 0"  . profiler-stop))
 #+end_src
 
 * AI
@@ -1477,7 +1484,9 @@ I've only ever needed this for configuring Jenkins jobs.
   :defer t)
 #+end_src
 
-* LSP-mode
+* LSP
+
+** LSP-mode
 
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-mode
@@ -1819,6 +1828,16 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 #+end_src
 
 * History
+** Setup a directory for savefiles
+
+#+begin_src emacs-lisp :tangle yes
+(defconst tv-savefile-dir (expand-file-name "etc/savefile" user-emacs-directory))
+
+(unless (file-exists-p tv-savefile-dir)
+  (make-directory tv-savefile-dir))
+
+#+end_src
+
 ** Save-place-mode
 
 Remember and restore the last cursor location of opened files.
@@ -1859,8 +1878,8 @@ Enable =recentf-mode=.
   :init (recentf-mode 1)
   :config
   (setq recentf-save-file (expand-file-name "recentf" tv-savefile-dir)
-        recentf-max-saved-items 40
-        recentf-max-menu-items 40
+        recentf-max-saved-items 1000
+        recentf-max-menu-items 1000
         ;; disable recentf-cleanup on Emacs start, because it can cause
         ;; problems with remote files
         recentf-auto-cleanup 'never))
@@ -1868,11 +1887,13 @@ Enable =recentf-mode=.
 
 ** Winner
 
+Remember and access previous window configurations.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package winner
   :ensure nil
   :hook after-init
-  :commands (winner-undo winnner-redo)
+  :commands (winner-undo winner-redo)
   :custom
   (winner-boring-buffers '("*Completions*" "*Help*" "*Apropos*"
                            "*Buffer List*" "*info*" "*Compile-Log*")))
@@ -2219,7 +2240,7 @@ Use 4 spaces as the default indentation level.
 
 ** Denote
 
-I use =denote= for note taking and personal knowledge management. I migrated from =org-roam= to =denote= mostly due to the slow database indexing - after importing about 1200 notes from my IMDB watchlist, the indexing started taking minutes. Denote does not use a database, which is a huge plus in my book.
+I use =denote= for note taking and personal knowledge management.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package denote
