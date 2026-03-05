@@ -1458,6 +1458,7 @@ Use smartparens.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package python-black
+  :defer t
   :after python
   :hook ((python-mode . python-black-on-save-mode)
          (python-mode . lsp)
@@ -1465,12 +1466,11 @@ Use smartparens.
          (python-ts-mode . lsp)
          (python-ts-mode . indent-bars-mode))
   :config (setq lsp-pylsp-plugins-flake8-ignore '("D103" "D100" "D105")))
-
-;; (add-hook 'python-mode-hook #'lsp)
-;; (add-hook 'python-ts-mode-hook #'lsp)
 #+end_src
 
 ** Groovy
+
+I've only ever needed this for configuring Jenkins jobs.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package groovy-mode
@@ -1488,6 +1488,7 @@ Use smartparens.
   :config
   (setq lsp-completion-enable-additional-text-edit nil
         lsp-lens-enable t
+        lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory)
         lsp-auto-guess-root t
         lsp-headerline-breadcrumb-enable nil
         ;; Silence the 'LSP server exited, do you want to restart it' prompt when killing buffers.
