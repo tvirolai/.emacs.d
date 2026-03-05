@@ -1413,30 +1413,56 @@ to this hack to run the indentation and capitalization for the whole buffer."
 
 ** Typescript / JS
 
-Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=, so it needs to be disabled in it.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package typescript-mode
-  :hook ((tsx-ts-mode . (lambda ()
-                          (rainbow-delimiters-mode -1)))
-         (tsx-ts-mode . prettier-js-mode)
-         (tsx-ts-mode . indent-bars-mode)
-         (tsx-ts-mode . lsp))
-  :defer t
-  :mode (("\\.mjml" . html-mode)
-         ("\\.js" . tsx-ts-mode)
-         ("\\.ts" . tsx-ts-mode))
-  :custom
-  (js-indent-level 2)
-  (typescript-indent-level 2))
-#+end_src
-
 *** Prettier
 
-Setup prettier.
+Setup prettier. It's used by default if the project does not use Eslint instead.
 
 #+begin_src emacs-lisp :tangle yes
+(defconst tv/eslint-config-files
+  '("eslint.config.js" "eslint.config.cjs" "eslint.config.mjs" "eslint.config.ts"
+    ".eslintrc" ".eslintrc.js" ".eslintrc.cjs" ".eslintrc.json"
+    ".eslintrc.yaml" ".eslintrc.yml"))
+
+(defun tv/project-uses-eslint-p ()
+  "Return non-nil if current project appears to use ESLint."
+  (locate-dominating-file
+   default-directory
+   (lambda (dir)
+     (seq-some (lambda (file)
+                 (file-exists-p (expand-file-name file dir)))
+               tv/eslint-config-files))))
+
 (use-package prettier-js)
+#+end_src
+
+*** Eslint
+
+Config adapted from [[https://www.rahuljuliato.com/posts/eslint-on-emacs][Rahul Juliato]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package flymake-eslint
+  :config
+  (setq flymake-eslint-prefer-json-diagnostics t))
+
+(defun tv/use-local-eslint ()
+  "Set project's `node_modules' binary eslint as first priority.
+If nothing is found, keep the default value flymake-eslint set or
+your override of `flymake-eslint-executable-name.'"
+  (interactive)
+  (let* ((root (locate-dominating-file (buffer-file-name) "node_modules"))
+         (eslint (and root
+                      (expand-file-name "node_modules/.bin/eslint"
+                                        root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flymake-eslint-executable-name eslint)
+      (message (format "Found local ESLINT! Setting: %s" eslint))
+      (flymake-eslint-enable))))
+
+(defun tv/configure-eslint-with-flymake ()
+  (when (or (eq major-mode 'tsx-ts-mode)
+	    (eq major-mode 'typescript-ts-mode)
+	    (eq major-mode 'typescriptreact-mode))
+    (tv/use-local-eslint)))
 #+end_src
 
 *** Smartparens
@@ -1450,6 +1476,29 @@ Use smartparens.
   :config
   ;; load default config
   (require 'smartparens-config))
+#+end_src
+
+*** Typescript-mode
+
+Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=, so it needs to be disabled in it.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package typescript-mode
+  :hook ((tsx-ts-mode . (lambda ()
+                          (rainbow-delimiters-mode -1)))
+         (tsx-ts-mode . (lambda ()
+                          (if (tv/project-uses-eslint-p)
+                            (tv/use-local-eslint)
+                            (prettier-js-mode 1))))
+         (tsx-ts-mode . indent-bars-mode)
+         (tsx-ts-mode . lsp))
+  :defer t
+  :mode (("\\.mjml" . html-mode)
+         ("\\.js" . tsx-ts-mode)
+         ("\\.ts" . tsx-ts-mode))
+  :custom
+  (js-indent-level 2)
+  (typescript-indent-level 2))
 #+end_src
 
 ** Java
