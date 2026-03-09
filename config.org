@@ -1718,31 +1718,9 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :init
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
-  ;; :hook ((prog-mode-hook . completion-preview-mode)
-  ;;     (text-mode-hook . completion-preview-mode))
-  ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
-  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-  ;; (setq read-extended-command-predicate
-  ;;       #'command-completion-default-include-p)
-
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
-#+end_src
-
-Enable Corfu in minibuffers. Source: [[https://github.com/yantar92/emacs-config/blob/master/config.org][Ihor]].
-
-#+begin_src emacs-lisp :tangle yes
-(use-package corfu
-  :init
-  (defun corfu-enable-in-minibuffer ()
-    "Enable Corfu in the minibuffer."
-    (when (local-variable-p 'completion-at-point-functions)
-      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
-      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                  corfu-popupinfo-delay nil)
-      (corfu-mode 1)))
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer))
 #+end_src
 
 ** Orderless
@@ -2105,7 +2083,7 @@ Use 4 spaces as the default indentation level.
     (kbd "M-J") #'org-shiftmetadown
     (kbd "§") #'verb-send-request-on-point-other-window-stay)
   ;; Include the time in timestamps by default.
-  (setq org-time-stamp-formats '("<%Y-%m-%d %a %H:%M>" . "<%Y-%m-%d %a %H:%M>"))
+  ;; (setq org-time-stamp-formats '("<%Y-%m-%d %a %H:%M>" . "<%Y-%m-%d %a %H:%M>"))
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-insert-heading-respect-content t)
   (setq org-directory "~/org/")
@@ -2531,6 +2509,7 @@ Helpers for adding new elements to front matter.
                                     "now - - - - - - - - - - - - - - - - - - - - - - - - -"))
   (org-agenda-timegrid-use-ampm t)
   (org-agenda-tags-column 0)
+  (org-agenda-start-day "-1d") ;; Show the previous day.
   (org-agenda-window-setup 'only-window)
   (org-agenda-restore-windows-after-quit t)
   (org-agenda-log-mode-items '(closed clock state))
