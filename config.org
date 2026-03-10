@@ -822,6 +822,26 @@ This maybe fixes some indentation issues in org mode.
               #'(lambda (&rest _args) (balance-windows))))
 #+end_src
 
+* Compilation
+
+From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package compile
+  :ensure nil
+  :custom
+  (compilation-always-kill t)
+  (compilation-scroll-output t)
+  (ansi-color-for-compilation-mode t)
+  :config
+  ;; Not ideal, but I do not want this poluting the mode-line
+  (defun emacs-solo/ignore-compilation-status (&rest _)
+    (setq compilation-in-progress nil))
+  (advice-add 'compilation-start :after #'emacs-solo/ignore-compilation-status)
+
+  (add-hook 'compilation-filter-hook #'ansi-color-compilation-filter))
+#+end_src
+
 * Version control
 
 ** Git gutter
@@ -2769,6 +2789,8 @@ Use ansi-colors in shell.
   :after quotient
   :hook ((eshell-mode . hide-mode-line-mode)
          (eshell-mode . (lambda ()
+                          (eshell-read-history)))
+         (eshell-mode . (lambda ()
                           (setenv "TERM" "xterm-256color")
                           (setq eshell-banner-message (quotient-generate-excerpt 'eshell))
                           (setq-local completion-styles '(basic))
@@ -2787,10 +2809,35 @@ Use ansi-colors in shell.
         eshell-error-if-no-glob t
         eshell-hist-ignoredups t
         eshell-save-history-on-exit t
+        eshell-history-size 100000
         eshell-prefer-lisp-functions nil
         eshell-directory-name (expand-file-name "etc/eshell" user-emacs-directory)
         eshell-destroy-buffer-when-process-dies t)
   :config
+  ;; From Emacs Solo:
+  ;; MAKE ALL INSTANCES OF ESHELL SHARE/MERGE ITS COMMAND HISTORY
+  ;;
+  (defun emacs-solo/eshell--collect-all-history ()
+    "Return a list of all eshell history entries from all buffers and disk."
+    (let ((history-from-buffers
+           (cl-loop for buf in (buffer-list)
+                    when (with-current-buffer buf (derived-mode-p 'eshell-mode))
+                    append (with-current-buffer buf
+                             (when (boundp 'eshell-history-ring)
+                               (ring-elements eshell-history-ring)))))
+          (history-from-file
+           (when (file-exists-p eshell-history-file-name)
+             (with-temp-buffer
+               (insert-file-contents eshell-history-file-name)
+               (split-string (buffer-string) "\n" t)))))
+      (seq-uniq (append history-from-buffers history-from-file))))
+
+  (defun emacs-solo/eshell--save-merged-history ()
+    "Save all eshell buffer histories merged into `eshell-history-file-name`."
+    (let ((all-history (emacs-solo/eshell--collect-all-history)))
+      (with-temp-file eshell-history-file-name
+        (insert (mapconcat #'identity all-history "\n")))))
+  (add-hook 'kill-emacs-hook #'emacs-solo/eshell--save-merged-history)
   (evil-set-initial-state 'eshell-mode 'emacs))
 #+end_src
 
