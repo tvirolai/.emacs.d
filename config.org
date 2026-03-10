@@ -437,7 +437,9 @@ Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
         doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode)
         doom-modeline-enable-word-count t
         doom-modeline-total-line-number t
-        doom-modeline-unicode-fallback t))
+        doom-modeline-icon t
+        doom-modeline-modal-icon t
+        doom-modeline-unicode-fallback nil))
 #+end_src
 
 *** Hide modeline
@@ -3925,7 +3927,7 @@ Enable nice settings for reading or writing.
 
 *** Custom implementation
 
-Query the web using EWW. After writing this, I've found out that there's this thing called =counsel-search=.
+Query the web using EWW. After writing this, I've found out that there's this thing called =counsel-search=. And Webjump!
 
 #+begin_src emacs-lisp :tangle yes
 (defvar query-history '())
