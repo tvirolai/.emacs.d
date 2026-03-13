@@ -438,7 +438,7 @@ Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
         doom-modeline-enable-word-count t
         doom-modeline-total-line-number t
         doom-modeline-icon t
-        doom-modeline-modal-icon t
+        doom-modeline-modal-icon nil
         doom-modeline-unicode-fallback nil))
 #+end_src
 
