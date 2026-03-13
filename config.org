@@ -2055,10 +2055,15 @@ Use 4 spaces as the default indentation level.
   (("C-c c" . org-capture)
    ("C-c l" . org-store-link))
   :custom
+  ;; For whatever reason, running org-web-tools-insert-web-page-as-entry
+  ;; always gives the "unable to test pandoc" warning on first
+  ;; run if this variable isn't larger than the default 0.2.
+  (org-web-tools-pandoc-sleep-time 0.5)
   (fill-column 100)
   ;; Disable the underscore-to-subscript thing.
   (org-pretty-entities t)
   (org-log-done 'time)
+  (org-startup-folded 'content)
   (org-log-into-drawer t)
   (org-clock-into-drawer t)
   (org-use-sub-superscripts "{}")
