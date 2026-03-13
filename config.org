@@ -1466,6 +1466,14 @@ Config adapted from [[https://www.rahuljuliato.com/posts/eslint-on-emacs][Rahul 
     (prettier-js-mode 1)))
 #+end_src
 
+Since the =lsp-eslint-auto-fix-on-save= variable doesn't seem to have any effect, this is a workaround to achieving the same thing.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'before-save-hook #'(lambda ()
+                                (when lsp-eslint-auto-fix-on-save
+                                  (lsp-eslint-fix-all))))
+#+end_src
+
 *** Prettier
 
 Setup prettier. It's used by default if the project does not use Eslint instead.
