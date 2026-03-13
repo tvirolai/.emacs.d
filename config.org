@@ -2246,7 +2246,6 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ox-jira
-  :defer t
   :config
   (add-to-list 'org-export-backends 'ox-jira))
 #+end_src
@@ -2255,7 +2254,6 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ox-slack
-  :defer t
   :config
   (add-to-list 'org-export-backends 'ox-slack))
 #+end_src
@@ -3940,7 +3938,7 @@ Enable nice settings for reading or writing.
 
 *** Custom implementation
 
-Query the web using EWW. After writing this, I've found out that there's this thing called =counsel-search=. And Webjump!
+Query the web /using EWW/. After writing this, I've found out that there's this thing called =counsel-search=. And =webjump=, which is built-in.
 
 #+begin_src emacs-lisp :tangle yes
 (defvar query-history '())
