@@ -251,10 +251,12 @@ The cursor may blink. Not in image buffers though.
 (blink-cursor-mode t)
 
 (defun disable-cursor-for-viewing ()
+  "Hide the cursor when viewing content that's not edited."
   (setq-local cursor-type nil)
   (blink-cursor-mode -1))
 
 (defun restore-cursor ()
+  "Show the cursor when exiting a mode for viewing non-editable buffers."
   (kill-local-variable 'cursor-type)
   (blink-cursor-mode 1))
 
@@ -313,12 +315,14 @@ Choose theme. Ensure that the customizations are done after loading the theme.
 
 #+begin_src emacs-lisp :tangle yes
 (defun gui-setup ()
+  "Setup the GUI appearance."
   (when (display-graphic-p)
     (load-theme (if work-laptop-p
                     'modus-vivendi
                   'ef-elea-dark) t)))
 
 (defun add-italics (&optional theme no-confirm no-enable)
+  "Set some face attributes after loading a theme."
   (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil :slant 'italic))
 
@@ -542,6 +546,7 @@ Disable custom themes before loading a new one.
 
 #+begin_src emacs-lisp :tangle yes
 (defun disable-custom-themes (&optional theme no-confirm no-enable)
+  "Wipe the theme settings to avoid mungling state."
   (mapc #'disable-theme custom-enabled-themes))
 
 (advice-add 'load-theme :before #'disable-custom-themes)
@@ -921,6 +926,7 @@ Use =which-key=, in minibuffer.
   (which-key-setup-minibuffer)
 
   (defun tv/which-key-inhibit ()
+    "Disable `which-key'."
     (setq-local which-key-inhibit t)))
 #+end_src
 
@@ -1001,7 +1007,7 @@ Prevent the "Text is read only" message when pressing backspace in minibuffer ([
 
 #+begin_src emacs-lisp :tangle yes
 (defun backward-delete-char-stop-at-read-only (n &optional killflag)
-  "Do as `backward-delete-char' but stop at read-only text."
+  "Do as `backward-delete-char' (delete N characters) but stop at read-only text."
   (interactive "p\nP")
   (unless (or (get-text-property (point) 'read-only)
               (eq (point) (point-min))
@@ -1151,6 +1157,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 
 #+begin_src emacs-lisp :tangle yes
 (defun read-and-return-yt-url ()
+  "Read a Youtube ID or an URL, return a formatted Youtube URL."
   (let ((input (read-string "Id tai URL: ")))
     (if (string-search "youtu" input)
         input
@@ -1248,10 +1255,12 @@ Configure the necessary packages.
   (add-hook 'lisp-mode-hook #'paredit-mode))
 
 (defun initialize-kondo ()
+  "Initialize `clj-kondo' linters."
   (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
     (setq flycheck-checkers (cons checker (delq checker flycheck-checkers)))))
 
 (defun my-clojure-mode-hook ()
+  "Initialize things for `clojure-mode'."
   (let ((modes (list #'paredit-mode #'subword-mode #'electric-pairs-mode
                      #'rainbow-delimiters-mode #'flycheck-mode
                      #'subword-mode)))
@@ -2178,7 +2187,7 @@ Use 4 spaces as the default indentation level.
 ;; From elken
 
 (defun tv/org-archive-done-tasks ()
-  "Attempt to archive all done tasks in file"
+  "Attempt to archive all done tasks in file."
   (interactive)
   (org-map-entries
    (lambda ()
@@ -2624,12 +2633,12 @@ Configuration adapted from [[https://systemcrafters.net/emacs-tips/presentations
       visual-fill-column-center-text t)
 
 (defun my/org-present-start ()
-  ;; Center the presentation and wrap lines
+  "Center the presentation and wrap lines."
   (visual-fill-column-mode 1)
   (visual-line-mode 1))
 
 (defun my/org-present-end ()
-  ;; Stop centering the document
+  "Stop centering the document."
   (visual-fill-column-mode 0)
   (visual-line-mode 0))
 
@@ -2898,9 +2907,8 @@ Copied from [[https://github.com/abrochard/emacs-config/blob/master/configuratio
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/eshell-here ()
-  "Opens up a new shell in the directory associated with the
-    current buffer's file. The eshell is renamed to match that
-    directory to make multiple eshell windows easier."
+  "Opens up a new shell in the directory associated with the current buffer's file.
+The eshell is renamed to match that directory to make multiple eshell windows easier."
   (interactive)
   (let* ((height (/ (window-total-height) 3)))
     (split-window-vertically (- height))
@@ -2916,8 +2924,7 @@ Jump around directories quickly. From [[https://karthinks.com/software/jumping-d
 
 #+begin_src emacs-lisp :tangle yes
 (defun eshell/z (&optional regexp)
-  "Navigate to a previously visited directory in eshell, or to
-any directory proferred by `consult-dir'."
+  "Navigate to a previously visited directory in eshell, or to any directory proferred by `consult-dir'."
   (let ((eshell-dirs (delete-dups
                       (mapcar 'abbreviate-file-name
                               (ring-elements eshell-last-dir-ring)))))
@@ -3731,7 +3738,7 @@ From [[https://github.com/abrochard/emacs-config][abrochard]].
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/sudo ()
-  "Use TRAMP to `sudo' the current buffer"
+  "Use TRAMP to `sudo' the current buffer."
   (interactive)
   (when buffer-file-name
     (find-alternate-file
@@ -3756,8 +3763,7 @@ From [[https://github.com/abrochard/emacs-config][abrochard]].
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/generate-scratch-buffer ()
-  "Create and switch to a temporary scratch buffer with a random
-     name."
+  "Create and switch to a temporary scratch buffer with a random name."
   (interactive)
   (switch-to-buffer (make-temp-name "*scratch-")))
 #+end_src
@@ -3944,7 +3950,7 @@ Query the web /using EWW/. After writing this, I've found out that there's this 
 (defvar query-history '())
 
 (defun tv/query-web ()
-  "Perform a web query using eww."
+  "Perform a web query using `eww'."
   (interactive)
   (let ((query (completing-read "Hakutermi: " query-history)))
     (progn
@@ -3971,7 +3977,7 @@ From [[https://www.masteringemacs.org/article/searching-buffers-occur-mode][Mast
 
 #+begin_src emacs-lisp :tangle yes
 (defun get-buffers-matching-mode (mode)
-  "Returns a list of buffers where their major-mode is equal to MODE"
+  "Returns a list of buffers where their major-mode is equal to MODE."
   (let ((buffer-mode-matches '()))
     (dolist (buf (buffer-list))
       (with-current-buffer buf
@@ -3993,7 +3999,7 @@ Similar logic than [[Grep for the symbol at point]] below, only this one calls =
 
 #+begin_src emacs-lisp :tangle yes
 (defun occur-symbol-in-open-buffers ()
-  "Search for symbol at point in all open file-visiting buffers using multi-occur."
+  "Search for symbol at point in all open file-visiting buffers using `multi-occur'."
   (interactive)
   (let* ((sym (thing-at-point 'symbol t))
          (re  (when sym (regexp-quote sym)))
@@ -4012,7 +4018,7 @@ Similar logic than [[Grep for the symbol at point]] below, only this one calls =
 
 #+begin_src emacs-lisp :tangle yes
 (defun occur-input-in-open-buffers ()
-  "Read input and search for that term in file-visiting buffers using multi-occur."
+  "Read input and search for that term in file-visiting buffers using `multi-occur'."
   (interactive)
   (let* ((input (read-string "Hakutermi: "))
          (input-re (regexp-quote input))
