@@ -321,7 +321,7 @@ Choose theme. Ensure that the customizations are done after loading the theme.
                     'modus-vivendi
                   'ef-elea-dark) t)))
 
-(defun add-italics (&optional theme no-confirm no-enable)
+(defun add-italics ()
   "Set some face attributes after loading a theme."
   (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil :slant 'italic))
@@ -545,7 +545,7 @@ Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
 Disable custom themes before loading a new one.
 
 #+begin_src emacs-lisp :tangle yes
-(defun disable-custom-themes (&optional theme no-confirm no-enable)
+(defun disable-custom-themes ()
   "Wipe the theme settings to avoid mungling state."
   (mapc #'disable-theme custom-enabled-themes))
 
@@ -625,7 +625,7 @@ Bypass on-save hooks when needed.
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/save-buffer-without-hooks ()
-  "Save buffer without running before-save-hook."
+  "Save buffer without running `before-save-hook'."
   (interactive)
   (let ((before-save-hook nil))
     (save-buffer)))
@@ -646,6 +646,7 @@ Use =tree-sitter=.
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/turn-on-tree-sitter-mode-if-the-file-is-not-overtly-large ()
+  "Enable tree-sitter if the buffer is not too large to parse."  
   (when (< (buffer-size) 1000000)
     (turn-on-tree-sitter-mode)))
 
@@ -1007,7 +1008,7 @@ Prevent the "Text is read only" message when pressing backspace in minibuffer ([
 
 #+begin_src emacs-lisp :tangle yes
 (defun backward-delete-char-stop-at-read-only (n &optional killflag)
-  "Do as `backward-delete-char' (delete N characters) but stop at read-only text."
+  "Do as `backward-delete-char' (delete N characters) but stop at read-only text or KILLFLAG."
   (interactive "p\nP")
   (unless (or (get-text-property (point) 'read-only)
               (eq (point) (point-min))
@@ -1293,6 +1294,7 @@ Configure the necessary packages.
   (add-hook 'cider-repl-mode-hook #'rainbow-delimiters-mode))
 
 (defun my-cider-repl-mode-hook ()
+  "Do some setup for cider-repl."
   (paredit-mode 1)
   (evil-local-set-key 'insert (kbd "C-<return>") 'paredit-RET)
   (evil-local-set-key 'insert (kbd "RET") 'cider-repl-closing-return)
@@ -2198,6 +2200,7 @@ Use 4 spaces as the default indentation level.
    "/DONE" 'file))
 
 (defun tv/org-remove-kill-tasks ()
+  "Wipe out tasks in kill state."
   (interactive)
   (org-map-entries
    (lambda ()
@@ -2668,7 +2671,7 @@ From [[https://www.reddit.com/r/emacs/comments/1lnhtbs/how_do_you_store_and_revi
 #+begin_src emacs-lisp :tangle yes
 (defun tv/eww-to-org (&optional dest)
   "Render the current eww buffer using org markup.
-  If DEST, a buffer, is provided, insert the markup there."
+If DEST, a buffer, is provided, insert the markup there."
   (interactive)
   (unless (org-region-active-p)
     (let ((shr-width 80)) (eww-readable)))
@@ -2781,7 +2784,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
     (elfeed-search-update :force)))
 
 (defun tv/elfeed-mark-read (entry)
-  "Display the currently selected item in a buffer."
+  "Display the currently selected ENTRY in a buffer."
   (interactive (list (elfeed-search-selected :ignore-region)))
   (when (elfeed-entry-p entry)
     (elfeed-untag entry 'unread)
@@ -2926,7 +2929,7 @@ Jump around directories quickly. From [[https://karthinks.com/software/jumping-d
 
 #+begin_src emacs-lisp :tangle yes
 (defun eshell/z (&optional regexp)
-  "Navigate to a previously visited directory in eshell, or to any directory proferred by `consult-dir'."
+  "Navigate to a previously visited directory in eshell, or to any directory proferred by `consult-dir'. Optionally match REGEXP."
   (let ((eshell-dirs (delete-dups
                       (mapcar 'abbreviate-file-name
                               (ring-elements eshell-last-dir-ring)))))
@@ -3792,6 +3795,7 @@ When doing lots of base64 encoding and decoding, it's more ergonomical to proces
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/apply-fn-to-word-under-point (fn)
+  "A utility HOC that applies FN to the word under point."
   (let* ((point-loc (point))
          (bounds (bounds-of-thing-at-point 'symbol))
          (text   (buffer-substring-no-properties (car bounds) (cdr bounds))))
@@ -3914,7 +3918,7 @@ From [[https://lmno.lol/alvaro/emacs-quick-kill-process][Xenodium]].
                                (map-elt selection 'pid)
                                (map-elt selection 'user)
                                (map-elt selection 'comm))))
-    (when (y-or-n-p (format "Kill? %s" prompt-title))
+    (when (y-or-n-p (format "Kill %s?" prompt-title))
       (dwim-shell-command-on-marked-files
        (format "Kill %s" prompt-title)
        (format "kill -9 %d" (map-elt selection 'pid))
@@ -4107,4 +4111,10 @@ No Evil mode when playing Tetris.
 #+begin_src emacs-lisp :tangle yes
 (use-package tetris
   :hook (tetris-mode . turn-off-evil-mode))
+#+end_src
+
+* Footer
+
+#+begin_src emacs-lisp :tangle yes
+;;; config.el ends here
 #+end_src
