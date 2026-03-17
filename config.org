@@ -442,7 +442,7 @@ Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
         doom-modeline-enable-word-count t
         doom-modeline-total-line-number t
         doom-modeline-icon t
-        doom-modeline-modal-icon nil
+        doom-modeline-modal-icon t
         doom-modeline-unicode-fallback nil))
 #+end_src
 
@@ -583,7 +583,7 @@ Rainbow-delimiters are useful in lisps.
 A bit wider line spacing than the default.
 
 #+begin_src emacs-lisp :tangle yes
-(setq-default line-spacing 0.15)
+(setq-default line-spacing 0.1)
 #+end_src
 
 ** Olivetti mode
@@ -863,7 +863,7 @@ From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/kill-magit-diff-buffer-in-current-repo (&rest _)
-  "Delete the magit-diff buffer related to the current repo."
+  "Delete the `magit-diff' buffer related to the current repo."
   (let ((magit-diff-buffer-in-current-repo
          (magit-mode-get-buffer 'magit-diff-mode)))
     (kill-buffer magit-diff-buffer-in-current-repo)))
@@ -1157,7 +1157,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 
 #+begin_src emacs-lisp :tangle yes
 (defun read-and-return-yt-url ()
-  "Read a Youtube ID or an URL, return a formatted Youtube URL."
+  "Read, maybe format and return a Youtube URL. Input is either video id or full url."
   (let ((input (read-string "Id tai URL: ")))
     (if (string-search "youtu" input)
         input
@@ -1386,9 +1386,8 @@ Custom functions for formatting SQL code.
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/format-sql-buffer ()
-  "Since there's some bug that breaks the indentation (`sqlind-indent-line`
-specifically) when running it with `newline-and-indent`, I've resorted
-to this hack to run the indentation and capitalization for the whole buffer."
+  "A bug breaks the indentation (`sqlind-indent-line` specifically) when running it with `newline-and-indent`.
+I've resorted to this hack to run the indentation and capitalization for the whole buffer."
   (interactive)
   (sqlind-minor-mode)
   (indent-region (point-min) (point-max))
@@ -1497,7 +1496,8 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
 
 #+begin_src emacs-lisp :tangle yes
 (use-package typescript-mode
-  :hook ((tsx-ts-mode . (lambda () (rainbow-delimiters-mode -1)))
+  :hook ((tsx-ts-mode . (lambda ()
+                          (rainbow-delimiters-mode -1)))
          (tsx-ts-mode . indent-bars-mode)
          (tsx-ts-mode . tv/configure-js-ts-lsp)
          (tsx-ts-mode . lsp-deferred)
@@ -1512,7 +1512,9 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
          ("\\.tsx\\'" . tsx-ts-mode))
   :custom
   (js-indent-level 2)
-  (typescript-indent-level 2))
+  (typescript-indent-level 2)
+  :config
+  (corfu-mode -1))
 #+end_src
 
 *** Smartparens
@@ -2130,7 +2132,7 @@ Use 4 spaces as the default indentation level.
   ;; (setq org-time-stamp-formats '("<%Y-%m-%d %a %H:%M>" . "<%Y-%m-%d %a %H:%M>"))
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-insert-heading-respect-content t)
-  (setq org-directory "~/org/")
+  (setq org-directory "~/org")
   (setq org-default-notes-file (concat org-directory "inbox.org"))
   (setq org-work-notes-file (concat org-directory "work.org"))
   (setq org-archive-location "archive/Archive_%s::")
