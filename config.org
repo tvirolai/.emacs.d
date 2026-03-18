@@ -687,6 +687,14 @@ Use =tree-sitter=.
 (require 'tree-sitter-langs)
 #+end_src
 
+* Undo system
+
+#+begin_src emacs-lisp :tangle yes
+(use-package undo-fu
+  :config
+  (setq evil-undo-system 'undo-fu))
+#+end_src
+
 * Evil mode
 
 Vim keybindings here.
@@ -703,8 +711,9 @@ Vim keybindings here.
   (setopt evil-disable-insert-state-bindings t)
   ;; (evil-set-undo-system 'vundo)
   ;; (evil-set-undo-system 'undo-tree)
-  (evil-set-undo-system 'undo-redo)
+  ;; (evil-set-undo-system 'undo-redo)
   (setq evil-undo-system 'undo-fu)
+  ;; (setq evil-undo-system 'vundo)
   (setq evil-split-window-below t
         evil-vsplit-window-right t)
   (setq evil-ex-substitute-global t)
@@ -751,31 +760,6 @@ Vim keybindings here.
 (use-package evil-visual-mark-mode
   :config
   (evil-visual-mark-mode +1))
-#+end_src
-
-Vundo.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package vundo
-  :commands (vundo)
-  :config
-  ;; Take less on-screen space.
-  (setq vundo-compact-display t)
-  (define-key vundo-mode-map (kbd "l") #'vundo-forward)
-  (define-key vundo-mode-map (kbd "<right>") #'vundo-forward)
-  (define-key vundo-mode-map (kbd "h") #'vundo-backward)
-  (define-key vundo-mode-map (kbd "<left>") #'vundo-backward)
-  (define-key vundo-mode-map (kbd "j") #'vundo-next)
-  (define-key vundo-mode-map (kbd "<down>") #'vundo-next)
-  (define-key vundo-mode-map (kbd "k") #'vundo-previous)
-  (define-key vundo-mode-map (kbd "<up>") #'vundo-previous)
-  (define-key vundo-mode-map (kbd "<home>") #'vundo-stem-root)
-  (define-key vundo-mode-map (kbd "<end>") #'vundo-stem-end)
-  (define-key vundo-mode-map (kbd "q") #'vundo-quit)
-  (define-key vundo-mode-map (kbd "C-g") #'vundo-quit)
-  (define-key vundo-mode-map (kbd "RET") #'vundo-confirm))
-
-(with-eval-after-load 'evil (evil-define-key 'normal 'global (kbd "C-M-u") 'vundo))
 #+end_src
 
 Evil-surround.
