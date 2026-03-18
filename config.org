@@ -892,7 +892,7 @@ From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
 
 Load Magit-extras. This enables e.g. jumping straight to Magit status buffer when switching projects.
 
-#+begin_src elisp
+#+begin_src elisp :tangle yes
 (require 'magit-extras)
 #+end_src
 
