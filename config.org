@@ -322,7 +322,7 @@ Choose theme. Ensure that the customizations are done after loading the theme.
                   'ef-elea-dark) t)))
 
 (defun add-italics (&optional theme no-confirm no-enable)
-  "Set some face attributes after loading a theme."
+  "Set some face attributes after loading a THEME."
   (set-face-attribute 'font-lock-comment-face nil :slant 'italic)
   (set-face-attribute 'font-lock-keyword-face nil :slant 'italic))
 
@@ -546,7 +546,7 @@ Disable custom themes before loading a new one.
 
 #+begin_src emacs-lisp :tangle yes
 (defun disable-custom-themes (&optional theme no-confirm no-enable)
-  "Wipe the theme settings to avoid mungling state."
+  "Wipe the THEME settings to avoid mungling state."
   (mapc #'disable-theme custom-enabled-themes))
 
 (advice-add 'load-theme :before #'disable-custom-themes)
@@ -722,9 +722,7 @@ Vim keybindings here.
   (setq evil-respect-visual-line-mode nil)
   (evil-add-command-properties #'flymake-goto-next-error :jump t)
   (evil-add-command-properties #'evil-scroll-up :jump t)
-  (evil-add-command-properties #'consult-grep :jump t)
-  ;; (setq evil-emacs-state-cursor '("orange" box))
-  )
+  (evil-add-command-properties #'consult-grep :jump t))
 
 (use-package undo-fu
   :after evil
@@ -2133,7 +2131,7 @@ Use 4 spaces as the default indentation level.
   ;; (setq org-time-stamp-formats '("<%Y-%m-%d %a %H:%M>" . "<%Y-%m-%d %a %H:%M>"))
   (setq org-M-RET-may-split-line '((default . nil)))
   (setq org-insert-heading-respect-content t)
-  (setq org-directory "~/org")
+  (setq org-directory "~/org/")
   (setq org-default-notes-file (concat org-directory "inbox.org"))
   (setq org-work-notes-file (concat org-directory "work.org"))
   (setq org-archive-location "archive/Archive_%s::")
