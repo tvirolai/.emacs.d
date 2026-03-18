@@ -2081,7 +2081,7 @@ Use 4 spaces as the default indentation level.
   ;; Disable the underscore-to-subscript thing.
   (org-pretty-entities t)
   (org-log-done 'time)
-  (org-startup-folded 'content)
+  (org-startup-folded 'showeverything)
   (org-log-into-drawer t)
   (org-clock-into-drawer t)
   (org-use-sub-superscripts "{}")
