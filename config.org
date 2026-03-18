@@ -614,8 +614,9 @@ Automatically save the buffer when the window loses focus. Trying this out.
 #+begin_src emacs-lisp :tangle yes
 (use-package super-save
   :config
-  ;; Save buffers automatically when Emacs is idle
-  (setq super-save-auto-save-when-idle t)
+  ;; Don't save buffers automatically when Emacs is idle. With `delete-trailing-whitespace' hook
+  ;; this can cause the cursor to move on its own.
+  (setq super-save-auto-save-when-idle nil)
   (setq super-save-silent t)
   ;; Disable the built-in auto-save (backup files) since super-save handles it
   (setq auto-save-default nil)
@@ -886,6 +887,13 @@ From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
     "q" #'tv/mu-magit-kill-buffers)
   (add-hook 'magit-post-refresh-hook
             #'git-gutter:update-all-windows))
+#+end_src
+
+
+Load Magit-extras. This enables e.g. jumping straight to Magit status buffer when switching projects.
+
+#+begin_src elisp
+(require 'magit-extras)
 #+end_src
 
 ** Git timemachine
