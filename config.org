@@ -2671,51 +2671,86 @@ Enable dragging and dropping images to org documents. Note that the command-line
 (use-package org-web-tools)
 #+end_src
 
-From [[https://www.reddit.com/r/emacs/comments/1lnhtbs/how_do_you_store_and_revisit_articles_from_web/][Emacs Reddit]].
+Modified from [[https://www.reddit.com/r/emacs/comments/1lnhtbs/how_do_you_store_and_revisit_articles_from_web/][Emacs Reddit]].
 
 #+begin_src emacs-lisp :tangle yes
+(defun tv/eww--strip-shr-margin (text)
+  "Remove SHR's common one-space left margin from TEXT."
+  (replace-regexp-in-string "\\(^\\|\n\\) " "\\1" text))
+
+(defun tv/eww--normalize-text (text)
+  "Prepare EWW text for Org export."
+  (replace-regexp-in-string "\\*" "·"
+                            (tv/eww--strip-shr-margin text)))
+
+(defun tv/eww--chunk-prop (props)
+  "Return the most relevant export property from PROPS."
+  (let ((k (seq-find (lambda (x) (plist-get props x))
+                     '(shr-url image-url outline-level face))))
+    (and k (list k (plist-get props k)))))
+
+(defun tv/eww--render-chunk-to-org (text prop)
+  "Convert TEXT with PROP into Org markup."
+  (pcase prop
+    ((and (or `(shr-url ,url) `(image-url ,url))
+          (guard (string-match-p "^http" url)))
+     (let ((tt (replace-regexp-in-string "\n\\([^$]\\)" " \\1" text)))
+       (org-link-make-string url tt)))
+
+    (`(outline-level ,n)
+     (concat (make-string (1- (* 2 n)) ?*) text "\n"))
+
+    ('(face italic)
+     (format "/%s/ " (string-trim text)))
+
+    ('(face bold)
+     (format "*%s* " (string-trim text)))
+
+    (_ text)))
+
 (defun tv/eww-to-org (&optional dest)
-  "Render the current eww buffer using org markup.
-If DEST, a buffer, is provided, insert the markup there."
+  "Render the current EWW buffer using Org markup.
+If DEST is a buffer, insert the markup there."
   (interactive)
   (unless (org-region-active-p)
-    (let ((shr-width 80)) (eww-readable)))
+    (let ((shr-width 80))
+      (eww-readable)))
   (let* ((start (if (org-region-active-p) (region-beginning) (point-min)))
-         (end (if (org-region-active-p) (region-end) (point-max)))
-         (buff (or dest (generate-new-buffer "*eww-to-org*")))
-         (link (eww-current-url))
+         (end   (if (org-region-active-p) (region-end) (point-max)))
+         (buff  (or dest (generate-new-buffer "*eww-to-org*")))
+         (link  (eww-current-url))
          (title (or (plist-get eww-data :title) "")))
     (with-current-buffer buff
-      (insert "#+title: " title "\n#+link: " link "\n\n")
+      (erase-buffer)
+      (insert "#+title: " title "\n")
+      (insert "#+link: " link "\n\n")
       (org-mode))
     (save-excursion
       (goto-char start)
       (while (< (point) end)
         (let* ((p (point))
                (props (text-properties-at p))
-               (k (seq-find (lambda (x) (plist-get props x))
-                            '(shr-url image-url outline-level face)))
-               (prop (and k (list k (plist-get props k))))
+               (prop (tv/eww--chunk-prop props))
                (next (if prop
                          (next-single-property-change p (car prop) nil end)
                        (next-property-change p nil end)))
-               (txt (buffer-substring (point) next))
-               (txt (replace-regexp-in-string "\\*" "·" txt)))
+               (txt (tv/eww--normalize-text
+                     (buffer-substring-no-properties p next))))
           (with-current-buffer buff
-            (insert
-             (pcase prop
-               ((and (or `(shr-url ,url) `(image-url ,url))
-                     (guard (string-match-p "^http" url)))
-                (let ((tt (replace-regexp-in-string "\n\\([^$]\\)" " \\1" txt)))
-                  (org-link-make-string url tt)))
-               (`(outline-level ,n)
-                (concat (make-string (- (* 2 n) 1) ?*) " " txt "\n"))
-               ('(face italic) (format "/%s/ " (string-trim txt)))
-               ('(face bold) (format "*%s* " (string-trim txt)))
-               (_ txt))))
+            (insert (tv/eww--render-chunk-to-org txt prop)))
           (goto-char next))))
     (pop-to-buffer buff)
     (goto-char (point-min))))
+#+end_src
+
+Remove extra line breaks from a selection.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/unfill-region (beg end)
+  "Transform filled lines in region into unfilled paragraphs."
+  (interactive "r")
+  (let ((fill-column most-positive-fixnum))
+    (fill-region beg end)))
 #+end_src
 
 ** Org-friendly word counting
