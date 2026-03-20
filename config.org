@@ -2560,6 +2560,11 @@ Helpers for adding new elements to front matter.
   (org-agenda-time-grid '((daily today require-timed)
                           (600 800 1000 1200 1400 1600 1800 2000)
                           " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+  (org-agenda-prefix-format
+   '((agenda . " %i %-20:c%?-12t% s")
+     (todo   . " %i %-12:c")
+     (tags   . " %i %-12:c")
+     (search . " %i %-12:c")))
   ;; (org-agenda-start-with-log-mode '(closed clock state))
   ;; (org-agenda-files (list org-default-notes-file))
   (org-agenda-files (list org-directory (concat org-directory "archive/Archive_inbox.org")))
