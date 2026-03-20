@@ -878,7 +878,6 @@ From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
             #'git-gutter:update-all-windows))
 #+end_src
 
-
 Load Magit-extras. This enables e.g. jumping straight to Magit status buffer when switching projects.
 
 #+begin_src elisp :tangle yes
@@ -1469,7 +1468,7 @@ Config adapted from [[https://www.rahuljuliato.com/posts/eslint-on-emacs][Rahul 
     (setq-local lsp-eslint-auto-fix-on-save nil)
     (prettier-js-mode 1))
   ;; Use LSP for completion.
-  (setq corfu-mode -1))
+  (corfu-mode -1))
 #+end_src
 
 Since the =lsp-eslint-auto-fix-on-save= variable doesn't seem to have any effect, this is a workaround to achieving the same thing.
@@ -1493,21 +1492,25 @@ Setup prettier. It's used by default if the project does not use Eslint instead.
 Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=, so it needs to be disabled in it.
 
 #+begin_src emacs-lisp :tangle yes
+(defvar tv/js-ts-modes
+  '(js-ts-mode typescript-ts-mode tsx-ts-mode))
+
+(defun tv/js-ts-mode-setup ()
+  "Shared setup for JS/TS tree-sitter modes."
+  (rainbow-delimiters-mode -1)
+  (indent-bars-mode 1)
+  (tv/configure-js-ts-lsp)
+  (lsp-deferred))
+
 (use-package typescript-mode
-  :hook ((tsx-ts-mode . (lambda ()
-                          (rainbow-delimiters-mode -1)))
-         (tsx-ts-mode . indent-bars-mode)
-         (tsx-ts-mode . tv/configure-js-ts-lsp)
-         (tsx-ts-mode . lsp-deferred)
-         (typescript-ts-mode . tv/configure-js-ts-lsp)
-         (typescript-ts-mode . lsp-deferred)
-         (js-ts-mode . tv/configure-js-ts-lsp)
-         (js-ts-mode . lsp-deferred))
   :defer t
   :mode (("\\.mjml\\'" . html-mode)
-         ("\\.js\\'" . js-ts-mode)
-         ("\\.ts\\'" . typescript-ts-mode)
-         ("\\.tsx\\'" . tsx-ts-mode))
+         ("\\.js\\'"   . js-ts-mode)
+         ("\\.ts\\'"   . typescript-ts-mode)
+         ("\\.tsx\\'"  . tsx-ts-mode))
+  :hook ((js-ts-mode . tv/js-ts-mode-setup)
+         (typescript-ts-mode . tv/js-ts-mode-setup)
+         (tsx-ts-mode . tv/js-ts-mode-setup))
   :custom
   (js-indent-level 2)
   (typescript-indent-level 2))
