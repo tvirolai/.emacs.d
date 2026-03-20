@@ -2698,7 +2698,7 @@ Modified from [[https://www.reddit.com/r/emacs/comments/1lnhtbs/how_do_you_store
        (org-link-make-string url tt)))
 
     (`(outline-level ,n)
-     (concat (make-string (1- (* 2 n)) ?*) text "\n"))
+     (concat (make-string (1- (* 2 n)) ?*) " " text "\n"))
 
     ('(face italic)
      (format "/%s/ " (string-trim text)))
