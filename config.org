@@ -2562,7 +2562,7 @@ Helpers for adding new elements to front matter.
                           " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
   ;; (org-agenda-start-with-log-mode '(closed clock state))
   ;; (org-agenda-files (list org-default-notes-file))
-  (org-agenda-files (list org-directory))
+  (org-agenda-files (list org-directory (concat org-directory "archive/Archive_inbox.org")))
   ;; (org-agenda-files (directory-files-recursively org-directory "\\.org$"))
   ;; (org-agenda-todo-ignore-scheduled 'future)
   ;; TODO entries that can't be marked as done b/c of children are shown as dimmed in agenda view
