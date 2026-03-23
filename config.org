@@ -884,6 +884,54 @@ Load Magit-extras. This enables e.g. jumping straight to Magit status buffer whe
 (require 'magit-extras)
 #+end_src
 
+Magit deprecated the =magit-clean= function, so I rolled my own.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/magit-clean-safe (&optional include-ignored)
+  "Preview and confirm a `git clean` from a Magit-controlled repo.
+
+With prefix argument INCLUDE-IGNORED, also remove ignored files
+like `git clean -fdx`. Without it, behave like `git clean -fd`."
+  (interactive "P")
+  (let* ((default-directory (magit-toplevel))
+         (clean-args (if include-ignored
+                         '("clean" "-fdx")
+                       '("clean" "-fd")))
+         (dry-run-args (if include-ignored
+                           '("clean" "-ndx")
+                         '("clean" "-nd")))
+         (preview (magit-git-lines dry-run-args))
+         (items
+          (mapcar
+           (lambda (line)
+             (if (string-prefix-p "Would remove " line)
+                 (substring line (length "Would remove "))
+               line))
+           preview)))
+    (unless default-directory
+      (user-error "Not inside a Git repository"))
+    (if (null items)
+        (message "Nothing to clean")
+      (when
+          (yes-or-no-p
+           (concat
+            (format "Delete %d untracked %s?\n\n"
+                    (length items)
+                    (if include-ignored "and ignored files" "files"))
+            (mapconcat #'identity items "\n")
+            "\n\nThis cannot be undone. "))
+        (magit-run-git-async (nth 0 clean-args) (nth 1 clean-args))))))
+
+(defun tv/magit-clean-safe-including-ignored ()
+  "Like `tv/magit-clean-safe', but also remove ignored files."
+  (interactive)
+  (tv/magit-clean-safe t))
+
+(with-eval-after-load 'magit
+  (define-key magit-status-mode-map (kbd "C-c x") #'tv/magit-clean-safe)
+  (define-key magit-status-mode-map (kbd "C-c X") #'tv/magit-clean-safe-including-ignored))
+#+end_src
+
 ** Git timemachine
 
 Travel back in time.
@@ -2566,8 +2614,8 @@ Helpers for adding new elements to front matter.
      (tags   . " %i %-12:c")
      (search . " %i %-12:c")))
   ;; (org-agenda-start-with-log-mode '(closed clock state))
-  ;; (org-agenda-files (list org-default-notes-file))
-  (org-agenda-files (list org-directory (concat org-directory "archive/Archive_inbox.org")))
+  (org-agenda-files (list org-default-notes-file
+                          (concat org-directory "archive/Archive_inbox.org")))
   ;; (org-agenda-files (directory-files-recursively org-directory "\\.org$"))
   ;; (org-agenda-todo-ignore-scheduled 'future)
   ;; TODO entries that can't be marked as done b/c of children are shown as dimmed in agenda view
