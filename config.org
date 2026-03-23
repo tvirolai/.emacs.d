@@ -2125,7 +2125,7 @@ Use 4 spaces as the default indentation level.
                         (?C . "#ff9200")
                         (?D . "#747474")))
   (org-todo-keywords
-   '((sequence "TODO(t!)" "HOLD(h@/!)" "DOING(g!)" "REVIEW(r!)" "|" "DONE(d!)" "KILL(k)")
+   '((sequence "TODO(t!)" "HOLD(h@/!)" "DOING(g!)" "REVIEW(r!)" "REOPENED(o!)" "|" "DONE(d!)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   (org-done ((t (:foreground "PaleGreen"
