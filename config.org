@@ -2203,7 +2203,7 @@ Use 4 spaces as the default indentation level.
         org-indent-mode nil)
   (setq org-capture-templates
         '(("f" "Fleeting note" item
-           (file+headline org-default-notes-file "Notes")
+           (file+headline org-default-notes-file "Muistilista")
            "- %?"
            :jump-to-captured t)
           ("J" "Personal Journal" entry (file+datetree "~/org/journal.org")
@@ -2215,8 +2215,11 @@ Use 4 spaces as the default indentation level.
            :immediate-finish nil
            :kill-buffer t
            :jump-to-captured t)
-          ("t" "New task" entry
-           (file+headline org-default-notes-file "Tasks")
+          ("t" "New ticket" entry
+           (file+headline org-default-notes-file "Tiketit")
+           "* TODO %i%?")
+          ("s" "New task" entry
+           (file+headline org-default-notes-file "Tehtävät")
            "* TODO %i%?")
           ("v" "Video link" entry
            (file+headline "notes/20221110T100214--katsottavia-videoita__linkit_videot_youtube.org" "Inbox")
