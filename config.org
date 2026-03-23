@@ -2219,7 +2219,7 @@ Use 4 spaces as the default indentation level.
            (file+headline "notes/20221110T100214--katsottavia-videoita__linkit_videot_youtube.org" "Inbox")
            "* [[%^{Video URL}][%^{Video title}]]")
           ("j" "Journal entry" entry
-           (file+datetree "dailies.org" "week")
+           (file+datetree "journal.org" "week")
            "* %<%H:%M> %?"
            :jump-to-captured t)))
   ;; Export settings
