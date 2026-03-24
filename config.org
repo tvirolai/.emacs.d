@@ -2200,8 +2200,6 @@ Use 4 spaces as the default indentation level.
            (file+headline org-default-notes-file "Muistilista")
            "- %?"
            :jump-to-captured t)
-          ("J" "Personal Journal" entry (file+datetree "~/org/journal.org")
-           "* %<%R: >%? \n%t" :empty-lines-before 1)
           ("p" "Permanent note" plain
            (file denote-last-path)
            #'denote-org-capture
@@ -2217,11 +2215,7 @@ Use 4 spaces as the default indentation level.
            "* TODO %i%?")
           ("v" "Video link" entry
            (file+headline "notes/20221110T100214--katsottavia-videoita__linkit_videot_youtube.org" "Inbox")
-           "* [[%^{Video URL}][%^{Video title}]]")
-          ("j" "Journal entry" entry
-           (file+datetree "journal.org" "week")
-           "* %<%H:%M> %?"
-           :jump-to-captured t)))
+           "* [[%^{Video URL}][%^{Video title}]]")))
   ;; Export settings
   (setq org-export-with-toc nil)  ; No table of contents
   (setq org-export-with-section-numbers nil)  ; No section numbers
