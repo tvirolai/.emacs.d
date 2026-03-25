@@ -288,7 +288,7 @@ Let's try out Fontaine for setting up fonts.
   :config
   (setq fontaine-presets
         `((small
-           :default-height 100)
+           :default-height 120)
           (regular) ; like this it uses all the fallback values and is named `regular'
           (large
            :default-height 200)
