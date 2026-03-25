@@ -2585,11 +2585,7 @@ Helpers for adding new elements to front matter.
   :bind (("C-c a" . org-agenda))
   ;; :hook (org-agenda-finalize . org-agenda-entry-text-mode)
   :custom
-  (org-agenda-current-time-string (if (and (display-graphic-p)
-                                           (char-displayable-p ?←)
-                                           (char-displayable-p ?─))
-                                      "← now"
-                                    "now - - - - - - - - - - - - - - - - - - - - - - - - -"))
+  (org-agenda-current-time-string "<- now")
   (org-agenda-timegrid-use-ampm t)
   (org-agenda-tags-column 0)
   (org-agenda-start-day "-1d") ;; Show the previous day.
@@ -2628,33 +2624,6 @@ Helpers for adding new elements to front matter.
      (todo . " %i %-10:c %-5e %(get-schedule-or-deadline-if-available)")
      (tags . " %i %-12:c")
      (search . " %i %-12:c")))
-  ;; Lets define some custom cmds in agenda menu
-  (org-agenda-custom-commands
-   '(("h" "Agenda and Home tasks"
-      ((agenda "" ((org-agenda-span 2)))
-       (todo "WAITING|IN-PROGRESS")
-       (tags-todo "inbox|break")
-       (todo "NEXT"))
-      ((org-agenda-sorting-strategy '(time-up habit-up priority-down category-up))))
-
-     ("w" "Agenda and break|inbox tasks"
-      ((agenda "" ((org-agenda-span 1)))
-       (tags-todo "inbox|break"))
-      ((org-agenda-sorting-strategy '(time-up habit-up priority-down category-up))))
-
-     ("i" "In-Progress Tasks"
-      ((todo "IN-PROGRESS|WAITING")
-       (agenda ""))
-      ((org-agenda-sorting-strategy '(time-up habit-up priority-down category-up))))
-
-     ("g" "Goals: 12 Week Year"
-      ((agenda "")
-       (todo "IN-PROGRESS|WAITING"))
-      ((org-agenda-sorting-strategy '(time-up habit-up priority-down category-up))
-       (org-agenda-tag-filter-preset '("+12WY"))
-       (org-agenda-start-with-log-mode '(closed clock state))
-       (org-agenda-archives-mode t)
-       ))))
   :init
   ;; Originally from here: https://stackoverflow.com/a/59001859/2178312
   (defun get-schedule-or-deadline-if-available ()
