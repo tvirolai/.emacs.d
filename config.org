@@ -1036,6 +1036,9 @@ Bind a comfortable global key combination for =other-window= as =C-x o= is too l
 
 #+begin_src emacs-lisp :tangle yes
 (global-set-key (kbd "M-o") #'other-window)
+(global-set-key (kbd "M-O") #'(lambda ()
+                                (interactive)
+                                (other-window -1)))
 (global-set-key (kbd "M-å") #'delete-window)
 #+end_src
 
