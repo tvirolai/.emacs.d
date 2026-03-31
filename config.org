@@ -2210,6 +2210,9 @@ Use 4 spaces as the default indentation level.
            :immediate-finish nil
            :kill-buffer t
            :jump-to-captured t)
+          ("q" "Quote" entry
+           (file "notes/20260212T113823--lainauksia__lainaukset_linkit_listat_sitaatit.org")
+           "* %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:SOURCE: \n:END:\n\n#+begin_quote\n%^{Quote}\n#+end_quote\n\n")
           ("t" "New ticket" entry
            (file+headline org-default-notes-file "Tiketit")
            "* TODO %i%?")
