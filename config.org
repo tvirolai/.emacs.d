@@ -171,6 +171,7 @@ Mac-specific settings.
 (setq mac-option-modifier 'nil
       mac-command-modifier 'meta
       mac-function-modifier 'super
+      mac-right-command-modifier 'super
       select-enable-clipboard t)
 #+end_src
 
