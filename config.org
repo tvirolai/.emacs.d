@@ -2005,6 +2005,37 @@ Remember and access previous window configurations.
 
 ** Docker
 
+Some custom code to clean up inactive buffers.
+
+#+begin_src emacs-lisp :tangle yes
+(require 'cl-lib)
+
+(defun tv/docker-kill-inactive-eat-buffers (&optional include-visible)
+  "Kill all inactive Eat buffers.
+
+An Eat buffer is considered inactive when it has no live process.
+
+By default, skip Eat buffers currently visible in a window.
+With prefix arg INCLUDE-VISIBLE, kill those too."
+  (interactive "P")
+  (let ((visible-buffers (mapcar #'window-buffer (window-list)))
+        (killed 0))
+    (dolist (buf (buffer-list))
+      (with-current-buffer buf
+        (when (and (derived-mode-p 'eat-mode)
+                   (or include-visible
+                       (not (memq buf visible-buffers)))
+                   (let ((proc (get-buffer-process buf)))
+                     (not (and proc (process-live-p proc)))))
+          (kill-buffer buf)
+          (cl-incf killed))))
+    (message "Killed %d inactive Eat buffer%s"
+             killed
+             (if (= killed 1) "" "s"))))
+#+end_src
+
+Configure the packages.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package dockerfile-mode
   :hook ((dockerfile-mode . lsp))
@@ -2015,7 +2046,10 @@ Remember and access previous window configurations.
   :bind (("C-c d" . docker)
          (:map docker-container-mode-map
                ;; Override evil-mode's binding for ?.
-               ("?" . docker-container-help))))
+               ("?" . docker-container-help))
+         (:map global-map
+               ;; C-c k is the prefix for custom killing commands.
+               ("C-c k d" . tv/docker-kill-inactive-eat-buffers))))
   #+end_src
 
 ** Markdown
@@ -3735,7 +3769,7 @@ A powerful collection of utility functions.
 (use-package crux
   :bind (("C-c b" . crux-cleanup-buffer-or-region)
          ("C-c D" . crux-delete-file-and-buffer)
-         ("C-c k" . crux-kill-buffer-truename)))
+         ("C-c k b" . crux-kill-buffer-truename)))
 #+end_src
 
 * Various convenience functions and other miscellaneous stuff
