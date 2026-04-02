@@ -2008,8 +2008,6 @@ Remember and access previous window configurations.
 Some custom code to clean up inactive buffers.
 
 #+begin_src emacs-lisp :tangle yes
-(require 'cl-lib)
-
 (defun tv/docker-kill-inactive-eat-buffers (&optional include-visible)
   "Kill all inactive Eat buffers.
 
@@ -2028,7 +2026,7 @@ With prefix arg INCLUDE-VISIBLE, kill those too."
                    (let ((proc (get-buffer-process buf)))
                      (not (and proc (process-live-p proc)))))
           (kill-buffer buf)
-          (cl-incf killed))))
+          (setq killed (1+ killed)))))
     (message "Killed %d inactive Eat buffer%s"
              killed
              (if (= killed 1) "" "s"))))
