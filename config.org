@@ -119,6 +119,22 @@ Disable unnecessary stuff.
 (setq use-short-answers t)
 #+end_src
 
+*** Disable bidirectional text scanning
+
+I've never needed to edit right-to-left language content, so support for it will be disabled by default in my config.
+
+#+begin_src emacs-lisp :tangle yes
+(setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right)
+(setq bidi-inhibit-bpa t)
+#+end_src
+
+*** Skip fontification during input
+
+#+begin_src emacs-lisp :tangle yes
+(setq redisplay-skip-fontification-on-input t)
+#+end_src
+
 ** General things
 
 Set 10MB as the limit for garbage collection.
@@ -131,6 +147,12 @@ Warn when opening files bigger than 100MB.
 
 #+begin_src emacs-lisp :tangle yes
 (setq large-file-warning-threshold 100000000)
+#+end_src
+
+Set process output buffer size.
+
+#+begin_src emacs-lisp :tangle yes
+(setq read-process-output-max (* 4 1024 1024)) ;; 4MB
 #+end_src
 
 Prefer latest bytecode.
@@ -227,6 +249,32 @@ Store miscellaneous files under =/etc=.
 (setq bookmark-default-file (expand-file-name "etc/bookmarks" user-emacs-directory))
 #+end_src
 
+Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is useful for example when yanking stuff from the kill-ring using M-y.
+
+#+begin_src emacs-lisp :tangle yes
+(setq enable-recursive-minibuffers t)
+#+end_src
+
+** Kill ring
+
+#+begin_src emacs-lisp :tangle yes
+(setq save-interprogram-paste-before-kill t)
+(setq kill-do-not-save-duplicates t)
+#+end_src
+
+Persist kill ring across sessions.
+
+#+begin_src emacs-lisp :tangle yes
+(setq savehist-additional-variables
+      '(search-ring regexp-search-ring kill-ring))
+
+(add-hook 'savehist-save-hook
+          (lambda ()
+            (setq kill-ring
+                  (mapcar #'substring-no-properties
+                          (cl-remove-if-not #'stringp kill-ring)))))
+#+end_src
+
 ** Custom.el
 
 Dump custom settings in a separate file.
@@ -234,12 +282,6 @@ Dump custom settings in a separate file.
 #+begin_src emacs-lisp :tangle yes
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (load custom-file t)
-#+end_src
-
-Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is useful for example when yanking stuff from the kill-ring using M-y.
-
-#+begin_src emacs-lisp :tangle yes
-(setq enable-recursive-minibuffers t)
 #+end_src
 
 * Appearance
@@ -266,6 +308,13 @@ The cursor may blink. Not in image buffers though.
 
 ;; Restore when exiting
 (add-hook 'change-major-mode-hook #'restore-cursor)
+#+end_src
+
+*** Don't show cursors in non-focused windows
+
+#+begin_src emacs-lisp :tangle yes
+(setq-default cursor-in-non-selected-windows nil)
+(setq highlight-nonselected-windows nil)
 #+end_src
 
 ** Fonts
@@ -594,6 +643,14 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
 #+begin_src emacs-lisp :tangle yes
 (use-package olivetti
   :custom (olivetti-body-width 94))
+#+end_src
+
+** Help system
+
+Automatically move focus to help buffer when opening it.
+
+#+begin_src emacs-lisp :tangle yes
+(setq help-window-select t)
 #+end_src
 
 ** Winpulse
@@ -1111,6 +1168,7 @@ Set keybindings for profiler.
 #+end_src
 
 * AI
+
 ** Gptel
 
 Let's try whether this could be useful. Gptel is a light-weight LLM client supporting multiple backends.
@@ -1930,6 +1988,7 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
 #+end_src
 
 * History
+
 ** Setup a directory for savefiles
 
 #+begin_src emacs-lisp :tangle yes
@@ -1952,6 +2011,14 @@ Remember and restore the last cursor location of opened files.
   (setq-default save-place t))
 #+end_src
 
+Recenter view after opening a file.
+
+#+begin_src emacs-lisp :tangle yes
+(advice-add 'save-place-find-file-hook :after
+            (lambda (&rest _)
+              (when buffer-file-name (ignore-errors (recenter)))))
+#+end_src
+
 ** Savehist-mode
 
 Remember where we were in the minibuffer.
@@ -1969,6 +2036,14 @@ Remember where we were in the minibuffer.
         savehist-save-minibuffer-history 1
         savehist-file (expand-file-name "savehist" tv-savefile-dir))
   (savehist-mode +1))
+#+end_src
+
+** Re-builder
+
+Use regular regex syntax, not the =read= syntax which is the default.
+
+#+begin_src emacs-lisp :tangle yes
+(setq reb-re-syntax 'string)
 #+end_src
 
 ** Recentf-mode
@@ -4041,6 +4116,15 @@ Enable nice settings for reading or writing.
       (olivetti-mode -1)
       (variable-pitch-mode -1)
       (display-line-numbers-mode))))
+#+end_src
+
+** Auto-chmod scripts on save
+
+Make a script automatically executable on save.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'after-save-hook
+          #'executable-make-buffer-file-executable-if-script-p)
 #+end_src
 
 ** Query the web
