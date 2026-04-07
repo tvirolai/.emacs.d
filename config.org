@@ -3078,6 +3078,18 @@ Trying the eat terminal emulator. It's used under the hood by at least [[Docker]
   (setq vterm-keymap-exceptions nil))
 #+end_src
 
+** Ghostel
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ghostel
+  :hook (ghostel-mode . tv/which-key-inhibit)
+  :bind (:map ghostel-mode-map
+              ("C-M-l" . 'next-buffer)
+              ("C-M-h" . 'previous-buffer))
+  :config
+  (evil-set-initial-state 'ghostel-mode 'emacs))
+#+end_src
+
 * Secrets and encryption
 
 ** Configure epg-pinentry-mode
