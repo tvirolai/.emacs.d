@@ -2295,7 +2295,7 @@ Use 4 spaces as the default indentation level.
     (kbd "M-H") #'org-shiftmetaleft
     (kbd "M-K") #'org-shiftmetaup
     (kbd "M-J") #'org-shiftmetadown
-    (kbd "§") #'verb-send-request-on-point-other-window-stay)
+    (kbd "§") #'verb-send-request-on-point-display)
   ;; Include the time in timestamps by default.
   ;; (setq org-time-stamp-formats '("<%Y-%m-%d %a %H:%M>" . "<%Y-%m-%d %a %H:%M>"))
   (setq org-M-RET-may-split-line '((default . nil)))
