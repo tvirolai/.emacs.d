@@ -1121,8 +1121,23 @@ Frame management.
 
 #+begin_src emacs-lisp :tangle yes
 (global-set-key (kbd "M-§") 'other-frame)
-(global-set-key (kbd "C-M-'") 'make-frame)
+(global-set-key (kbd "C-M-'") 'make-frame-command)
 (global-set-key (kbd "M-°") 'delete-frame)
+#+end_src
+
+Force refocus after killing a frame.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/refocus-after-frame-delete (&rest _)
+  (run-at-time
+   0 nil
+   (lambda ()
+     (when-let ((frame (selected-frame)))
+       (select-frame-set-input-focus frame)
+       (when-let ((window (frame-selected-window frame)))
+         (select-window window))))))
+
+(advice-add 'delete-frame :after #'tv/refocus-after-frame-delete)
 #+end_src
 
 Window management. Source: [[https://www.masteringemacs.org/article/demystifying-emacs-window-manager][Mastering Emacs]].
