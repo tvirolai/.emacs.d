@@ -2631,6 +2631,44 @@ setting `denote-rename-confirmations' to a nil value)."
       (user-error "No marked files; aborting"))))
 #+end_src
 
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/denote-flip-title ()
+  "Flip DATE and TITLE in marked Denote file names.
+
+Only the positions of DATE and TITLE are changed. Keywords,
+signature, file extension, and directory are left as is."
+  (interactive nil dired-mode)
+  (if-let* ((marks (dired-get-marked-files)))
+      (progn
+        (dolist (filename marks)
+          (let* ((dir (file-name-directory filename))
+                 (base (file-name-nondirectory filename)))
+            (if (string-match
+                 (rx string-start
+                     (group (= 8 digit) "T" (= 6 digit)) ; date
+                     "--"
+                     (group (*? anything))               ; title
+                     (optional (group "__" (* anything))) ; keywords etc.
+                     (group "." (+ (not (any "/"))))     ; extension
+                     string-end)
+                 base)
+                (let* ((date (match-string 1 base))
+                       (title (match-string 2 base))
+                       (rest (or (match-string 3 base) ""))
+                       (ext (match-string 4 base))
+                       (newname (expand-file-name
+                                 (concat title "--" date rest ext)
+                                 dir)))
+                  (unless (string-equal filename newname)
+                    (rename-file filename newname 0)
+                    (message "Renamed: %s -> %s" base
+                             (file-name-nondirectory newname))))
+              (message "Skipping non-Denote file: %s" base))))
+        (revert-buffer))
+    (user-error "No marked files; aborting")))
+#+end_src
+
 *** Align front matter
 
 Re-indent front-matter. Could be handy if a key longer than the stock ones has been added.
