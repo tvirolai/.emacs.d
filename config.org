@@ -2336,6 +2336,10 @@ Use 4 spaces as the default indentation level.
            :immediate-finish nil
            :kill-buffer t
            :jump-to-captured t)
+          ("i" "Idea" entry
+           (file "/Users/tuomo.virolainen/Documents/Journelly.org")
+           "* [%<%Y-%m-%d %a %H:%M>] @ -\n%i\n%?"
+           :prepend t)
           ("q" "Quote" entry
            (file "notes/20260212T113823--lainauksia__lainaukset_linkit_listat_sitaatit.org")
            "* %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:SOURCE: %^{Source}\n:END:\n\n#+begin_quote\n\n#+end_quote\n\n"
