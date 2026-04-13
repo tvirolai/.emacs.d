@@ -368,8 +368,8 @@ Choose theme. Ensure that the customizations are done after loading the theme.
   "Setup the GUI appearance."
   (when (display-graphic-p)
     (load-theme (if work-laptop-p
-                    ;; 'modus-vivendi
-                    'modus-operandi-tinted
+                    'modus-vivendi
+                    ;; 'modus-operandi-tinted
                   'ef-elea-dark) t)))
 
 (defun add-italics (&optional theme no-confirm no-enable)
@@ -1120,7 +1120,9 @@ Prevent the "Text is read only" message when pressing backspace in minibuffer ([
 Frame management.
 
 #+begin_src emacs-lisp :tangle yes
-(global-set-key (kbd "M-§") 'other-frame)
+(if work-laptop-p
+    (global-set-key (kbd "M-ESC") 'other-frame)
+    (global-set-key (kbd "M-§") 'other-frame))
 (global-set-key (kbd "C-M-'") 'make-frame-command)
 (global-set-key (kbd "M-°") 'delete-frame)
 #+end_src
