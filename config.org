@@ -2338,7 +2338,7 @@ Use 4 spaces as the default indentation level.
            :jump-to-captured t)
           ("i" "Idea" entry
            (file "/Users/tuomo.virolainen/Documents/Journelly.org")
-           "* [%<%Y-%m-%d %a %H:%M>] @ -\n%i\n%?"
+           "* [%<%Y-%m-%d %a %H:%M>] @ -%i\n%?"
            :prepend t)
           ("q" "Quote" entry
            (file "notes/20260212T113823--lainauksia__lainaukset_linkit_listat_sitaatit.org")
