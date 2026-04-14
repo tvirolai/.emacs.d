@@ -3285,6 +3285,8 @@ Disable images.
   :defer t
   :hook ((dired-mode . dired-hide-details-mode)
          (dired-mode . hl-line-mode)
+         (dired-mode . (lambda ()
+                         (setq-local redisplay-skip-fontification-on-input nil)))
          ;; (dired-mode . ready-player-mode)
          )
   :bind (:map dired-mode-map
