@@ -1094,10 +1094,12 @@ A handful of must-have keybindings for me.
 Bind a comfortable global key combination for =other-window= as =C-x o= is too long for such a common thing.
 
 #+begin_src emacs-lisp :tangle yes
+(defun tv/prev-window ()
+  (interactive)
+  (other-window -1))
+
 (global-set-key (kbd "M-o") #'other-window)
-(global-set-key (kbd "M-O") #'(lambda ()
-                                (interactive)
-                                (other-window -1)))
+(global-set-key (kbd "M-O") #'tv/prev-window)
 (global-set-key (kbd "M-å") #'delete-window)
 #+end_src
 
@@ -3176,7 +3178,8 @@ Trying the eat terminal emulator. It's used under the hood by at least [[Docker]
 (use-package eat
   :defer t
   :config
-  (keymap-set eat-mode-map "M-o" #'other-window)
+  (keymap-set eat-semi-char-mode-map "M-o" #'other-window)
+  (keymap-set eat-semi-char-mode-map "M-O" #'tv/prev-window)
   (evil-set-initial-state 'eat-mode 'emacs))
 #+end_src
 
