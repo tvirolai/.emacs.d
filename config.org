@@ -4102,7 +4102,7 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
                             (read-string "Tikettinumero: ")))
            (parsed-ticket (if (cl-search "-" ticket-number)
                               ticket-number
-                            (concat "UHMA2-" ticket-number)))
+                            (concat "OPISKELU-" ticket-number)))
            (url (concat "https://jira.it.helsinki.fi/browse/" parsed-ticket)))
       (progn
         (push parsed-ticket visited-jira-issues)
