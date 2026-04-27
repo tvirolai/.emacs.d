@@ -1360,6 +1360,11 @@ Use LSP when editing shell scripts.
 (add-to-list 'auto-mode-alist '("\\.sh\\.j2" . bash-ts-mode))
 #+end_src
 
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'after-save-hook
+          'executable-make-buffer-file-executable-if-script-p)
+#+end_src
+
 ** Clojure
 
 Configure the necessary packages.
@@ -3230,6 +3235,33 @@ Trying the eat terminal emulator. It's used under the hood by at least [[Docker]
   (evil-set-initial-state 'ghostel-mode 'emacs))
 #+end_src
 
+** dwim-shell-command
+
+The [[https://github.com/xenodium/dwim-shell-command][dwim-shell-command]] package has a large number of useful commands as well as nice facilities for writing your own.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package dwim-shell-command)
+#+end_src
+
+*** Convert video files to use a better supported codec
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/dwim-shell-command-video-compatible-mp4 ()
+  "Convert marked/current video(s) to broadly compatible MP4."
+  (interactive)
+  (dwim-shell-command-on-marked-files
+   "Convert to compatible MP4"
+   "ffmpeg -y -i '<<f>>' \
+-f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 \
+-shortest \
+-c:v libx264 -pix_fmt yuv420p -profile:v high -level 4.0 \
+-c:a aac -b:a 128k \
+-movflags +faststart \
+'<<fne>>_compatible.mp4'"
+   :utils "ffmpeg"
+   :extensions '("mp4" "mov" "mkv" "webm" "avi")))
+#+end_src
+
 * Secrets and encryption
 
 ** Configure epg-pinentry-mode
@@ -4116,8 +4148,6 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
 From [[https://lmno.lol/alvaro/emacs-quick-kill-process][Xenodium]].
 
 #+begin_src emacs-lisp :tangle yes
-(use-package dwim-shell-command)
-
 (require 'map)
 (require 'proced)
 (require 'seq)
