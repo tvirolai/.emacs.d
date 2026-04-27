@@ -1336,10 +1336,10 @@ Sort =ibuffer= by project.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ibuffer-projectile
-  :hook (ibuffer-hook . (lambda ()
-                          (ibuffer-projectile-set-filter-groups)
-                          (unless (eq ibuffer-sorting-mode 'alphabetic)
-                            (ibuffer-do-sort-by-alphabetic)))))
+  :hook (ibuffer . (lambda ()
+                     (ibuffer-projectile-set-filter-groups)
+                     (unless (eq ibuffer-sorting-mode 'alphabetic)
+                       (ibuffer-do-sort-by-alphabetic)))))
 #+end_src
 
 * Programming languages
@@ -2148,7 +2148,7 @@ Configure the packages.
          (:map global-map
                ;; C-c k is the prefix for custom killing commands.
                ("C-c k d" . tv/docker-kill-inactive-eat-buffers))))
-  #+end_src
+ #+end_src
 
 ** Markdown
 
