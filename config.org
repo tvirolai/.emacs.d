@@ -68,16 +68,95 @@ Set configuration file name for later reference.
 (defconst config-file "config.org")
 #+end_src
 
+#+begin_src emacs-lisp :tangle yes
+
+;;;; General options
+(use-package emacs
+  :ensure nil
+  :demand t
+  :init
+  (defun prot/keyboard-quit-dwim ()
+    "Do-What-I-Mean behaviour for a general `keyboard-quit'.
+
+The generic `keyboard-quit' does not do the expected thing when
+the minibuffer is open.  Whereas we want it to close the
+minibuffer, even without explicitly focusing it.
+
+The DWIM behaviour of this command is as follows:
+
+- When the region is active, disable it.
+- When a minibuffer is open, but not focused, close the minibuffer.
+- When the Completions buffer is selected, close it.
+- In every other case use the regular `keyboard-quit'."
+    (interactive)
+    (cond
+     ((region-active-p)
+      (keyboard-quit))
+     ((derived-mode-p 'completion-list-mode)
+      (delete-completion-window))
+     ((> (minibuffer-depth) 0)
+      (abort-recursive-edit))
+     (t
+      (keyboard-quit))))
+  :bind
+  ("C-g" . prot/keyboard-quit-dwim)
+  :config
+  ;; Set your favourite font family and height here.  The :height is
+  ;; 10x the point size you most commonly find on other applications.
+  (set-face-attribute 'default nil :family "JetBrains Mono" :height 180)
+  ;; Set your favourite font for elements that are designed to always
+  ;; be monospaced.  The height SHOULD BE a floating point, which is
+  ;; interpreted as relative to the `default'.
+  (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 1.0)
+  ;; Same as above for proportionately spaced elements.  Make any
+  ;; buffer proportionately spaced by enabling the `variable-pitch-mode'.
+  ;;
+  ;; [ NOTE: If you use the Modus themes or derivatives, set
+  ;;   `modus-themes-mixed-fonts', load the theme for the option to
+  ;;   take effect, and then enable `variable-pitch-mode':
+  ;;   spacing-sensitive elements like Org tables and code blocks will
+  ;;   remain monospaced. ]
+  (set-face-attribute 'variable-pitch nil :family "Aporetic Sans" :height 1.0)
+
+  ;; I have never seen a user say "no" to loading a theme they have
+  ;; downloaded.  Technically, any Elisp file can run arbitrary code,
+  ;; so this is not doing much on the security front.
+  (setq custom-safe-themes t)
+  (setq use-short-answers t)
+  (setq read-answer-short t)
+  (setq help-window-select t) ; also check `display-buffer-alist' below
+  (setq help-window-keep-selected t) ; Emacs 29
+  (setq find-library-include-other-files nil) ; Emacs 29
+  (setq window-combination-resize t)
+  (setq save-interprogram-paste-before-kill t)
+  ;; Do not jump to the current line in `*occur*' buffers.  The reason
+  ;; is that you are already on that line: you want to do `occur' to
+  ;; get more than that (and, presumably, to do something with the
+  ;; results such as to edit them with `occur-edit-mode').
+  (setq list-matching-lines-jump-to-current-line nil))
+#+end_src
+
 ** Package management
 
 Configure repos.
 
 #+begin_src emacs-lisp :tangle yes
-(setq package-enable-at-startup nil
-      package-archives '(("gnu" . "https://elpa.gnu.org/packages/")
-                         ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-                         ("melpa" . "https://melpa.org/packages/")
-                         ("org" . "https://orgmode.org/elpa/")))
+(use-package package
+  :ensure nil
+  :config
+  ;; I am not using `add-to-list' here because the default "gnu" is
+  ;; confusing to people, given that "elpa" is the better known name
+  ;; for it.
+  (setq package-archives
+        '(("gnu-elpa" . "https://elpa.gnu.org/packages/")
+          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
+          ("melpa" . "https://melpa.org/packages/")))
+  ;; Prefer GNU ELPA but accept the reality of MELPA's utility to the
+  ;; wider community.
+  (setq package-archive-priorities
+        '(("gnu-elpa" . 3)
+          ("nongnu" . 2)
+          ("melpa" . 1))))
 #+end_src
 
 Configure =use-package=.
@@ -116,7 +195,6 @@ Disable unnecessary stuff.
 (menu-bar-mode t)
 (setq inhibit-startup-screen t)
 (setq ring-bell-function 'ignore)
-(setq use-short-answers t)
 #+end_src
 
 *** Disable bidirectional text scanning
@@ -243,16 +321,25 @@ Put backup files under =etc/.tmp/=.
       `((".*" ,temporary-file-directory t)))
 #+end_src
 
-Store miscellaneous files under =/etc=.
-
-#+begin_src emacs-lisp :tangle yes
-(setq bookmark-default-file (expand-file-name "etc/bookmarks" user-emacs-directory))
-#+end_src
-
 Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is useful for example when yanking stuff from the kill-ring using M-y.
 
 #+begin_src emacs-lisp :tangle yes
 (setq enable-recursive-minibuffers t)
+#+end_src
+
+** Bookmarks
+
+#+begin_src emacs-lisp :tangle yes
+;;;; Bookmarks
+(use-package bookmark
+  :ensure nil
+  :config
+  ;; Write changes to the bookmark file as soon as 1 modification is
+  ;; made (addition or deletion).  Otherwise Emacs will only save the
+  ;; bookmarks when it closes, which may never happen properly
+  ;; (e.g. power failure).
+  (setq bookmark-save-flag 1)
+  (setq bookmark-default-file (expand-file-name "etc/bookmarks" user-emacs-directory)))
 #+end_src
 
 ** Kill ring
@@ -646,14 +733,6 @@ Olivetti mode squeezes the buffer into a column of limited width. This helps rea
   :custom (olivetti-body-width 94))
 #+end_src
 
-** Help system
-
-Automatically move focus to help buffer when opening it.
-
-#+begin_src emacs-lisp :tangle yes
-(setq help-window-select t)
-#+end_src
-
 ** Winpulse
 
 #+begin_src emacs-lisp :tangle yes
@@ -907,7 +986,6 @@ From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
 
 #+begin_src emacs-lisp :tangle yes
 (use-package git-gutter
-  :defer t
   :hook (after-init . global-git-gutter-mode))
 #+end_src
 
@@ -1162,6 +1240,46 @@ Window split threshold.
 #+begin_src emacs-lisp :tangle yes
 (setq split-width-threshold 160
       split-height-threshold nil)
+#+end_src
+
+Control the display of common ancillary windows.
+
+#+begin_src emacs-lisp :tangle yes
+;; Always focus common ancillary windows.  Place them in a window
+;; already occupied by their respective major mode or below the
+;; current window.
+(add-to-list 'display-buffer-alist
+             '((or . ((derived-mode . occur-mode)
+                      (derived-mode . grep-mode)
+                      (derived-mode . Buffer-menu-mode)
+                      (derived-mode . log-view-mode)
+                      (derived-mode . help-mode)))
+               (display-buffer-reuse-mode-window display-buffer-below-selected)
+               (body-function . select-window)))
+
+(add-to-list 'display-buffer-alist
+             '("\\`\\*\\(Org \\(Select\\|Note\\)\\|Agenda Commands\\)\\*\\'" ; the `org-capture' key selection, `org-add-log-note', and agenda dispatcher
+               (display-buffer-in-side-window)
+               (dedicated . t)
+               (side . bottom)
+               (slot . 0)
+               (window-parameters . ((mode-line-format . none)))))
+
+(add-to-list 'display-buffer-alist
+             '((derived-mode . calendar-mode)
+               (display-buffer-reuse-mode-window display-buffer-below-selected)
+               (mode . (calendar-mode bookmark-edit-annotation-mode ert-results-mode))
+               (inhibit-switch-frame . t)
+               (dedicated . t)
+               (window-height . fit-window-to-buffer)))
+
+(add-to-list 'display-buffer-alist
+             '((derived-mode . reb-mode) ; M-x re-builder
+               (display-buffer-reuse-mode-window display-buffer-below-selected)
+               (inhibit-switch-frame . t)
+               (window-height . 4) ; note this is literal lines, not relative
+               (dedicated . t)
+               (preserve-size . (t . t))))
 #+end_src
 
 Easy buffer switching.
@@ -1552,8 +1670,11 @@ I've resorted to this hack to run the indentation and capitalization for the who
                                 (setq-local corfu-auto nil)
                                 (corfu-mode))))
 
+(use-package aggressive-indent)
+
 (add-hook 'emacs-lisp-mode-hook #'(lambda ()
                                     (unless (string= (buffer-name) "*scratch*")
+                                      (aggressive-indent-mode)
                                       (flycheck-mode))))
 #+end_src
 
@@ -1821,9 +1942,10 @@ Writable grep. This makes possible to use workflows for search and replace like:
 #+begin_src emacs-lisp :tangle yes
 (use-package vertico
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
+  :custom
+  (vertico-cycle t)
   :init
-  (vertico-mode)
-  (setq vertico-cycle t))
+  (vertico-mode 1))
 
 (use-package vertico-multiform
   :ensure nil
@@ -1922,12 +2044,10 @@ Writable grep. This makes possible to use workflows for search and replace like:
          ("M-r" . consult-history)
          :map prog-mode-map
          ("M-g o" . consult-imenu))
-
   :init
   (defun remove-items (x y)
     (setq y (cl-remove-if (lambda (item) (memq item x)) y))
     y)
-
   ;; Any themes that are incomplete/lacking don't work with centaur tabs/solair mode
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
@@ -1942,13 +2062,31 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :bind (("C-s" . avy-goto-char-timer)))
 #+end_src
 
+** Isearch
+
+#+begin_src emacs-lisp :tangle yes
+(use-package isearch
+  :ensure nil
+  :config
+  ;; ;; Enable those to make "package install" match those words with
+  ;; ;; anything in between.  I think this is the single best tweak I
+  ;; ;; ever made.
+  ;;
+  ;; (setq search-whitespace-regexp ".*?")
+  ;; (setq isearch-lax-whitespace t)
+  ;; (setq isearch-regexp-lax-whitespace nil)
+  (setq isearch-lazy-count t)
+  (setq lazy-count-prefix-format "(%s/%s) ")
+  (setq lazy-count-suffix-format nil))
+#+end_src
+
 ** Marginalia
 
 #+begin_src emacs-lisp :tangle yes
 (use-package marginalia
-  :ensure
+  :ensure t
   :init
-  (marginalia-mode))
+  (marginalia-mode 1))
 #+end_src
 
 ** Embark
@@ -1957,7 +2095,14 @@ Writable grep. This makes possible to use workflows for search and replace like:
 (use-package embark
   :bind (("C-M-ö" . embark-act)
          ("C-;" . embark-dwim)
-         ("C-h B" . embark-bindings)) ;; alternative for `describe-bindings'
+         ("C-h B" . embark-bindings)
+         ;; Embark is helpful in every context, though there are other ways
+         ;; to do what it does.  Where it stands out is in its ability to
+         ;; deal with all the minibuffer results.  The equivalent of those
+         ;; two commands should be a core Emacs functionality.
+         (:map minibuffer-local-map
+               ("C-c C-c" . embark-collect)
+               ("C-c C-e" . embark-export))) ;; alternative for `describe-bindings'
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
@@ -1973,17 +2118,14 @@ Writable grep. This makes possible to use workflows for search and replace like:
 
   :config
   ;; Hide the mode line of the Embark live/completions buffers
+  (use-package embark-consult
+    :ensure t
+    :after consult
+    :hook (embark-collect-mode . consult-preview-at-point-mode))
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
                  (window-parameters (mode-line-format . none)))))
-
-;; (setq prefix-help-command #'embark-prefix-help-command)
-
-;; Consult users will also want the embark-consult package.
-(use-package embark-consult
-  :hook
-  (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
 
 ** Yasnippet
@@ -2060,7 +2202,17 @@ Remember where we were in the minibuffer.
         history-length 25
         savehist-save-minibuffer-history 1
         savehist-file (expand-file-name "savehist" tv-savefile-dir))
-  (savehist-mode +1))
+  (savehist-mode 1))
+#+end_src
+
+** Delsel
+
+#+begin_src emacs-lisp :tangle yes
+;;;; Delete the selected text when inserting new text
+(use-package delsel
+  :ensure nil
+  :config
+  (delete-selection-mode 1))
 #+end_src
 
 ** Re-builder
@@ -2497,7 +2649,11 @@ Open multiple links at once.
         (lambda (link)
           (let ((type (org-element-property :type link))
                 (url  (org-element-property :raw-link link)))
-            (when (member type '("http" "https"))
+            (when (and (member type '("http" "https"))
+                       (seq-some (lambda (sub)
+                                   (string-search sub url))
+                                 '("oikotie.fi" "etuovi.com"))
+                       (not (string-search "/talo/" url)))
               (push url links))))))
     (dolist (url (nreverse (delete-dups links)))
       (browse-url url))))
@@ -3336,6 +3492,22 @@ Disable images.
    shr-width 80))
 #+end_src
 
+* SHR
+
+#+begin_src emacs-lisp :tangle yes
+;;;; SHR
+(use-package shr
+  :ensure nil
+  :config
+  ;; t is bad for accessibility and generally awkward for HTML email
+  ;; (especially with dark themes).
+  (setq shr-use-colors nil)
+  ;; This option should not exist, given `variable-pitch-mode'.
+  ;; Furthermore, its default value runs counter to almost everything
+  ;; else in Emacs which just uses the `default' face.
+  (setq shr-use-fonts nil))
+#+end_src
+
 * Dired
 
 #+begin_src emacs-lisp :tangle yes
@@ -3358,12 +3530,16 @@ Disable images.
   (dired-auto-revert-buffer t)
   (delete-by-moving-to-trash t)
   (dired-mouse-drag-files t)
+  (dired-clean-up-buffers-too t)
   (dired-dwim-target t)
   :config
   (setq dired-listing-switches "-alFh")
   (setq dired-use-ls-dired nil)
+  (setq dired-create-destination-dirs 'ask)
   (setq dired-recursive-deletes 'always)
   (setq dired-recursive-copies 'always)
+  (setq dired-create-destination-dirs-on-trailing-dirsep t) ; Emacs 29
+  (setq wdired-create-parent-directories t)
   (setq dired-dwim-target t)
   (evil-define-key 'normal 'global (kbd "C-M-ä") 'dired-jump))
 
@@ -3381,6 +3557,14 @@ Install [[https://github.com/Fuco1/dired-narrow][dired-narrow]].
 
 #+begin_src emacs-lisp :tangle yes
 (use-package dired-narrow)
+#+end_src
+
+Viewing/editing system trash can.
+
+#+begin_src emacs-lisp :tangle yes
+;; Useful when combined with `delete-by-moving-to-trash'.
+(use-package trashed
+  :ensure t)
 #+end_src
 
 * Transient
@@ -3920,6 +4104,7 @@ Trying this. Source: https://erichlf.github.io/blog/2020/09/09/how-to-setup-emac
 #+end_src
 
 * Diffing
+
 ** Show diff for unsaved changes
 
 When there are unsaved changes and the user tries to exit Emacs, it asks whether I want to save them. With this snippet in the config, it also shows /what/ the said changes are, which should be helpful.
@@ -3941,6 +4126,34 @@ Ztree is /"A major mode for displaying the directory tree in text mode"/. One th
 #+begin_src emacs-lisp :tangle yes
 (use-package ztree
   :defer t)
+#+end_src
+
+** Diff
+
+#+begin_src emacs-lisp :tangle yes
+;;;; Diff
+(use-package diff
+  :ensure
+  :config
+  ;; You cannot expect the syntax highlighting of themes to look
+  ;; equally readabable against what typically are red and green
+  ;; backgrounds.  This should be opt-in by default, not opt-out.
+  (setq diff-font-lock-syntax nil))
+#+end_src
+
+** Ediff
+
+#+begin_src emacs-lisp :tangle yes
+;;;; Ediff
+(use-package ediff
+  :ensure nil
+  :config
+  ;; Ediff is virtually unusable without those.  Especially on tiling
+  ;; window managers.  But even on a regular desktop environment it is
+  ;; confusing and cumbersome to have the control panel in another
+  ;; frame.
+  (setq ediff-split-window-function 'split-window-horizontally)
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 #+end_src
 
 * Package development helpers
