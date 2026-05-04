@@ -101,26 +101,6 @@ The DWIM behaviour of this command is as follows:
   :bind
   ("C-g" . prot/keyboard-quit-dwim)
   :config
-  ;; Set your favourite font family and height here.  The :height is
-  ;; 10x the point size you most commonly find on other applications.
-  (set-face-attribute 'default nil :family "JetBrains Mono" :height 180)
-  ;; Set your favourite font for elements that are designed to always
-  ;; be monospaced.  The height SHOULD BE a floating point, which is
-  ;; interpreted as relative to the `default'.
-  (set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 1.0)
-  ;; Same as above for proportionately spaced elements.  Make any
-  ;; buffer proportionately spaced by enabling the `variable-pitch-mode'.
-  ;;
-  ;; [ NOTE: If you use the Modus themes or derivatives, set
-  ;;   `modus-themes-mixed-fonts', load the theme for the option to
-  ;;   take effect, and then enable `variable-pitch-mode':
-  ;;   spacing-sensitive elements like Org tables and code blocks will
-  ;;   remain monospaced. ]
-  (set-face-attribute 'variable-pitch nil :family "Aporetic Sans" :height 1.0)
-
-  ;; I have never seen a user say "no" to loading a theme they have
-  ;; downloaded.  Technically, any Elisp file can run arbitrary code,
-  ;; so this is not doing much on the security front.
   (setq custom-safe-themes t)
   (setq use-short-answers t)
   (setq read-answer-short t)
