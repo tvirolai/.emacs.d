@@ -3654,13 +3654,39 @@ Patterns * !Junk
 Create Near
 Sync All
 Expunge None
-SyncState ~/mail/imap-transfer
+SyncState *
+
+IMAPAccount proton
+Host 127.0.0.1
+User my-proton-account@pm.me
+PassCmd "echo $PROTON_PASS"
+Port 1143
+TLSType STARTTLS
+TLSVersions +1.2
+AuthMechs LOGIN
+CertificateFile ~/mail/certificates/cert.pem
+
+IMAPStore proton-remote
+Account proton
+
+MaildirStore proton-local
+Path ~/mail/proton/
+Inbox ~/mail/proton/INBOX
+SubFolders Verbatim
+
+Channel proton
+Near :proton-local:
+Far :proton-remote:
+Patterns * !Junk
+Create Near
+Sync Pull
+SyncState *
 #+end_src
 
 As to the =.authinfo.gpg= that stores the credentials for sending mail, it looks like this (after decryption):
 
 #+begin_src
-machine kapsi port 465 login my-username password my-password
+machine mail.kapsi.fi port 587 login my-username password my-password
 #+end_src
 
 To automate fetching and indexing new mail, I've set up a cron job that runs at a five-minute interval:
