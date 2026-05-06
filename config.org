@@ -72,32 +72,6 @@ Set configuration file name for later reference.
 (use-package emacs
   :ensure nil
   :demand t
-  :init
-  (defun prot/keyboard-quit-dwim ()
-    "Do-What-I-Mean behaviour for a general `keyboard-quit'.
-
-The generic `keyboard-quit' does not do the expected thing when
-the minibuffer is open.  Whereas we want it to close the
-minibuffer, even without explicitly focusing it.
-
-The DWIM behaviour of this command is as follows:
-
-- When the region is active, disable it.
-- When a minibuffer is open, but not focused, close the minibuffer.
-- When the Completions buffer is selected, close it.
-- In every other case use the regular `keyboard-quit'."
-    (interactive)
-    (cond
-     ((region-active-p)
-      (keyboard-quit))
-     ((derived-mode-p 'completion-list-mode)
-      (delete-completion-window))
-     ((> (minibuffer-depth) 0)
-      (abort-recursive-edit))
-     (t
-      (keyboard-quit))))
-  :bind
-  ;; ("C-g" . prot/keyboard-quit-dwim)
   :config
   (setq custom-safe-themes t)
   (setq use-short-answers t)
@@ -485,6 +459,16 @@ Tabs should never ever be used for indentation. If they are, they should look si
 (setq-default indent-tabs-mode nil)
 #+end_src
 
+** dtrt-indent
+
+Try to deduce the indentation level from the surrounding code.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package dtrt-indent
+  :config
+  (setq dtrt-indent-global-mode 1))
+#+end_src
+
 ** Miscellaneous configuration
 
 Require a newline at the end.
@@ -858,7 +842,6 @@ Vim keybindings here.
 
 (use-package evil-collection
   :after evil
-  :custom (evil-want-integration t)
   :config
   (evil-collection-init))
 #+end_src
@@ -1139,7 +1122,6 @@ A handful of must-have keybindings for me.
 (evil-define-key 'normal 'global (kbd "Å") 'consult-org-heading)
 (evil-define-key 'normal 'global (kbd "M-ö") 'evil-end-of-line) ;; $ is too unwieldy on a Scandinavian keyboard
 (evil-define-key 'normal 'global (kbd "¨") 'evil-search-forward)
-(evil-define-key 'normal 'global (kbd "'") 'evil-search-forward)
 (evil-define-key 'normal 'global (kbd "C-u") 'evil-scroll-up)
 (evil-define-key 'normal 'global (kbd "DEL") 'paredit-splice-sexp)
 (evil-define-key 'normal 'global (kbd "´") 'kill-buffer)
@@ -1648,12 +1630,11 @@ I've resorted to this hack to run the indentation and capitalization for the who
                                 (setq-local corfu-auto nil)
                                 (corfu-mode))))
 
-(use-package aggressive-indent)
-
-(add-hook 'emacs-lisp-mode-hook #'(lambda ()
-                                    (unless (string= (buffer-name) "*scratch*")
-                                      (aggressive-indent-mode)
-                                      (flycheck-mode))))
+(use-package aggressive-indent
+  :hook (emacs-lisp-mode . (lambda ()
+                             (unless (string= (buffer-name) "*scratch*")
+                               (aggressive-indent-mode)
+                               (flycheck-mode)))))
 #+end_src
 
 ** Common Lisp
@@ -2316,6 +2297,14 @@ Interactively query / filter large JSON files.
   :vc (:url "https://github.com/bigbuger/consult-jq.git" :branch "master")
   :init
   (setq consult-jq-completion-styles '(basic partial-completion)))
+#+end_src
+
+** CSV
+
+#+begin_src emacs-lisp :tangle yes
+(use-package csv-mode
+  :defer t
+  :hook (csv-mode . csv-guess-set-separator))
 #+end_src
 
 ** XML
@@ -3537,14 +3526,6 @@ Install [[https://github.com/Fuco1/dired-narrow][dired-narrow]].
 (use-package dired-narrow)
 #+end_src
 
-Viewing/editing system trash can.
-
-#+begin_src emacs-lisp :tangle yes
-;; Useful when combined with `delete-by-moving-to-trash'.
-(use-package trashed
-  :ensure t)
-#+end_src
-
 * Transient
 
 Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
@@ -3969,11 +3950,18 @@ that and instead tries to complete against dictionary entries."
   :ensure nil
   :after message
   :config
-  (setq sendmail-program (executable-find "msmtpq"))
-  (setq send-mail-function #'smtpmail-send-it)
-  (setq smtpmail-smtp-server "mail.kapsi.fi")
-  (setq smtpmail-smtp-service 587)
-  (setq smtpmail-stream-type 'starttls))
+  (setq send-mail-function #'smtpmail-send-it
+      message-send-mail-function #'smtpmail-send-it
+      user-mail-address "tuomo.virolainen@kapsi.fi"
+
+      smtpmail-smtp-server "mail.kapsi.fi"
+      smtpmail-smtp-user "tvirolai"
+      smtpmail-smtp-service 587
+      smtpmail-stream-type 'starttls
+      smtpmail-auth-supported '(plain login)
+
+      smtpmail-debug-info t
+      smtpmail-debug-verb t))
 
 ;; (setq smtpmail-stream-type 'ssl)
 #+end_src
