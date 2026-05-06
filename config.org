@@ -132,7 +132,7 @@ Configure path.
   :init
   (when (memq window-system '(mac ns x))
     (require 'exec-path-from-shell)
-    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS" "KAPSI_PASS" "OPENAI_API_KEY"))
+    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO" "LANG" "LC_CTYPE" "JAVA_HOME" "MAVEN_OPTS" "KAPSI_PASS" "OPENAI_API_KEY" "PROTON_PASS"))
       (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)))
 #+end_src
@@ -3679,7 +3679,8 @@ Near :proton-local:
 Far :proton-remote:
 Patterns * !Junk
 Create Near
-Sync Pull
+Sync Pull PushFlags PushDelete
+Expunge Far
 SyncState *
 #+end_src
 
