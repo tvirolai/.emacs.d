@@ -3396,14 +3396,26 @@ The [[https://github.com/xenodium/dwim-shell-command][dwim-shell-command]] packa
   (interactive)
   (dwim-shell-command-on-marked-files
    "Convert to compatible MP4"
-   "ffmpeg -y -i '<<f>>' \
--f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 \
--shortest \
--c:v libx264 -pix_fmt yuv420p -profile:v high -level 4.0 \
--c:a aac -b:a 128k \
--movflags +faststart \
-'<<fne>>_compatible.mp4'"
-   :utils "ffmpeg"
+   "in='<<f>>'
+out='<<fne>>_compatible.mp4'
+
+if ffprobe -v error -select_streams a:0 -show_entries stream=index -of csv=p=0 \"$in\" | grep -q .; then
+  ffmpeg -y -i \"$in\" \
+    -map 0:v:0 -map 0:a:0 \
+    -c:v libx264 -pix_fmt yuv420p -profile:v high -level 4.0 \
+    -c:a aac -b:a 128k \
+    -movflags +faststart \
+    \"$out\"
+else
+  ffmpeg -y -i \"$in\" -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 \
+    -map 0:v:0 -map 1:a:0 \
+    -shortest \
+    -c:v libx264 -pix_fmt yuv420p -profile:v high -level 4.0 \
+    -c:a aac -b:a 128k \
+    -movflags +faststart \
+    \"$out\"
+fi"
+   :utils "ffmpeg,ffprobe"
    :extensions '("mp4" "mov" "mkv" "webm" "avi")))
 #+end_src
 
