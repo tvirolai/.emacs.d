@@ -1950,7 +1950,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
   ;; Optional customizations
   :custom
   (corfu-cycle t)                ;; Enable cycling for `corfu-next/previous'
-  (corfu-auto t)               ;; Enable auto completion
+  (corfu-auto t)
   (corfu-auto-prefix 2)
   (corfu-auto-delay 0.4)
   (corfu-on-exact-match 'insert) ;; Insert when there's only one match
@@ -3464,7 +3464,8 @@ Use the =pass= package to interact with the similarly named Linux password manag
 ** Ansible vault
 
 #+begin_src emacs-lisp :tangle yes
-(use-package ansible-vault)
+(use-package ansible-vault
+  :defer t)
 #+end_src
 
 ** X509-mode
