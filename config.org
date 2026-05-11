@@ -111,7 +111,7 @@ Set configuration file name for later reference.
           ("melpa" . 1))))
 #+end_src
 
-*** =use-package=
+*** use-package
 
 #+begin_src emacs-lisp :tangle yes
 (setq use-package-always-ensure t)
@@ -235,6 +235,12 @@ Mac-specific settings.
 (global-set-key (kbd "<C-wheel-down>") 'ignore)
 #+end_src
 
+Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is useful for example when yanking stuff from the kill-ring using M-y.
+
+#+begin_src emacs-lisp :tangle yes
+(setq enable-recursive-minibuffers t)
+#+end_src
+
 ** UTF-8
 
 UTF-8 should be preferred everywhere.
@@ -273,16 +279,9 @@ Put backup files under =etc/.tmp/=.
       `((".*" ,temporary-file-directory t)))
 #+end_src
 
-Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is useful for example when yanking stuff from the kill-ring using M-y.
-
-#+begin_src emacs-lisp :tangle yes
-(setq enable-recursive-minibuffers t)
-#+end_src
-
 ** Bookmarks
 
 #+begin_src emacs-lisp :tangle yes
-;;;; Bookmarks
 (use-package bookmark
   :ensure nil
   :config
@@ -358,7 +357,7 @@ The cursor may blink. Not in image buffers though.
 
 ** Fonts
 
-Let's try out Fontaine for setting up fonts.
+Configure fonts using Fontaine.
 
 #+begin_src emacs-lisp :tangle yes
 (setq default-height
@@ -1542,7 +1541,7 @@ Configure the necessary packages.
 
 *** Jet
 
-[[https://github.com/ericdallo/jet.el][Jet]] is a very handy package for converting between Clojure-related data formats. It wraps the similarly named [[https://github.com/borkdude/jet][command-line-tool]].
+[[https://github.com/ericdallo/jet.el][Jet]] is a very handy package for converting between Clojure-related data formats. It wraps the similarly named [[https://github.com/borkdude/jet][command-line tool]].
 
 #+begin_src emacs-lisp :tangle yes
 (use-package jet
@@ -1562,8 +1561,8 @@ Haskell configs. Locally remap the =font-lock-keyword-face= attribute, since sla
                            (face-remap-add-relative 'font-lock-keyword-face nil :slant 'normal)))))
 
 (use-package lsp-haskell
-  :after haskell-mode
-  :defer t)
+  :defer t
+  :after haskell-mode)
 #+end_src
 
 ** SQL
