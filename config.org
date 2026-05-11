@@ -1542,7 +1542,7 @@ Configure the necessary packages.
 
 *** Jet
 
-[[https://github.com/borkdude/jet][Jet]] is a very handy package for converting between Clojure-related data formats.
+[[https://github.com/ericdallo/jet.el][Jet]] is a very handy package for converting between Clojure-related data formats. It wraps the similarly named [[https://github.com/borkdude/jet][command-line-tool]].
 
 #+begin_src emacs-lisp :tangle yes
 (use-package jet
