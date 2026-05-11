@@ -3665,7 +3665,7 @@ Far :kapsi-remote:
 Patterns * !Junk
 Create Near
 Sync All
-Expunge None
+Expunge Far
 SyncState *
 
 IMAPAccount proton
