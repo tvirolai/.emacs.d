@@ -546,12 +546,6 @@ Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
         doom-modeline-unicode-fallback nil))
 #+end_src
 
-*** Hide modeline
-
-#+begin_src emacs-lisp :tangle yes
-(use-package hide-mode-line)
-#+end_src
-
 ** Ultra-scroll
 
 Scroll smoothly when using a mouse or trackpad.
@@ -1321,7 +1315,6 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 Let's try plain text accounting.
 
 #+begin_src emacs-lisp :tangle yes
-;;; Basic configuration
 (use-package ledger-mode
   :defer t)
 #+end_src
@@ -1447,30 +1440,57 @@ Use LSP when editing shell scripts.
 
 Configure the necessary packages.
 
+*** Lisp editing
+
 #+begin_src emacs-lisp :tangle yes
 (use-package paredit
-  :config
-  (add-hook 'emacs-lisp-mode-hook #'paredit-mode)
-  ;; enable in the *scratch* buffer
-  (add-hook 'lisp-interaction-mode-hook #'paredit-mode)
-  (add-hook 'lisp-mode-hook #'paredit-mode))
+  :commands paredit-mode)
 
-(defun initialize-kondo ()
-  "Initialize `clj-kondo' linters."
-  (dolist (checker '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn))
-    (setq flycheck-checkers (cons checker (delq checker flycheck-checkers)))))
+(defconst tv/lisp-editing-mode-hooks
+  '(emacs-lisp-mode-hook
+    lisp-interaction-mode-hook
+    lisp-mode-hook
+    clojure-mode-hook
+    clojurescript-mode-hook
+    inf-clojure-mode-hook
+    cider-repl-mode-hook)
+  "Hooks that should enable common Lisp editing helpers.")
 
-(defun my-clojure-mode-hook ()
-  "Initialize things for `clojure-mode'."
-  (let ((modes (list #'paredit-mode #'subword-mode #'electric-pairs-mode
-                     #'rainbow-delimiters-mode #'flycheck-mode
-                     #'subword-mode)))
-    (dolist (mode modes)
-      (mode 1))))
+(defun tv/lisp-settings ()
+  "Enable common structured editing helpers for Lisp-like modes."
+  (paredit-mode 1)
+  (subword-mode 1)
+  (electric-pair-local-mode 1)
+  (rainbow-delimiters-mode 1))
+
+(dolist (hook tv/lisp-editing-mode-hooks)
+  (add-hook hook #'tv/lisp-settings))
+#+end_src
+
+*** Clojure config
+
+#+begin_src emacs-lisp :tangle yes
+(defconst tv/clojure-flycheck-checkers
+  '(clj-kondo-clj clj-kondo-cljs clj-kondo-cljc clj-kondo-edn)
+  "Flycheck checkers used for Clojure buffers.")
+
+(defun tv/register-clojure-flycheck-checkers ()
+  "Register Clojure Flycheck checkers."
+  (dolist (checker tv/clojure-flycheck-checkers)
+    (add-to-list 'flycheck-checkers checker)))
+
+(defun tv/clojure-mode-setup ()
+  "Enable Clojure buffer integrations."
+  (flycheck-mode 1)
+  (hs-minor-mode 1)
+  (lsp))
 
 (use-package clojure-mode
   :defer t
+  :hook ((clojure-mode clojurescript-mode) . tv/clojure-mode-setup)
   :config
+  (with-eval-after-load 'flycheck
+    (tv/register-clojure-flycheck-checkers))
   (define-clojure-indent
    (returning 1)
    (testing-dynamic 1)
@@ -3186,7 +3206,7 @@ Use ansi-colors in shell.
 #+begin_src emacs-lisp :tangle yes
 (use-package eshell
   :after quotient
-  :hook ((eshell-mode . hide-mode-line-mode)
+  :hook ((eshell-mode . mode-line-invisible-mode)
          (eshell-mode . (lambda ()
                           (eshell-read-history)))
          (eshell-mode . (lambda ()
@@ -3347,7 +3367,7 @@ Trying the eat terminal emulator. It's used under the hood by at least [[Docker]
 
 #+begin_src emacs-lisp :tangle yes
 (use-package vterm
-  :hook ((vterm-mode . hide-mode-line-mode)
+  :hook ((vterm-mode . mode-line-invisible-mode)
          (vterm-mode . (lambda ()
                          (setq-local global-hl-line-mode nil))))
   :defer t
