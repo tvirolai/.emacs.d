@@ -805,9 +805,11 @@ Vim keybindings here.
   :demand t
   :bind (("<escape>" . keyboard-escape-quit))
   :init
-  (setq evil-want-keybinding nil)
   ;; no vim insert bindings
+  (setq evil-want-keybinding nil)
   :config
+  ;; https://github.com/emacs-evil/evil/issues/1983
+  (defvar evil-mode-buffers '())
   (evil-mode 1)
   (setopt evil-disable-insert-state-bindings t)
   ;; (evil-set-undo-system 'vundo)
@@ -1136,7 +1138,11 @@ Bind a comfortable global key combination for =other-window= as =C-x o= is too l
   (interactive)
   (other-window -1))
 
-(global-set-key (kbd "M-o") #'other-window)
+(use-package ace-window
+  :custom
+  (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
+
+(global-set-key (kbd "M-o") #'ace-window)
 (global-set-key (kbd "M-O") #'tv/prev-window)
 (global-set-key (kbd "M-å") #'delete-window)
 #+end_src
@@ -3898,7 +3904,7 @@ that and instead tries to complete against dictionary entries."
   (remove-hook 'notmuch-show-hook #'notmuch-show-turn-on-visual-line-mode)
   (remove-hook 'notmuch-search-hook #'notmuch-hl-line-mode) ; Check my `lin' package
   :bind
-  ( :map global-map
+  (:map global-map
     ("C-x m" . notmuch-mua-new-mail) ; override `compose-mail'
     :map notmuch-search-mode-map ; I normally don't use the tree view, otherwise check `notmuch-tree-mode-map'
     ("/" . notmuch-search-filter) ; alias for l
@@ -3918,7 +3924,7 @@ that and instead tries to complete against dictionary entries."
   :ensure nil
   :after notmuch
   :bind
-  ( :map notmuch-search-mode-map
+  (:map notmuch-search-mode-map
     ("D" . prot-notmuch-search-delete-thread)
     ("S" . prot-notmuch-search-spam-thread)
     ("g" . prot-notmuch-refresh-buffer)
