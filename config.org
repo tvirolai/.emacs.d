@@ -93,22 +93,17 @@ Set configuration file name for later reference.
 *** Repos
 
 #+begin_src emacs-lisp :tangle yes
-(use-package package
-  :ensure nil
-  :config
-  ;; I am not using `add-to-list' here because the default "gnu" is
-  ;; confusing to people, given that "elpa" is the better known name
-  ;; for it.
-  (setq package-archives
-        '(("gnu-elpa" . "https://elpa.gnu.org/packages/")
-          ("nongnu" . "https://elpa.nongnu.org/nongnu/")
-          ("melpa" . "https://melpa.org/packages/")))
-  ;; Prefer GNU ELPA but accept the reality of MELPA's utility to the
-  ;; wider community.
-  (setq package-archive-priorities
-        '(("gnu-elpa" . 3)
-          ("nongnu" . 2)
-          ("melpa" . 1))))
+(require 'package)
+
+(setq package-archives
+      '(("gnu-elpa" . "https://elpa.gnu.org/packages/")
+        ("nongnu"   . "https://elpa.nongnu.org/nongnu/")
+        ("melpa"    . "https://melpa.org/packages/")))
+
+(setq package-archive-priorities
+      '(("gnu-elpa" . 3)
+        ("nongnu"   . 2)
+        ("melpa"    . 1)))
 #+end_src
 
 *** use-package
@@ -524,6 +519,7 @@ Remove the icon from the titlebar.
 Suppress compilation warnings.
 
 #+begin_src emacs-lisp :tangle yes
+(setq warning-minimum-level :error)
 (setq native-comp-async-report-warnings-errors nil)
 #+end_src
 
@@ -622,19 +618,6 @@ Create missing parent folders automatically. Source: [[https://github.com/bbatso
 #+end_src
 
 ** Themes
-
-I have been using the =doom-dracula= theme forever, but I'm currently trying out =modus-vivendi= to maximize legibility on bad monitors which I unfortunately have to use quite a bit.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package doom-themes
-  :custom
-  (doom-dracula-brighter-modeline t)
-  (doom-dracula-brighter-comments t)
-  (doom-dracula-colorful-headers t)
-  :config
-  ;; (load-theme 'doom-dracula t)
-  )
-#+end_src
 
 Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
 
@@ -1703,9 +1686,10 @@ Config adapted from [[https://www.rahuljuliato.com/posts/eslint-on-emacs][Rahul 
 Since the =lsp-eslint-auto-fix-on-save= variable doesn't seem to have any effect, this is a workaround to achieving the same thing.
 
 #+begin_src emacs-lisp :tangle yes
-(add-hook 'before-save-hook #'(lambda ()
-                                (when lsp-eslint-auto-fix-on-save
-                                  (lsp-eslint-fix-all))))
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (bound-and-true-p lsp-eslint-auto-fix-on-save)
+              (lsp-eslint-fix-all))))
 #+end_src
 
 *** Prettier
