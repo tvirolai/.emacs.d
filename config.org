@@ -241,6 +241,13 @@ Allow recursive minibuffers, i.e. using minibuffer inside minibuffer. This is us
 (setq enable-recursive-minibuffers t)
 #+end_src
 
+** Performance and compilation
+
+#+begin_src emacs-lisp :tangle yes
+(setq native-comp-jit-compilation nil)
+(setq package-native-compile t)
+#+end_src
+
 ** UTF-8
 
 UTF-8 should be preferred everywhere.
