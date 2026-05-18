@@ -523,31 +523,6 @@ Suppress compilation warnings.
 (setq native-comp-async-report-warnings-errors nil)
 #+end_src
 
-** Modeline
-
-*** Doom modeline
-
-Remember to run =nerd-icons-install-fonts= after installing Nerd icons.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package nerd-icons)
-
-(use-package doom-modeline
-  :after nerd-icons
-  :hook (after-init . doom-modeline-mode)
-  :config
-  (setq find-file-visit-truename t
-        doom-modeline-battery nil
-        column-number-mode t
-        size-indication-mode t
-        doom-modeline-continuous-word-count-modes '(markdown-mode gfm-mode org-mode)
-        doom-modeline-enable-word-count t
-        doom-modeline-total-line-number t
-        doom-modeline-icon t
-        doom-modeline-modal-icon t
-        doom-modeline-unicode-fallback nil))
-#+end_src
-
 ** Ultra-scroll
 
 Scroll smoothly when using a mouse or trackpad.
