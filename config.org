@@ -1089,6 +1089,7 @@ A handful of bindings inspired by Doom Emacs / Spacemacs.
 (define-key my-leader-map "," 'avy-goto-char-timer)
 (define-key my-leader-map "." 'consult-line)
 (define-key my-leader-map "x" 'consult-imenu)
+(define-key my-leader-map "u" 'universal-argument)
 ;; Grep from all open buffers
 (define-key my-leader-map "-" 'swiper-all)
 #+end_src
@@ -4205,6 +4206,11 @@ A powerful collection of utility functions.
 #+end_src
 
 * Various convenience functions and other miscellaneous stuff
+
+#+begin_src emacs-lisp :tangle yes
+ ;; My dashboard is an editable org file which opens like this:
+(setq initial-buffer-choice "~/org/inbox.org")
+#+end_src
 
 ** Jump to scratch buffer
 
