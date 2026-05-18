@@ -360,53 +360,11 @@ The cursor may blink. Not in image buffers though.
 ** Mode line
 
 #+begin_src emacs-lisp :tangle yes
-;; Minimal mode line
-(setq-default
- mode-line-format
- '("    "                          ; start padding
-   "%e"
-
-   ;; Evil state
-   (:eval
-    (when (bound-and-true-p evil-mode)
-      (format "[%s] " evil-state)))
-
-   ;; Modified indicator
-   (:eval
-    (if (buffer-modified-p) "[+]" "[-]"))
-
-   "  "
-
-   ;; File name
-   mode-line-buffer-identification
-
-   "  "
-
-   ;; Position: current line:column, total rows, percentage
-   "(" line-number-mode "%l:%c"
-   "/" (:eval (number-to-string (count-lines (point-min) (point-max))))
-   " " (-3 . "%p") ")"
-
-   "  "
-
-   ;; Buffer size
-   "[" (:eval (format-mode-line "%I")) "]"
-
-   "  "
-
-   ;; Major mode
-   "[" mode-name "]"
-
-   "  "
-
-   ;; Git branch
-   (:eval
-    (when vc-mode
-      (concat "["
-              (substring vc-mode 5)
-              "]")))
-
-   "  "))
+(use-package moody
+  :config
+  (moody-replace-mode-line-front-space)
+  (moody-replace-mode-line-buffer-identification)
+  (moody-replace-vc-mode))
 #+end_src
 
 ** Fonts
