@@ -932,7 +932,16 @@ From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
 
 #+begin_src emacs-lisp :tangle yes
 (use-package git-gutter
-  :hook (after-init . global-git-gutter-mode))
+  :hook (after-init . global-git-gutter-mode)
+  :config
+  (add-to-list 'git-gutter:update-hooks 'focus-in-hook)
+
+  (defun tv/git-gutter-update-current-buffer ()
+    (when (and buffer-file-name git-gutter-mode)
+      (git-gutter)))
+
+  (add-hook 'find-file-hook #'tv/git-gutter-update-current-buffer)
+  (add-hook 'buffer-list-update-hook #'tv/git-gutter-update-current-buffer))
 #+end_src
 
 ** Magit
@@ -950,9 +959,7 @@ From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
   :after git-gutter
   :config
   (evil-define-key 'normal magit-status-mode-map
-    "q" #'tv/mu-magit-kill-buffers)
-  (add-hook 'magit-post-refresh-hook
-            #'git-gutter:update-all-windows))
+    "q" #'tv/mu-magit-kill-buffers))
 #+end_src
 
 Load Magit-extras. This enables e.g. jumping straight to Magit status buffer when switching projects.
