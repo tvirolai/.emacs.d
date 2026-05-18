@@ -357,6 +357,44 @@ The cursor may blink. Not in image buffers though.
 (setq highlight-nonselected-windows nil)
 #+end_src
 
+** Mode line
+
+#+begin_src emacs-lisp :tangle yes
+;; Minimal mode line
+(setq-default
+ mode-line-format
+ '("%e"
+   ;; File name
+   mode-line-buffer-identification
+
+   "  "
+
+   ;; Position in buffer (line:column and percentage)
+   "(" line-number-mode "%l:%c"
+   " " (-3 . "%p") ")"
+
+   "  "
+
+   ;; Buffer size
+   "[" (:eval (format-mode-line "%I")) "]"
+
+   "  "
+
+   ;; Major mode
+   "[" mode-name "]"
+
+   "  "
+
+   ;; Git branch (requires vc-mode)
+   (:eval
+    (when vc-mode
+      (concat "["
+              (substring vc-mode 5)
+              "]")))
+
+   "  "))
+#+end_src
+
 ** Fonts
 
 Configure fonts using Fontaine.
