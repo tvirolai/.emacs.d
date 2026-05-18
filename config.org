@@ -363,14 +363,28 @@ The cursor may blink. Not in image buffers though.
 ;; Minimal mode line
 (setq-default
  mode-line-format
- '("%e"
+ '("    "                          ; start padding
+   "%e"
+
+   ;; Evil state
+   (:eval
+    (when (bound-and-true-p evil-mode)
+      (format "[%s] " evil-state)))
+
+   ;; Modified indicator
+   (:eval
+    (if (buffer-modified-p) "[+]" "[-]"))
+
+   "  "
+
    ;; File name
    mode-line-buffer-identification
 
    "  "
 
-   ;; Position in buffer (line:column and percentage)
+   ;; Position: current line:column, total rows, percentage
    "(" line-number-mode "%l:%c"
+   "/" (:eval (number-to-string (count-lines (point-min) (point-max))))
    " " (-3 . "%p") ")"
 
    "  "
@@ -385,7 +399,7 @@ The cursor may blink. Not in image buffers though.
 
    "  "
 
-   ;; Git branch (requires vc-mode)
+   ;; Git branch
    (:eval
     (when vc-mode
       (concat "["
