@@ -1108,7 +1108,8 @@ Bind a comfortable global key combination for =other-window= as =C-x o= is too l
   :custom
   (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
-(global-set-key (kbd "M-o") #'ace-window)
+(global-set-key (kbd "M-o") #'other-window)
+;; (global-set-key (kbd "M-O") #'tv/prev-window)
 (global-set-key (kbd "M-O") #'tv/prev-window)
 (global-set-key (kbd "M-å") #'delete-window)
 #+end_src
