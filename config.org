@@ -1726,6 +1726,34 @@ Use smartparens.
   (require 'smartparens-config))
 #+end_src
 
+*** Running tests
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/npm-compile (command)
+  (let ((default-directory
+         (project-root (project-current t))))
+    (compile command)))
+
+(defun tv/npm-test ()
+  "Run NPM tests for the current project."
+  (interactive)
+  (tv/npm-compile "npm test"))
+
+(defun tv/npm-test-frontend ()
+  "Run NPM frontend tests for the current project."
+  (interactive)
+  (tv/npm-compile "npm run test:frontend"))
+
+(defun tv/npm-test-backend ()
+  "Run NPM backend tests for the current project."
+  (interactive)
+  (tv/npm-compile "npm run test:backend"))
+
+(global-set-key (kbd "C-c t t") #'tv/npm-test)
+(global-set-key (kbd "C-c t f") #'tv/npm-test-frontend)
+(global-set-key (kbd "C-c t b") #'tv/npm-test-backend)
+#+end_src
+
 ** Java
 
 #+begin_src emacs-lisp :tangle yes
