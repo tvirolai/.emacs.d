@@ -359,12 +359,25 @@ The cursor may blink. Not in image buffers though.
 
 ** Mode line
 
+*** Moody
+
+A mode line. I used Doom modeline before but that caused some performance issues on huge files. I did not debug that more but rather jumped ship.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package moody
   :config
   (moody-replace-mode-line-front-space)
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
+#+end_src
+
+*** Minions
+
+A companion to Moody. Moves minor mode info inside a context menu, resulting in a cleaner overview.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package minions
+  :config (minions-mode 1))
 #+end_src
 
 ** Fonts
