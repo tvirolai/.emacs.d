@@ -366,6 +366,7 @@ A mode line. I used Doom modeline before but that caused some performance issues
 #+begin_src emacs-lisp :tangle yes
 (use-package moody
   :config
+  (column-number-mode 1)
   (moody-replace-mode-line-front-space)
   (moody-replace-mode-line-buffer-identification)
   (moody-replace-vc-mode))
