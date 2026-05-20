@@ -2409,7 +2409,7 @@ Use 4 spaces as the default indentation level.
   ;; always gives the "unable to test pandoc" warning on first
   ;; run if this variable isn't larger than the default 0.2.
   (org-web-tools-pandoc-sleep-time 0.5)
-  (fill-column 100)
+  ;; (fill-column 100)
   ;; Disable the underscore-to-subscript thing.
   (org-pretty-entities t)
   (org-log-done 'time)
@@ -4180,11 +4180,9 @@ Ztree is /"A major mode for displaying the directory tree in text mode"/. One th
 ** Diff
 
 #+begin_src emacs-lisp :tangle yes
-;;;; Diff
 (use-package diff
-  :ensure
   :config
-  ;; You cannot expect the syntax highlighting of themes to look
+  ;; Prot: You cannot expect the syntax highlighting of themes to look
   ;; equally readabable against what typically are red and green
   ;; backgrounds.  This should be opt-in by default, not opt-out.
   (setq diff-font-lock-syntax nil))
@@ -4193,12 +4191,11 @@ Ztree is /"A major mode for displaying the directory tree in text mode"/. One th
 ** Ediff
 
 #+begin_src emacs-lisp :tangle yes
-;;;; Ediff
 (use-package ediff
   :ensure nil
   :config
-  ;; Ediff is virtually unusable without those.  Especially on tiling
-  ;; window managers.  But even on a regular desktop environment it is
+  ;; Prot: Ediff is virtually unusable without those. Especially on tiling
+  ;; window managers. But even on a regular desktop environment it is
   ;; confusing and cumbersome to have the control panel in another
   ;; frame.
   (setq ediff-split-window-function 'split-window-horizontally)
@@ -4244,7 +4241,7 @@ A powerful collection of utility functions.
 
 #+begin_src emacs-lisp :tangle yes
  ;; My dashboard is an editable org file which opens like this:
-(setq initial-buffer-choice "~/org/inbox.org")
+;; (setq initial-buffer-choice "~/org/inbox.org")
 #+end_src
 
 ** Jump to scratch buffer
