@@ -2409,8 +2409,8 @@ Use 4 spaces as the default indentation level.
   ;; For whatever reason, running org-web-tools-insert-web-page-as-entry
   ;; always gives the "unable to test pandoc" warning on first
   ;; run if this variable isn't larger than the default 0.2.
+  (auto-fill-mode 1)
   (org-web-tools-pandoc-sleep-time 0.5)
-  ;; (fill-column 100)
   ;; Disable the underscore-to-subscript thing.
   (org-pretty-entities t)
   (org-log-done 'time)
@@ -3525,6 +3525,7 @@ Disable images.
   :config
   (setq shr-inhibit-images t)
   (setq shr-indentation 2)
+  (setq shr-image-animate nil) ; No GIFs, even if images are temporarily enabled.
   (setq shr-width 80)
   ;; This option should not exist, given `variable-pitch-mode'.
   ;; Furthermore, its default value runs counter to almost everything
