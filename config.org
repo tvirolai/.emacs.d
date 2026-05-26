@@ -1831,7 +1831,11 @@ I've only ever needed this for configuring Jenkins jobs.
         lsp-modeline-code-actions-enable t
         lsp-keep-workspace-alive nil)
   (require 'lsp-eslint)
-  (push 'jsts-ls lsp-disabled-clients))
+  (push 'jsts-ls lsp-disabled-clients)
+  (with-eval-after-load 'lsp-mode
+    (advice-add 'tv/kill-other-buffers
+                :after
+                #'lsp-workspace-remove-all-folders)))
 #+end_src
 
 ** lsp-sonarlint
@@ -4276,7 +4280,6 @@ Clean up some buffers. Modified from: https://themagitian.github.io/posts/emacsc
           (buffer-list)))
   (message "Killed other buffers"))
 
-(advice-add 'tv/kill-other-buffers :after #'lsp-workspace-remove-all-folders)
 (global-set-key (kbd "C-c å") 'tv/kill-other-buffers)
 #+end_src
 
