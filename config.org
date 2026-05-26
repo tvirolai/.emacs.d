@@ -2474,6 +2474,7 @@ Use 4 spaces as the default indentation level.
   (setq org-insert-heading-respect-content t)
   (setq org-directory "~/org/")
   (setq org-default-notes-file (concat org-directory "inbox.org"))
+  (setq org-deadline-warning-days 35)
   (setq org-work-notes-file (concat org-directory "work.org"))
   (setq org-archive-location "archive/Archive_%s::")
   (setq org-ellipsis " ▾")
