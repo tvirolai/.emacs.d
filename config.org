@@ -746,7 +746,7 @@ Use =tree-sitter=. I noticed that =treesit-auto= was slowing opening files down 
 (use-package treesit-auto
   :custom
   (treesit-auto-install 'prompt)
-  (treesit-auto-langs '(bash css commonlisp clojure dockerfile html java javascript json make markdown org python haskell sql toml tsx typescript yaml))
+  (treesit-auto-langs '(bash css commonlisp clojure dockerfile html java javascript json make markdown python haskell sql toml tsx typescript yaml))
   :config
   (defvar jf/treesit-lang-cache
     (make-hash-table :test 'equal)
