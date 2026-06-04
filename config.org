@@ -215,11 +215,17 @@ Revert buffers when the underlying file has changed.
 Mac-specific settings.
 
 #+begin_src emacs-lisp :tangle yes
-(setq mac-option-modifier 'nil
-      mac-command-modifier 'meta
-      mac-function-modifier 'super
-      mac-right-command-modifier 'super
-      select-enable-clipboard t)
+(when (eq system-type 'darwin)
+  (setq mac-option-modifier 'nil
+        mac-command-modifier 'meta
+        mac-function-modifier 'super
+        mac-right-command-modifier 'super))
+#+end_src
+
+Enable system clipboard.
+
+#+begin_src emacs-lisp :tangle yes
+(setq select-enable-clipboard t)
 #+end_src
 
 [[https://lmno.lol/alvaro/hey-mouse-dont-mess-with-my-emacs-font-size][Prevent]] mouse / trackpad input from accidentally resizing fonts.
@@ -1370,11 +1376,21 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 *** Watch from Youtube
 
 #+begin_src emacs-lisp :tangle yes
-(defun tv/watch-yt ()
+(defun tv/yt-watch ()
   "Watch a Youtube video using MPV. Input is either video id or full url."
   (interactive)
   (let ((url (read-and-return-yt-url)))
     (async-shell-command (format "mpv '%s'" url))))
+#+end_src
+
+*** Listen from youtube
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/yt-listen ()
+  "Watch a Youtube video using MPV. Input is either video id or full url."
+  (interactive)
+  (let ((url (read-and-return-yt-url)))
+    (async-shell-command (format "mpv --no-video '%s'" url))))
 #+end_src
 
 *** Download from Yle Areena
@@ -2417,7 +2433,6 @@ Use 4 spaces as the default indentation level.
   ;; For whatever reason, running org-web-tools-insert-web-page-as-entry
   ;; always gives the "unable to test pandoc" warning on first
   ;; run if this variable isn't larger than the default 0.2.
-  (auto-fill-mode 1)
   (org-web-tools-pandoc-sleep-time 0.5)
   ;; Disable the underscore-to-subscript thing.
   (org-pretty-entities t)
@@ -2456,6 +2471,7 @@ Use 4 spaces as the default indentation level.
      ("CANCELED"     . "blue")
      ("[CANCELED]"   . "blue")))
   :config
+  (setq auto-fill-mode 1)
   (custom-set-faces
    '(org-document-title ((t (:inherit outline-1 :height 1.50))))
    '(org-level-1 ((t (:inherit outline-1 :height 1.30))))
@@ -3530,7 +3546,6 @@ Disable images.
 ** SHR
 
 #+begin_src emacs-lisp :tangle yes
-;;;; SHR
 (use-package shr
   :ensure nil
   :config
@@ -3538,9 +3553,6 @@ Disable images.
   (setq shr-indentation 2)
   (setq shr-image-animate nil) ; No GIFs, even if images are temporarily enabled.
   (setq shr-width 80)
-  ;; This option should not exist, given `variable-pitch-mode'.
-  ;; Furthermore, its default value runs counter to almost everything
-  ;; else in Emacs which just uses the `default' face.
   (setq shr-use-fonts nil))
 #+end_src
 
@@ -3762,7 +3774,7 @@ machine mail.kapsi.fi port 587 login my-username password my-password
 To automate fetching and indexing new mail, I've set up a cron job that runs at a five-minute interval:
 
 #+begin_src bash
-,*/5 * * * * . $HOME/check-mail.sh
+*/5 * * * * . $HOME/check-mail.sh
 #+end_src
 
 Here the =check-mail.sh= script looks like this.
