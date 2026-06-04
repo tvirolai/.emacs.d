@@ -2551,7 +2551,10 @@ Use 4 spaces as the default indentation level.
            "* TODO %i%?")
           ("v" "Video link" entry
            (file "notes/20221110T100214--youtube__linkit_videot_youtube.org")
-           "* [[%^{Video URL}][%^{Video title}]]"
+           "* [[%^{Video URL}][%^{Video title}]]
+:PROPERTIES:
+:CAPTURED: %U
+:END:"
            :prepend t
            :empty-lines-before 1)))
   ;; Export settings
