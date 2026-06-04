@@ -1387,7 +1387,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/yt-listen ()
-  "Watch a Youtube video using MPV. Input is either video id or full url."
+  "Play a Youtube video as audio. Input is either video id or full url."
   (interactive)
   (let ((url (read-and-return-yt-url)))
     (async-shell-command (format "mpv --no-video '%s'" url))))
@@ -2149,6 +2149,10 @@ Writable grep. This makes possible to use workflows for search and replace like:
     :ensure t
     :after consult
     :hook (embark-collect-mode . consult-preview-at-point-mode))
+  (keymap-set embark-url-map "v" #'tv/yt-watch)
+  (keymap-set embark-url-map "a" #'tv/yt-listen)
+  (keymap-set embark-url-map "d" #'tv/yt-dlp)
+  (keymap-set embark-url-map "y" #'tv/yle-dl)
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
