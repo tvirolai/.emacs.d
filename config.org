@@ -2550,8 +2550,10 @@ Use 4 spaces as the default indentation level.
            (file+headline org-default-notes-file "Tehtävät")
            "* TODO %i%?")
           ("v" "Video link" entry
-           (file+headline "notes/20221110T100214--katsottavia-videoita__linkit_videot_youtube.org" "Inbox")
-           "* [[%^{Video URL}][%^{Video title}]]")))
+           (file "notes/20221110T100214--youtube__linkit_videot_youtube.org")
+           "* [[%^{Video URL}][%^{Video title}]]"
+           :prepend t
+           :empty-lines-before 1)))
   ;; Export settings
   (setq org-export-with-toc nil)  ; No table of contents
   (setq org-export-with-section-numbers nil)  ; No section numbers
