@@ -1365,12 +1365,19 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
         input
       (format "https://www.youtube.com/watch?v=%s" input))))
 
-(defun tv/yt-dlp ()
+(defun tv/yt-download ()
   "Download a video from Youtube. Input is either video id or full url."
   (interactive)
   (let* ((url (read-and-return-yt-url))
          (default-directory "~/Desktop/YT"))
     (async-shell-command (format "yt-dlp '%s' --no-playlist" url))))
+
+(defun tv/yt-download-as-audio ()
+  "Download a video as an MP3 from Youtube. Input is either video id or full url."
+  (interactive)
+  (let* ((url (read-and-return-yt-url))
+         (default-directory "~/Desktop/YT"))
+    (async-shell-command (format "yt-dlp -t mp3 '%s' --no-playlist" url))))
 #+end_src
 
 *** Watch from Youtube
@@ -2151,7 +2158,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
     :hook (embark-collect-mode . consult-preview-at-point-mode))
   (keymap-set embark-url-map "v" #'tv/yt-watch)
   (keymap-set embark-url-map "a" #'tv/yt-listen)
-  (keymap-set embark-url-map "d" #'tv/yt-dlp)
+  (keymap-set embark-url-map "d" #'tv/yt-download)
+  (keymap-set embark-url-map "m" #'tv/yt-download-as-audio)
   (keymap-set embark-url-map "y" #'tv/yle-dl)
   (add-to-list 'display-buffer-alist
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
