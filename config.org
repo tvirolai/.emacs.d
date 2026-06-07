@@ -3213,6 +3213,17 @@ A bit more intuitive handling for lists in org mode, see [[https://github.com/ca
 ;;   :hook (org-mode . org-autolist-mode))
 #+end_src
 
+** Mark an entry as watched
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/org-set-watched ()
+  "Set WATCHED property on current heading."
+  (interactive)
+  (org-set-property
+   "WATCHED"
+   (format-time-string "%Y-%m-%d %H:%M:%S")))
+#+end_src
+
 * Elfeed
 
 RSS feeds are a convenient way to consume information on a pull-basis from different sources. I can't be bothered to tweak the stock elfeed experience too much.
