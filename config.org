@@ -2636,7 +2636,12 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org-modern
-  :hook (org-mode . org-modern-mode))
+  :hook (org-mode . org-modern-mode)
+  :config
+  (setq org-modern-star '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶"))
+  (setq org-modern-list '((43 . "➤")
+                          (45 . "–")
+                          (42 . "•"))))
 #+end_src
 
 ** Additional org export backends
@@ -3221,7 +3226,7 @@ A bit more intuitive handling for lists in org mode, see [[https://github.com/ca
   (interactive)
   (org-set-property
    "WATCHED"
-   (format-time-string "%Y-%m-%d %H:%M:%S")))
+   (format-time-string "[%Y-%m-%d %H:%M:%S]")))
 #+end_src
 
 * Elfeed
