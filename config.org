@@ -220,6 +220,9 @@ Mac-specific settings.
         mac-command-modifier 'meta
         mac-function-modifier 'super
         mac-right-command-modifier 'super))
+
+(setq browse-url-browser-function #'browse-url-default-macosx-browser)
+(setq browse-url-secondary-browser-function #'browse-url-default-macosx-browser)
 #+end_src
 
 Enable system clipboard.
