@@ -1353,7 +1353,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
     (ready-player-macos-use-sf-symbols)))
 #+end_src
 
-** Video streaming
+** Video / audio streaming
 
 *** Download from Youtube
 
@@ -1409,6 +1409,59 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
   (let* ((url (read-string "URL: "))
          (default-directory "~/Desktop/YT"))
     (async-shell-command (format "yle-dl '%s'" url))))
+#+end_src
+
+*** A play queue
+
+TODO: Refine.
+
+#+begin_src emacs-lisp :tangle yes
+(defvar tv/yt-queue nil
+  "Queue of YouTube URLs to play.")
+
+(defvar tv/yt-process nil
+  "Current mpv process for YouTube audio.")
+
+(defun tv/yt-play-next ()
+  "Play the next URL in `tv/yt-queue'."
+  (when tv/yt-queue
+    (let ((url (pop tv/yt-queue)))
+      (setq tv/yt-process
+            (start-process
+             "tv-yt-mpv"
+             "*tv-yt-mpv*"
+             "mpv"
+             "--no-video"
+             url))
+      (set-process-sentinel
+       tv/yt-process
+       (lambda (proc event)
+         (when (and (eq (process-status proc) 'exit)
+                    (= (process-exit-status proc) 0))
+           (tv/yt-play-next)))))))
+
+(defun tv/yt-enqueue ()
+  "Add a YouTube URL to the play queue."
+  (interactive)
+  (let ((url (read-and-return-yt-url)))
+    (setq tv/yt-queue (append tv/yt-queue (list url)))
+    (message "Queued: %s" url)
+    (unless (and tv/yt-process
+                 (process-live-p tv/yt-process))
+      (tv/yt-play-next))))
+
+(defun tv/yt-skip ()
+  "Skip current track."
+  (interactive)
+  (when (process-live-p tv/yt-process)
+    (delete-process tv/yt-process))
+  (tv/yt-play-next))
+
+(defun tv/yt-clear-queue ()
+  "Clear pending YouTube queue."
+  (interactive)
+  (setq tv/yt-queue nil)
+  (message "YouTube queue cleared"))
 #+end_src
 
 *** Empv
