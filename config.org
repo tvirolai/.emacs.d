@@ -439,10 +439,7 @@ Choose theme. Ensure that the customizations are done after loading the theme.
 (defun gui-setup ()
   "Setup the GUI appearance."
   (when (display-graphic-p)
-    (load-theme (if work-laptop-p
-                    'modus-vivendi
-                    ;; 'modus-operandi-tinted
-                  'ef-elea-dark) t)))
+    (load-theme 'modus-vivendi)))
 
 (defun add-italics (&optional theme no-confirm no-enable)
   "Set some face attributes after loading a THEME."
@@ -625,12 +622,6 @@ Create missing parent folders automatically. Source: [[https://github.com/bbatso
 #+end_src
 
 ** Themes
-
-Also install [[https://protesilaos.com/emacs/ef-themes][ef-themes]].
-
-#+begin_src emacs-lisp :tangle yes
-(use-package ef-themes)
-#+end_src
 
 Disable custom themes before loading a new one.
 
