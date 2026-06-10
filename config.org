@@ -667,15 +667,6 @@ A bit wider line spacing than the default.
 (setq-default line-spacing 0.1)
 #+end_src
 
-** Olivetti mode
-
-Olivetti mode squeezes the buffer into a column of limited width. This helps readability.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package olivetti
-  :custom (olivetti-body-width 94))
-#+end_src
-
 ** Winpulse
 
 #+begin_src emacs-lisp :tangle yes
@@ -2534,7 +2525,6 @@ Use 4 spaces as the default indentation level.
      ("CANCELED"     . "blue")
      ("[CANCELED]"   . "blue")))
   :config
-  (setq auto-fill-mode 1)
   (custom-set-faces
    '(org-document-title ((t (:inherit outline-1 :height 1.50))))
    '(org-level-1 ((t (:inherit outline-1 :height 1.30))))
@@ -2769,7 +2759,7 @@ Open multiple links at once.
       (browse-url url))))
 #+end_src
 
-** Denote
+* Denote
 
 I use =denote= for note taking and personal knowledge management.
 
@@ -4588,25 +4578,6 @@ From [[https://lmno.lol/alvaro/emacs-quick-kill-process][Xenodium]].
        :utils "kill"
        :error-autofocus t
        :silent-success t))))
-#+end_src
-
-** Write mode
-
-Enable nice settings for reading or writing.
-
-#+begin_src emacs-lisp :tangle yes
-(define-minor-mode write-mode
-  "Enable nice settings for reading or writing."
-  :init-value nil
-  (if write-mode
-      (progn
-        (olivetti-mode)
-        (variable-pitch-mode)
-        (display-line-numbers-mode -1))
-    (progn
-      (olivetti-mode -1)
-      (variable-pitch-mode -1)
-      (display-line-numbers-mode))))
 #+end_src
 
 ** Auto-chmod scripts on save
