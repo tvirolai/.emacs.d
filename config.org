@@ -1899,12 +1899,12 @@ I've only ever needed this for configuring Jenkins jobs.
 #+begin_src emacs-lisp :tangle yes
 (use-package lsp-mode
   :hook ((lsp-mode . lsp-enable-which-key-integration)
-         (lsp-mode . (lambda ()
-                       (when (derived-mode-p 'tsx-ts-mode)
-                         (corfu-mode -1))))) ;; Clashes with lsp completion
+         (lsp-mode . lsp-diagnostics-mode))
   :config
   (setq lsp-completion-enable-additional-text-edit nil
         lsp-lens-enable t
+        lsp-completion-provider :capf
+        lsp-diagnostics-provider :flycheck
         lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory)
         lsp-auto-guess-root t
         lsp-headerline-breadcrumb-enable nil
@@ -1914,6 +1914,11 @@ I've only ever needed this for configuring Jenkins jobs.
         lsp-keep-workspace-alive nil)
   (require 'lsp-eslint)
   (push 'jsts-ls lsp-disabled-clients)
+  (setq-local completion-at-point-functions
+              (list (cape-capf-super
+                     #'lsp-completion-at-point
+                     #'cape-file
+                     #'cape-dabbrev)))
   (with-eval-after-load 'lsp-mode
     (advice-add 'tv/kill-other-buffers
                 :after
