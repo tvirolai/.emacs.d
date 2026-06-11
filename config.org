@@ -4748,6 +4748,22 @@ Source: https://timothyjohnsonsci.com/writing/2025-12-30-emacs-daemon-restart/.
     (kill-emacs)))
 #+end_src
 
+** Unfill
+
+From Prot.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/simple-unfill-region-or-paragraph ()
+  "Unfill current paragraph or the active region."
+  (interactive)
+  (unless mark-ring ; needed when entering a new buffer
+    (push-mark (point) t nil))
+  (let ((fill-column most-positive-fixnum))
+    (if (region-active-p)
+        (fill-region (region-beginning) (region-end))
+      (fill-paragraph))))
+#+end_src
+
 ** Tetris
 
 No Evil mode when playing Tetris.
