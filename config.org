@@ -1474,6 +1474,7 @@ This is a Youtube client.
   :config
   (setq yeetube-display-thumbnails-p nil)
   (setf yeetube-results-limit 50)
+  (evil-set-initial-state 'yeetube-mode 'emacs)
   (add-hook 'yeetube-mode-hook
             (lambda ()
               (setq-local yeetube-mpv-no-video t)))
