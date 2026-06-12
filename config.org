@@ -1458,6 +1458,15 @@ TODO: Refine.
 #+end_src
 
 
+*** Yeetube
+
+#+begin_src emacs-lisp :tangle yes
+(use-package yeetube
+  :config
+  (setq yeetube-display-thumbnails-p nil)
+  (setf yeetube-results-limit 50))
+#+end_src
+
 * Flycheck
 
 #+begin_src emacs-lisp :tangle yes
@@ -2594,7 +2603,8 @@ Use 4 spaces as the default indentation level.
            :empty-lines 1)
           ("t" "New ticket" entry
            (file+headline org-default-notes-file "Tiketit")
-           "* TODO %i%?")
+           "* TODO %i%?"
+           :jump-to-captured t)
           ("s" "New task" entry
            (file+headline org-default-notes-file "Tehtävät")
            "* TODO %i%?")
