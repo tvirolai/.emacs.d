@@ -1457,14 +1457,28 @@ TODO: Refine.
   (setq empv-invidious-instance 'ivjs))
 #+end_src
 
-
 *** Yeetube
+
+This is a Youtube client.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package yeetube
+  :defer t
+  :custom
+  (yeetube-download-directory "~/Desktop/YT")
+  :init
+  (setq yeetube-ytdlp-program (or (executable-find "yt-dlp")
+                                  "/opt/homebrew/bin/yt-dlp")
+        yeetube-mpv-program (or (executable-find "mpv")
+                                "/opt/homebrew/bin/mpv"))
   :config
   (setq yeetube-display-thumbnails-p nil)
-  (setq yeetube-results-limit 50))
+  (setf yeetube-results-limit 50)
+  (add-hook 'yeetube-mode-hook
+            (lambda ()
+              (setq-local yeetube-mpv-no-video t)))
+  (evil-define-key '(normal motion) yeetube-mode-map
+    (kbd "RET") #'yeetube-play))
 #+end_src
 
 * Flycheck
