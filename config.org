@@ -4788,23 +4788,6 @@ From Prot.
       (fill-paragraph))))
 #+end_src
 
-** Highlight changes-mode hooks
-
-From [[https://karthinks.com/software/even-more-batteries-included-with-emacs/][Karthinks]].
-
-#+begin_src emacs-lisp :tangle yes
-(defun highlight-changes-mode-turn-off ()
-  (and highlight-changes-mode (highlight-changes-mode -1)))
-
-(defun highlight-changes-auto ()
-  (when (buffer-file-name)
-    (highlight-changes-mode-turn-on)
-    (add-hook 'after-save-hook #'highlight-changes-mode-turn-on nil t)
-    (add-hook 'before-save-hook #'highlight-changes-mode-turn-off nil t)))
-
-(add-hook 'text-mode-hook #'highlight-changes-auto)
-#+end_src
-
 ** Apropos help
 
 From [[https://karthinks.com/software/even-more-batteries-included-with-emacs/][Karthinks]].
