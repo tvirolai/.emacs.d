@@ -736,7 +736,7 @@ Use =tree-sitter=. I noticed that =treesit-auto= was slowing opening files down 
 (use-package treesit-auto
   :custom
   (treesit-auto-install 'prompt)
-  (treesit-auto-langs '(bash css commonlisp clojure dockerfile html java javascript json make markdown python haskell sql toml tsx typescript yaml))
+  (treesit-auto-langs '(bash css commonlisp clojure dockerfile html java javascript json make python haskell sql toml tsx typescript yaml))
   :config
   (defvar jf/treesit-lang-cache
     (make-hash-table :test 'equal)
@@ -2412,8 +2412,11 @@ Configure the packages.
 #+begin_src emacs-lisp :tangle yes
 (use-package markdown-mode
   :hook (markdown-mode . display-line-numbers-mode)
-  :mode ("README\\.md\\'" . gfm-mode)
-  :init (setq markdown-command "multimarkdown"))
+  :mode (("README\\.md\\'" . gfm-mode))
+  :init (setq markdown-command "multimarkdown")
+  :config
+  (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+  (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode)))
 #+end_src
 
 ** YAML
