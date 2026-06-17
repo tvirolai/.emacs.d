@@ -1263,11 +1263,19 @@ Set keybindings for profiler.
 Let's try whether this could be useful. Gptel is a light-weight LLM client supporting multiple backends.
 
 #+begin_src emacs-lisp :tangle yes
+;; (use-package gptel
+;;   :if (getenv "OPENAI_API_KEY")
+;;   :defer t
+;;   :config
+;;   (setq gptel-api-key (getenv "OPENAI_API_KEY")))
 (use-package gptel
-  :if (getenv "OPENAI_API_KEY")
   :defer t
   :config
-  (setq gptel-api-key (getenv "OPENAI_API_KEY")))
+  (setq gptel-model 'ollama/qwen3.5:9b
+        gptel-backend (gptel-make-ollama "Ollama"
+                        :host "localhost:11434"
+                        :stream t
+                        :models '(qwen3.5:9b))))
 #+end_src
 
 ** Agent-shell
@@ -1374,7 +1382,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
     (async-shell-command (format "mpv '%s'" url))))
 #+end_src
 
-*** Listen from youtube
+*** Listen from Youtube
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/yt-listen ()
@@ -1475,11 +1483,40 @@ This is a Youtube client.
   (setq yeetube-display-thumbnails-p nil)
   (setf yeetube-results-limit 50)
   (evil-set-initial-state 'yeetube-mode 'emacs)
-  ;; (add-hook 'yeetube-mode-hook
-  ;;           (lambda ()
-  ;;             (setq-local yeetube-mpv-no-video t)))
+  (add-hook 'yeetube-mode-hook
+            (lambda ()
+              (setq-local yeetube-mpv-no-video t)))
   (evil-define-key '(normal motion) yeetube-mode-map
     (kbd "RET") #'yeetube-play))
+#+end_src
+
+*** The personal music database
+
+TODO: Document.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/org-music-query ()
+  "Return plain \"ARTIST SONG\" or \"ARTIST ALBUM\" when point is on a level-3 album
+or level-4 song heading."
+  (save-excursion
+    (org-back-to-heading t)
+    (unless (> (org-outline-level) 2)
+      (error "Point is not on a level-3 or level-4 heading"))
+    (let ((song (substring-no-properties
+                 (org-get-heading t t t t)))
+          artist)
+      (while (> (org-outline-level) 2)
+        (org-up-heading-safe))
+      (setq artist
+            (substring-no-properties
+             (org-get-heading t t t t)))
+      (format "%s %s" artist song))))
+
+(defun tv/search-music-from-yeetube ()
+  "In the music knowledge base, query the song or album using yeetube."
+  (interactive)
+  (let ((query (tv/org-music-query)))
+    (yeetube-search query)))
 #+end_src
 
 * Flycheck
@@ -4179,7 +4216,7 @@ that and instead tries to complete against dictionary entries."
 
 #+begin_src emacs-lisp :tangle yes
 (use-package slack
-  :if work-laptop-p
+  :if nil ;; Disabled this for now
   :bind (("C-c S K" . slack-stop)
          ("C-c S c" . slack-select-rooms)
          ("C-c S u" . slack-select-unread-rooms)
