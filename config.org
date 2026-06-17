@@ -1517,6 +1517,9 @@ or level-4 song heading."
   (interactive)
   (let ((query (tv/org-music-query)))
     (yeetube-search query)))
+
+;; The mnemonic: query music
+(global-set-key (kbd "C-c q m") #'tv/search-music-from-yeetube)
 #+end_src
 
 * Flycheck
