@@ -2673,7 +2673,11 @@ Use 4 spaces as the default indentation level.
 :CAPTURED: %U
 :END:"
            :prepend t
-           :empty-lines-before 1)))
+           :empty-lines-before 1)
+          ("a" "Apartment listing" entry
+           (file+headline "notes/20250206T142141--asuntoilmoituksia__asunnot_asuntoilmoitukset_asuntokauppa_linkit_listat_oikotie.org" "Myynnissä")
+           "** %i%?"
+           :prepend t)))
   ;; Export settings
   (setq org-export-with-toc nil)  ; No table of contents
   (setq org-export-with-section-numbers nil)  ; No section numbers
