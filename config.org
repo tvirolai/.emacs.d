@@ -730,38 +730,46 @@ Bypass on-save hooks when needed.
 
 * Tree-sitter
 
-Use =tree-sitter=. I noticed that =treesit-auto= was slowing opening files down a /lot/, so I copied a workaround from [[https://github.com/jeremyf/dotemacs/blob/75410e2f56273b2be4abf10d0d72627ec4ad6a85/emacs.d/init.el#L5176-L5197][Jeremy Friesen]], which caches the availability calls. [[https://github.com/renzmann/treesit-auto/issues/135][The issue is known]] but as of yet unaddressed.
+Use =tree-sitter=. I noticed that =treesit-auto= was slowing opening files down a /lot/, so I copied a workaround from [[https://github.com/jeremyf/dotemacs/blob/75410e2f56273b2be4abf10d0d72627ec4ad6a85/emacs.d/init.el#L5176-L5197][Jeremy Friesen]] uu[[HTTPS://github.com/renzmann/treesit-auto/issues/135][The issue is known]] but as of yet unaddressed.
 
 #+begin_src emacs-lisp :tangle yes
-(use-package treesit-auto
+;; (use-package treesit-auto
+;;   :custom
+;;   (treesit-auto-install 'prompt)
+;;   (treesit-auto-langs '(bash css commonlisp clojure dockerfile html java javascript json make python haskell sql toml tsx typescript yaml))
+;;   :config
+;;   (defvar jf/treesit-lang-cache
+;;     (make-hash-table :test 'equal)
+;;     "Cache the expensive computation of treelit language availability.
+
+;; See `jf/treesit-language-available-p' for usage.")
+
+;;   (defun jf/treesit-language-available-p (fn lang &rest rest)
+;;     "Caching around the CPU expensive `treesit-language-available-p'."
+;;     ;; I did some profiling of `treesit-language-available-p', and found
+;;     ;; that when moving around via consult (and therefore preview) this
+;;     ;; function was contributing to 75% of the CPU time.  And it was run
+;;     ;; each time.
+;;     (let ((cached-value
+;;            (gethash lang jf/treesit-lang-cache 'miss)))
+;;       (if (eq 'miss cached-value)
+;;           (let ((value
+;;                  (apply fn lang rest)))
+;;             (puthash lang value jf/treesit-lang-cache)
+;;             value)
+;;         cached-value)))
+;;   (advice-add #'treesit-language-available-p
+;;               :around #'jf/treesit-language-available-p)
+;;   (treesit-auto-add-to-auto-mode-alist 'all)
+;;   (global-treesit-auto-mode))
+#+end_src
+
+#+begin_src emacs-lisp :tangle yes
+(use-package treesit
+  :ensure nil
   :custom
-  (treesit-auto-install 'prompt)
-  (treesit-auto-langs '(bash css commonlisp clojure dockerfile html java javascript json make python haskell sql toml tsx typescript yaml))
-  :config
-  (defvar jf/treesit-lang-cache
-    (make-hash-table :test 'equal)
-    "Cache the expensive computation of treelit language availability.
-
-See `jf/treesit-language-available-p' for usage.")
-
-  (defun jf/treesit-language-available-p (fn lang &rest rest)
-    "Caching around the CPU expensive `treesit-language-available-p'."
-    ;; I did some profiling of `treesit-language-available-p', and found
-    ;; that when moving around via consult (and therefore preview) this
-    ;; function was contributing to 75% of the CPU time.  And it was run
-    ;; each time.
-    (let ((cached-value
-           (gethash lang jf/treesit-lang-cache 'miss)))
-      (if (eq 'miss cached-value)
-          (let ((value
-                 (apply fn lang rest)))
-            (puthash lang value jf/treesit-lang-cache)
-            value)
-        cached-value)))
-  (advice-add #'treesit-language-available-p
-              :around #'jf/treesit-language-available-p)
-  (treesit-auto-add-to-auto-mode-alist 'all)
-  (global-treesit-auto-mode))
+  (treesit-auto-install-grammar t)
+  (treesit-enabled-modes t))
 #+end_src
 
 * Undo system
@@ -1271,11 +1279,11 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 (use-package gptel
   :defer t
   :config
-  (setq gptel-model 'ollama/qwen3.5:9b
+  (setq gptel-model 'ollama/gemma4:latest
         gptel-backend (gptel-make-ollama "Ollama"
                         :host "localhost:11434"
                         :stream t
-                        :models '(qwen3.5:9b))))
+                        :models '(gemma4:latest))))
 #+end_src
 
 ** Agent-shell
@@ -1742,13 +1750,13 @@ I've resorted to this hack to run the indentation and capitalization for the who
 ** Prisma ORM
 
 #+begin_src emacs-lisp :tangle yes
-(use-package prisma-ts-mode
-  :defer t
-  :mode (("\\.prisma" . prisma-ts-mode))
-  :config
-  (add-to-list
-   'treesit-language-source-alist
-   '(prisma "https://github.com/victorhqc/tree-sitter-prisma")))
+;; (use-package prisma-ts-mode
+;;   :defer t
+;;   :mode (("\\.prisma" . prisma-ts-mode))
+;;   :config
+;;   (add-to-list
+;;    'treesit-language-source-alist
+;;    '(prisma "https://github.com/victorhqc/tree-sitter-prisma")))
 #+end_src
 
 ** Emacs Lisp
@@ -1986,7 +1994,11 @@ Run Sonarlint in the editor.
 * Eldoc
 
 #+begin_src emacs-lisp :tangle yes
-(setq eldoc-echo-area-use-multiline-p nil)
+(use-package eldoc
+  :ensure nil
+  :custom
+  (eldoc-echo-area-use-multiline-p nil)
+  (eldoc-help-at-pt t))
 #+end_src
 
 * Verb
@@ -2299,6 +2311,14 @@ Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
   :after yasnippet)
 #+end_src
 
+** New stuff in Emacs 31
+
+#+begin_src emacs-lisp :tangle yes
+(setq completion-eager-update t)               ;; EMACS-31
+(setq completion-eager-display 'auto)          ;; EMACS-31
+(setq minibuffer-visible-completions 'up-down) ;; EMACS-31
+#+end_src
+
 * History
 
 ** Setup a directory for savefiles
@@ -2450,10 +2470,19 @@ Configure the packages.
 ** Markdown
 
 #+begin_src emacs-lisp :tangle yes
-(use-package markdown-mode
-  :hook (markdown-mode . display-line-numbers-mode)
+;; (use-package markdown-mode
+;;   :hook (markdown-mode . display-line-numbers-mode)
+;;   :mode (("README\\.md\\'" . gfm-mode))
+;;   :init (setq markdown-command "multimarkdown")
+;;   :config
+;;   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
+;;   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode)))
+
+(use-package markdown-ts-mode
+  :ensure nil
+  :defer t
+  :hook (gfm-mode . display-line-numbers-mode)
   :mode (("README\\.md\\'" . gfm-mode))
-  :init (setq markdown-command "multimarkdown")
   :config
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode)))
@@ -3750,99 +3779,6 @@ Install [[https://github.com/Fuco1/dired-narrow][dired-narrow]].
 
 #+begin_src emacs-lisp :tangle yes
 (use-package dired-narrow)
-#+end_src
-
-* Transient
-
-Modified from [[https://github.com/gopar/.emacs.d][Gopar]].
-
-#+begin_src emacs-lisp :tangle yes
-(use-package transient
-  :bind ("C-M-o" . windows-transient-window)
-  :config
-  (transient-define-prefix windows-transient-window ()
-    "Display a transient buffer showing useful window manipulation bindings."
-    [["Resize"
-      ("}" "h+" enlarge-window-horizontally :transient t)
-      ("{" "h-" shrink-window-horizontally :transient t)
-      ("^" "v+" enlarge-window :transient t)
-      ("V" "v-" shrink-window :transient t)]
-     ["Split"
-      ("v" "vertical" (lambda ()
-                        (interactive)
-                        (split-window-right)
-                        (windmove-right)) :transient t)
-      ("x" "horizontal" (lambda ()
-                          (interactive)
-                          (split-window-below)
-                          (windmove-down)) :transient t)
-      ("wv" "win-vertical" (lambda ()
-                             (interactive)
-                             (select-window (split-window-right))
-                             (windows-transient-window)) :transient nil)
-      ("wx" "win-horizontal" (lambda ()
-                               (interactive)
-                               (select-window (split-window-below))
-                               (windows-transient-window)) :transient nil)]
-     ["Misc"
-      ("B" "switch buffer" (lambda ()
-                             (interactive)
-                             (consult-buffer)
-                             (windows-transient-window)))
-      ("z" "undo" (lambda ()
-                    (interactive)
-                    (winner-undo)
-                    (setq this-command 'winner-undo)) :transient t)
-      ("Z" "redo" winner-redo :transient t)]]
-    [["Move"
-      ("h" "←" windmove-left :transient nil)
-      ("j" "↓" windmove-down :transient nil)
-      ("l" "→" windmove-right :transient nil)
-      ("k" "↑" windmove-up :transient nil)]
-     ["Swap"
-      ("sh" "←" windmove-swap-states-left :transient t)
-      ("sj" "↓" windmove-swap-states-down :transient t)
-      ("sl" "→" windmove-swap-states-right :transient t)
-      ("sk" "↑" windmove-swap-states-up :transient t)]
-     ["Delete"
-      ("dh" "←" windmove-delete-left :transient t)
-      ("dj" "↓" windmove-delete-down :transient t)
-      ("dl" "→" windmove-delete-right :transient t)
-      ("dk" "↑" windmove-delete-up :transient t)
-      ("D" "This" delete-window :transient t)]
-     ["Transpose"
-      ("tt" "↜" (lambda ()
-                  (interactive)
-                  (transpose-frame)
-                  (windows-transient-window)) :transient nil)
-      ("ti" "↕" (lambda ()
-                  (interactive)
-                  (flip-frame)
-                  (windows-transient-window)) :transient nil)
-      ("to" "⟷" (lambda ()
-                  (interactive)
-                  (flop-frame)
-                  (windows-transient-window)) :transient nil)
-      ("tc" "⟳" (lambda ()
-                  (interactive)
-                  (rotate-frame-clockwise)
-                  (windows-transient-window)) :transient nil)
-      ("ta" "⟲" (lambda ()
-                  (interactive)
-                  (rotate-frame-anticlockwise)
-                  (windows-transient-window)) :transient nil)]
-     ["Exit"
-      ("<escape>" "exit menu" (lambda ()
-                                (interactive)
-                                (transient-quit-one)) :transient nil)
-      ("q" "exit menu" (lambda ()
-                         (interactive)
-                         (transient-quit-one)) :transient nil)]]))
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes
-(use-package transpose-frame
-  :after transient)
 #+end_src
 
 * Email
