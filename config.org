@@ -1530,6 +1530,16 @@ or level-4 song heading."
 (global-set-key (kbd "C-c q m") #'tv/search-music-from-yeetube)
 #+end_src
 
+*** YTR
+
+A Youtube radio player.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ytr
+  :vc (:url "https://github.com/xenodium/ytr" :rev :newest)
+  :commands (ytr))
+#+end_src
+
 * Flycheck
 
 #+begin_src emacs-lisp :tangle yes
