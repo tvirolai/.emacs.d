@@ -4274,6 +4274,23 @@ Trying this. Source: https://erichlf.github.io/blog/2020/09/09/how-to-setup-emac
 ;;   '(((:category . "slack")) my/alert-style nil))
 #+end_src
 
+* Popper
+
+#+begin_src emacs-lisp :tangle yes
+(use-package popper
+  :ensure t ; or :straight t
+  :bind (("C-+"   . popper-toggle)
+         ("M-'"   . popper-cycle)
+         ("C-M-'" . popper-toggle-type))
+  :init
+  (setq popper-reference-buffers
+        '("\\*Async Shell Command\\*"
+          "^\\*eshell.*\\*$" eshell-mode ;eshell as a popup
+          compilation-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1))                ; For echo area hints
+#+end_src
+
 * Helpful
 
 [[https://github.com/Wilfred/helpful][Helpful]] seems to be useful. It provides more information about things than the built-in help system.
