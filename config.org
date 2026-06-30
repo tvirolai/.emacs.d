@@ -4165,6 +4165,28 @@ that and instead tries to complete against dictionary entries."
 ;; (setq smtpmail-stream-type 'ssl)
 #+end_src
 
+** Fix for a URL opening issue
+
+=RET= in Evil-mode broke at some point for Notmuch. I want that to open a URL under point.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/notmuch-url-at-point ()
+  (or (get-text-property (point) 'shr-url)
+      (get-text-property (point) 'help-echo)
+      (thing-at-point-url-at-point)))
+
+(defun tv/notmuch-show-ret ()
+  (interactive)
+  (if-let ((url (tv/notmuch-url-at-point)))
+      (browse-url url)
+    (notmuch-show-toggle-message)))
+
+(with-eval-after-load 'notmuch-show
+  (evil-define-key 'normal notmuch-show-mode-map
+    (kbd "RET") #'tv/notmuch-show-ret
+    (kbd "<return>") #'tv/notmuch-show-ret))
+#+end_src
+
 * Slack
 
 #+begin_src emacs-lisp :tangle yes
