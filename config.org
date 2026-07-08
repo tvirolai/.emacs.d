@@ -1057,6 +1057,19 @@ Use =which-key=, in minibuffer.
     (setq-local which-key-inhibit t)))
 #+end_src
 
+Define a keymap and a global minor mode for global overrides. See Prot's [[https://protesilaos.com/codelog/2026-07-08-emacs-global-keybinding-overrides/][video]] on the subject.
+
+#+begin_src emacs-lisp :tangle yes
+(defvar tv-overrides-mode-map (make-sparse-keymap)
+  "Keymap for global overrides.")
+
+(define-minor-mode tv-overrides-mode
+  "Activate the `tv-overrides-mode-map'"
+  :global t
+  :init-value nil
+  :keymap tv-overrides-mode-map)
+#+end_src
+
 Make =ESC= quit wherever possible.
 
 #+begin_src emacs-lisp :tangle yes
@@ -1134,10 +1147,15 @@ Bind a comfortable global key combination for =other-window= as =C-x o= is too l
   :custom
   (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
-(global-set-key (kbd "M-o") #'ace-window)
+(define-key tv-overrides-mode-map (kbd "M-o") #'ace-window)
+(define-key tv-overrides-mode-map (kbd "M-O") #'other-window)
+(define-key tv-overrides-mode-map (kbd "M-å") #'delete-window)
+
+(tv-overrides-mode 1)
+;; (global-set-key (kbd "M-o") #'ace-window)
 ;; (global-set-key (kbd "M-O") #'tv/prev-window)
-(global-set-key (kbd "M-O") #'other-window)
-(global-set-key (kbd "M-å") #'delete-window)
+;; (global-set-key (kbd "M-O") #'other-window)
+;; (global-set-key (kbd "M-å") #'delete-window)
 #+end_src
 
 Prevent the "Text is read only" message when pressing backspace in minibuffer ([[https://emacs.stackexchange.com/questions/66589/how-to-prevent-text-is-read-only-when-in-minibuffer?newreg=e978077fa67744548d4395e6d7a973b5][source]]).
@@ -1490,10 +1508,6 @@ This is a Youtube client.
   :config
   (setq yeetube-display-thumbnails-p nil)
   (setf yeetube-results-limit 50)
-  (evil-set-initial-state 'yeetube-mode 'emacs)
-  (add-hook 'yeetube-mode-hook
-            (lambda ()
-              (setq-local yeetube-mpv-no-video t)))
   (evil-define-key '(normal motion) yeetube-mode-map
     (kbd "RET") #'yeetube-play))
 #+end_src
