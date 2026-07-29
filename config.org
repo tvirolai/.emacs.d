@@ -730,45 +730,11 @@ Bypass on-save hooks when needed.
 
 * Tree-sitter
 
-Use =tree-sitter=. I noticed that =treesit-auto= was slowing opening files down a /lot/, so I copied a workaround from [[https://github.com/jeremyf/dotemacs/blob/75410e2f56273b2be4abf10d0d72627ec4ad6a85/emacs.d/init.el#L5176-L5197][Jeremy Friesen]] uu[[HTTPS://github.com/renzmann/treesit-auto/issues/135][The issue is known]] but as of yet unaddressed.
-
-#+begin_src emacs-lisp :tangle yes
-;; (use-package treesit-auto
-;;   :custom
-;;   (treesit-auto-install 'prompt)
-;;   (treesit-auto-langs '(bash css commonlisp clojure dockerfile html java javascript json make python haskell sql toml tsx typescript yaml))
-;;   :config
-;;   (defvar jf/treesit-lang-cache
-;;     (make-hash-table :test 'equal)
-;;     "Cache the expensive computation of treelit language availability.
-
-;; See `jf/treesit-language-available-p' for usage.")
-
-;;   (defun jf/treesit-language-available-p (fn lang &rest rest)
-;;     "Caching around the CPU expensive `treesit-language-available-p'."
-;;     ;; I did some profiling of `treesit-language-available-p', and found
-;;     ;; that when moving around via consult (and therefore preview) this
-;;     ;; function was contributing to 75% of the CPU time.  And it was run
-;;     ;; each time.
-;;     (let ((cached-value
-;;            (gethash lang jf/treesit-lang-cache 'miss)))
-;;       (if (eq 'miss cached-value)
-;;           (let ((value
-;;                  (apply fn lang rest)))
-;;             (puthash lang value jf/treesit-lang-cache)
-;;             value)
-;;         cached-value)))
-;;   (advice-add #'treesit-language-available-p
-;;               :around #'jf/treesit-language-available-p)
-;;   (treesit-auto-add-to-auto-mode-alist 'all)
-;;   (global-treesit-auto-mode))
-#+end_src
-
 #+begin_src emacs-lisp :tangle yes
 (use-package treesit
   :ensure nil
   :custom
-  (treesit-auto-install-grammar t)
+  (treesit-auto-install-grammar t) ; Emacs 31.1
   (treesit-enabled-modes t))
 #+end_src
 
@@ -1029,7 +995,7 @@ Travel back in time.
 
 ** Git-link
 
-Generate a link to Github (or whatever the project uses) directly from code.
+Generate a link to Github (or whatever forge the project uses) directly from code.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package git-link
@@ -1262,8 +1228,10 @@ Control the display of common ancillary windows.
 Easy buffer switching.
 
 #+begin_src emacs-lisp :tangle yes
-(evil-define-key 'normal 'global (kbd "C-M-l") 'next-buffer)
-(evil-define-key 'normal 'global (kbd "C-M-h") 'previous-buffer)
+;; (evil-define-key 'normal 'global (kbd "C-M-l") 'next-buffer)
+;; (evil-define-key 'normal 'global (kbd "C-M-h") 'previous-buffer)
+(define-key tv-overrides-mode-map (kbd "C-M-l") #'next-buffer)
+(define-key tv-overrides-mode-map (kbd "C-M-h") #'previous-buffer)
 #+end_src
 
 Jump to previous positions from the mark ring by repeating the command.
@@ -1427,6 +1395,19 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
   (let* ((url (read-string "URL: "))
          (default-directory "~/Desktop/YT"))
     (async-shell-command (format "yle-dl '%s'" url))))
+#+end_src
+
+*** Download from BBC etc.
+
+Download from BBC iPlayer or other compatible services. Save English subs as srt.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/download-from-bbc ()
+  "Download from BBC iPlayer or other compatible streaming service."
+  (interactive)
+  (let* ((url (input (read-string "Id tai URL: ")))
+         (default-directory "~/Desktop/YT"))
+    (async-shell-command (format "yt-dlp --write-subs --sub-format 'srt' --sub-langs 'en' '%s'" url))))
 #+end_src
 
 *** A play queue
@@ -2667,18 +2648,18 @@ Use 4 spaces as the default indentation level.
     (kbd "§") #'verb-send-request-on-point-display)
   ;; Include the time in timestamps by default.
   ;; (setq org-time-stamp-formats '("<%Y-%m-%d %a %H:%M>" . "<%Y-%m-%d %a %H:%M>"))
-  (setq org-M-RET-may-split-line '((default . nil)))
-  (setq org-insert-heading-respect-content t)
-  (setq org-directory "~/org/")
-  (setq org-default-notes-file (concat org-directory "inbox.org"))
-  (setq org-deadline-warning-days 35)
-  (setq org-work-notes-file (concat org-directory "work.org"))
-  (setq org-archive-location "archive/Archive_%s::")
-  (setq org-ellipsis " ▾")
-  (setq org-src-fontify-natively t)
-  (setq org-superstar-headline-bullets-list '("› "))
-  (setq org-agenda-start-with-log-mode t)
-  (setq org-cycle-emulate-tab nil)
+  (setopt org-M-RET-may-split-line '((default . nil)))
+  (setopt org-insert-heading-respect-content t)
+  (setopt org-directory "~/org/")
+  (setopt org-default-notes-file (concat org-directory "inbox.org"))
+  (setopt org-deadline-warning-days 35)
+  (setopt org-work-notes-file (concat org-directory "work.org"))
+  (setopt org-archive-location "archive/Archive_%s::")
+  (setopt org-ellipsis " ▾")
+  (setopt org-src-fontify-natively t)
+  (setopt org-superstar-headline-bullets-list '("› "))
+  (setopt org-agenda-start-with-log-mode t)
+  (setopt org-cycle-emulate-tab nil)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((sql . t)
@@ -2730,12 +2711,15 @@ Use 4 spaces as the default indentation level.
           ("a" "Apartment listing" entry
            (file+headline "notes/20250206T142141--asuntoilmoituksia__asunnot_asuntoilmoitukset_asuntokauppa_linkit_listat_oikotie.org" "Myynnissä")
            "** %i%?"
-           :prepend t)))
+           :prepend t)
+          ("m" "Music" entry
+           (file+headline "~/org/music.org" "Inbox")
+           "** %i%?")))
   ;; Export settings
-  (setq org-export-with-toc nil)  ; No table of contents
-  (setq org-export-with-section-numbers nil)  ; No section numbers
-  (setq org-export-with-smart-quotes t)  ; Use smart quotes
-  (setq org-export-with-sub-superscripts nil)  ; No superscripts
+  (setopt org-export-with-toc nil)  ; No table of contents
+  (setopt org-export-with-section-numbers nil)  ; No section numbers
+  (setopt org-export-with-smart-quotes t)  ; Use smart quotes
+  (setopt org-export-with-sub-superscripts nil)  ; No superscripts
   ;; https://github.com/zzamboni/dot-emacs/blob/master/init.org
   :hook ((org-mode . visual-line-mode)))
 
@@ -3226,7 +3210,9 @@ Configuration adapted from [[https://systemcrafters.net/emacs-tips/presentations
   :defer t)
 
 (use-package visual-fill-column
-  :defer t)
+  :defer t
+  :custom
+  (visual-fill-column-width 80))
 
 ;; Configure fill width
 (setq visual-fill-column-width 110
