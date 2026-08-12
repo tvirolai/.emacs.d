@@ -525,6 +525,7 @@ No lockfiles.
 
 #+begin_src emacs-lisp :tangle yes
 (setq global-visual-line-mode nil)
+(global-visual-wrap-prefix-mode t)
 #+end_src
 
 Make the titlebar transparent.
@@ -1405,7 +1406,7 @@ Download from BBC iPlayer or other compatible services. Save English subs as srt
 (defun tv/download-from-bbc ()
   "Download from BBC iPlayer or other compatible streaming service."
   (interactive)
-  (let* ((url (input (read-string "Id tai URL: ")))
+  (let* ((url (read-string "Id tai URL: "))
          (default-directory "~/Desktop/YT"))
     (async-shell-command (format "yt-dlp --write-subs --sub-format 'srt' --sub-langs 'en' '%s'" url))))
 #+end_src
@@ -4181,7 +4182,7 @@ that and instead tries to complete against dictionary entries."
       (browse-url url)
     (notmuch-show-toggle-message)))
 
-(with-eval-after-load 'notmuch-show
+(with-eval-after-load 'notmuch
   (evil-define-key 'normal notmuch-show-mode-map
     (kbd "RET") #'tv/notmuch-show-ret
     (kbd "<return>") #'tv/notmuch-show-ret))
