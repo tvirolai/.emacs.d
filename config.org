@@ -930,10 +930,12 @@ From [[https://github.com/LionyxML/emacs-solo][Emacs Solo]].
     "q" #'tv/mu-magit-kill-buffers))
 #+end_src
 
-Load Magit-extras. This enables e.g. jumping straight to Magit status buffer when switching projects.
+This enables jumping straight to Magit status buffer when switching projects.
 
 #+begin_src elisp :tangle yes
-(require 'magit-extras)
+(with-eval-after-load 'project
+  (add-to-list 'project-switch-commands
+               '(magit-project-status "Magit" ?m) t))
 #+end_src
 
 Magit deprecated the =magit-clean= function, so I rolled my own.
@@ -1271,6 +1273,14 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
                         :host "localhost:11434"
                         :stream t
                         :models '(gemma4:latest))))
+(use-package gptel
+  :defer t
+  :config
+  (setq gptel-model 'ollama/qwen3.8:27b
+        gptel-backend (gptel-make-ollama "Qwen"
+                        :host "localhost:11434"
+                        :stream t
+                        :models '(qwen3.8:27b))))
 #+end_src
 
 ** Agent-shell
