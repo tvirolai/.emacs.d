@@ -1418,7 +1418,7 @@ Download from BBC iPlayer or other compatible services. Save English subs as srt
   (interactive)
   (let* ((url (read-string "Id tai URL: "))
          (default-directory "~/Desktop/YT"))
-    (async-shell-command (format "yt-dlp --write-subs --sub-format 'srt' --sub-langs 'en' '%s'" url))))
+    (async-shell-command (format "yt-dlp --write-subs --sub-langs 'en' '%s'" url))))
 #+end_src
 
 *** A play queue
