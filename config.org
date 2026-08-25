@@ -1289,6 +1289,8 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 (use-package agent-shell
   :if work-laptop-p
   :defer t
+  :vc (:url "https://github.com/xenodium/agent-shell"
+            :rev "c57c11c")
   :bind ("C-c p a" . agent-shell)
   :ensure-system-package
   ;; Add agent installation configs here
@@ -1410,7 +1412,7 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 
 *** Download from BBC etc.
 
-Download from BBC iPlayer or other compatible services. Save English subs as srt.
+Download from BBC iPlayer or other compatible services.
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/download-from-bbc ()
@@ -3168,7 +3170,7 @@ Helpers for adding new elements to front matter.
   (org-agenda-current-time-string "<- now")
   (org-agenda-timegrid-use-ampm t)
   (org-agenda-tags-column 0)
-  (org-agenda-start-day "-1d") ;; Show the previous day.
+  (org-agenda-start-day "-2d") ;; Show the previous day.
   (org-agenda-window-setup 'only-window)
   (org-agenda-restore-windows-after-quit t)
   (org-agenda-log-mode-items '(closed clock state))
