@@ -1534,8 +1534,50 @@ or level-4 song heading."
   (let ((query (tv/org-music-query)))
     (yeetube-search query)))
 
+(defun tv/insert-first-music-url-from-yeetube--callback
+    (status target query)
+  "Insert the first video from a Yeetube response at TARGET.
+STATUS is the retrieval status and QUERY is used in status messages."
+  (unwind-protect
+      (let* ((result
+              (yeetube--parse-response
+               status
+               (lambda () (yeetube-backend-parse-page 'youtube))))
+             (video
+              (seq-find
+               (lambda (item) (eq (plist-get item :type) 'video))
+               (plist-get result :items))))
+        (cond
+         ((not result))
+         ((not video)
+          (message "No YouTube videos found for %s" query))
+         ((not (marker-buffer target))
+          (message "The insertion buffer no longer exists"))
+         (t
+          (let ((url (yeetube-backend-item-url
+                      'youtube (plist-get video :id) 'video)))
+            (with-current-buffer (marker-buffer target)
+              (save-excursion
+                (goto-char target)
+                (insert url)))
+            (message "Inserted %s" url)))))
+    (set-marker target nil)))
+
+(defun tv/insert-first-music-url-from-yeetube ()
+  "Insert the first YouTube video URL matching the song or album at point."
+  (interactive)
+  (require 'yeetube)
+  (let ((query (tv/org-music-query))
+        (target (copy-marker (point))))
+    (message "Searching YouTube for %s..." query)
+    (yeetube--fetch
+     (yeetube-backend-search-request 'youtube query)
+     #'tv/insert-first-music-url-from-yeetube--callback
+     (list target query))))
+
 ;; The mnemonic: query music
 (global-set-key (kbd "C-c q m") #'tv/search-music-from-yeetube)
+(global-set-key (kbd "C-c q M") #'tv/insert-first-music-url-from-yeetube)
 #+end_src
 
 *** YTR
@@ -3773,7 +3815,7 @@ Disable images.
   (dired-kill-when-opening-new-dired-buffer t) ;; Without this, each directory level opens in its own buffer.
   (dired-do-revert-buffer t)
   (dired-auto-revert-buffer t)
-  (delete-by-moving-to-trash t)
+  (delete-by-moving-to-trash nil)
   (dired-mouse-drag-files t)
   (dired-clean-up-buffers-too t)
   (dired-dwim-target t)
