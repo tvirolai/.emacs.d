@@ -1392,10 +1392,10 @@ Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodiu
 *** Listen from Youtube
 
 #+begin_src emacs-lisp :tangle yes
-(defun tv/yt-listen ()
+(defun tv/yt-listen (&optional url)
   "Play a Youtube video as audio. Input is either video id or full url."
   (interactive)
-  (let ((url (read-and-return-yt-url)))
+  (let ((url (or url (read-and-return-yt-url))))
     (async-shell-command (format "mpv --no-video '%s'" url))))
 #+end_src
 
@@ -1535,9 +1535,10 @@ or level-4 song heading."
     (yeetube-search query)))
 
 (defun tv/insert-first-music-url-from-yeetube--callback
-    (status target query)
-  "Insert the first video from a Yeetube response at TARGET.
-STATUS is the retrieval status and QUERY is used in status messages."
+    (status target query &optional action)
+  "Handle the first video from a Yeetube response for QUERY.
+STATUS is the retrieval status.  When ACTION is non-nil, call it
+with the video URL and TARGET; otherwise insert the URL at TARGET."
   (unwind-protect
       (let* ((result
               (yeetube--parse-response
@@ -1556,28 +1557,58 @@ STATUS is the retrieval status and QUERY is used in status messages."
          (t
           (let ((url (yeetube-backend-item-url
                       'youtube (plist-get video :id) 'video)))
-            (with-current-buffer (marker-buffer target)
-              (save-excursion
-                (goto-char target)
-                (insert url)))
-            (message "Inserted %s" url)))))
+            (if action
+                (funcall action url target)
+              (with-current-buffer (marker-buffer target)
+                (save-excursion
+                  (goto-char target)
+                  (insert url)))
+              (message "Inserted %s" url))))))
     (set-marker target nil)))
+
+(defun tv/first-music-url-from-yeetube (query target &optional action)
+  "Find the first YouTube video for QUERY.
+Pass its URL and TARGET to ACTION, or insert it at TARGET when
+ACTION is nil."
+  (require 'yeetube)
+  (message "Searching YouTube for %s..." query)
+  (yeetube--fetch
+   (yeetube-backend-search-request 'youtube query)
+   #'tv/insert-first-music-url-from-yeetube--callback
+   (list target query action)))
 
 (defun tv/insert-first-music-url-from-yeetube ()
   "Insert the first YouTube video URL matching the song or album at point."
   (interactive)
-  (require 'yeetube)
-  (let ((query (tv/org-music-query))
-        (target (copy-marker (point))))
-    (message "Searching YouTube for %s..." query)
-    (yeetube--fetch
-     (yeetube-backend-search-request 'youtube query)
-     #'tv/insert-first-music-url-from-yeetube--callback
-     (list target query))))
+  (tv/first-music-url-from-yeetube
+   (tv/org-music-query)
+   (copy-marker (point))))
+
+(defun tv/play-song-yt--store-and-play (url target)
+  "Store URL as the YOUTUBE property at TARGET and play it."
+  (with-current-buffer (marker-buffer target)
+    (save-excursion
+      (goto-char target)
+      (org-back-to-heading t)
+      (org-set-property "YOUTUBE" url)
+      (tv/yt-listen (org-entry-get (point) "YOUTUBE")))))
+
+(defun tv/play-song-yt ()
+  "Play the song at point using its YOUTUBE property.
+If the property does not exist, fetch and store its value first."
+  (interactive)
+  (let ((url (org-entry-get (point) "YOUTUBE")))
+    (if (and url (not (string-empty-p url)))
+        (tv/yt-listen url)
+      (tv/first-music-url-from-yeetube
+       (tv/org-music-query)
+       (copy-marker (point))
+       #'tv/play-song-yt--store-and-play))))
 
 ;; The mnemonic: query music
 (global-set-key (kbd "C-c q m") #'tv/search-music-from-yeetube)
 (global-set-key (kbd "C-c q M") #'tv/insert-first-music-url-from-yeetube)
+(global-set-key (kbd "C-c q p") #'tv/play-song-yt)
 #+end_src
 
 *** YTR
