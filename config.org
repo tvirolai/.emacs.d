@@ -1117,7 +1117,9 @@ Bind a comfortable global key combination for =other-window= as =C-x o= is too l
   (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l)))
 
 (define-key tv-overrides-mode-map (kbd "M-o") #'ace-window)
-(define-key tv-overrides-mode-map (kbd "M-O") #'other-window)
+;; This allows switching focus easily to e.g. ytr frame.
+;; See: https://xenodium.com/focus-windows-across-emacs-frames
+(define-key tv-overrides-mode-map (kbd "M-O") #'next-window-any-frame)
 (define-key tv-overrides-mode-map (kbd "M-å") #'delete-window)
 
 (tv-overrides-mode 1)
