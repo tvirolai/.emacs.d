@@ -1337,7 +1337,7 @@ Let's try plain text accounting.
 
 ** Ready player mode
 
-Trying [[https://github.com/xenodium/ready-player][this]] out. [[https://xenodium.com/a-tour-of-ready-player-mode][Seems]] like a nice way to play music and other media directly from Emacs.
+Ready player mode is a nice way to play locally stored music and other media directly from Emacs.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package ready-player
@@ -1508,9 +1508,36 @@ This is a Youtube client.
     (kbd "RET") #'yeetube-play))
 #+end_src
 
-*** The personal music database
+*** The personal music knowledge base
 
-TODO: Document.
+Since I like to own my data, I don't feel like storing playlists, info about my favourite albums and such stuff in streaming service providers' systems. Instead I've decided to manage that stuff locally.
+
+What I currently do is use an org file to store data about interesting music I've encountered for later reference. This not meant to contain all and everything I've ever enjoyed but to grow organically in time. Whenever I encounter something new I like - or find interesting in some way at least - I store it as a node using a capture template.
+
+This file should act as the master for data like this. Where the music is played from is a different thing. Streaming services, such as Youtube, act as backends. The backends can be both stored along as properties (such as a Youtube URL for a song, full album or a playlist) and be queried dynamically. If I have a node like the following:
+
+#+begin_src org
+* Music
+** Type O Negative
+*** October Rust
+**** Wolf Moon
+#+end_src
+
+I can place the point on the innermost node and press =C-c q p=. This runs a query looking for ="Type O Negative Wolf Moon" from Youtube, returns the first match, adds that as a property and starts playing it. Afterwards, the section looks like the following.
+
+#+begin_src org
+* Music
+** Type O Negative
+*** October Rust
+**** Wolf Moon
+:PROPERTIES:
+:YOUTUBE:  https://youtube.com/watch?v=3e1gkynGXXM
+:END:
+#+end_src
+
+This system, while functional and data-driven, still needs refining. One thing I personally miss and think of implementing is a play queue. It would show the current song, when it switches, in the echo area. I'm also going to be looking into integrating other backends better into the system.
+
+This will probably be a package eventually.
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/org-music-query ()
@@ -2259,6 +2286,23 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (setq tab-always-indent 'complete))
 #+end_src
 
+** Completion-preview
+
+#+begin_src emacs-lisp :tangle yes
+(use-package completion-preview
+  :ensure nil
+  :demand t
+  :bind (:map completion-preview-active-mode-map
+              ("M-i" . completion-preview-insert-word)
+              ("M-n" . completion-preview-next-candidate)
+              ("M-p" . completion-preview-prev-candidate)
+              ("M-<return>" . completion-preview-insert)
+              ("<tab>" . completion-preview-complete))
+  :config
+  (setq completion-preview-minimum-symbol-length 2)
+  (global-completion-preview-mode nil))
+#+end_src
+
 ** Orderless
 
 #+begin_src emacs-lisp :tangle yes
@@ -2665,6 +2709,9 @@ Use 4 spaces as the default indentation level.
 * Org mode
 
 ** General config
+:PROPERTIES:
+:ID:       14739DF6-013E-4B6C-8548-6384AE9ECCA9
+:END:
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org
