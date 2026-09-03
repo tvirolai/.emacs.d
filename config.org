@@ -1356,6 +1356,36 @@ Ready player mode is a nice way to play locally stored music and other media dir
 
 ** Video / audio streaming
 
+*** A Youtube play queue
+
+TODO: Finish this.
+
+#+begin_src emacs-lisp :tangle yes
+(defvar tv/yt-queue nil)
+
+(defvar tv/yt-queue-process nil)
+
+(defun tv/yt-queue-play)
+
+(defun tv/yt-queue--make-track (url &optional artist album track)
+  (list (cons :url url)
+        (cons :artist artist)
+        (cons :album album)
+        (cons :track track)))
+
+(defun tv/yt-queue-enqueue (url &optional artist name)
+  (if (not tv/yt-queue-process)
+      ))
+
+(defun tv/yt-queue-view ()
+  "View the queue in Tabulated List Mode."
+  (interactive))
+
+(defun tv/yt-queue-clear ())
+
+(defun tv/yt-queue-next ())
+#+end_src
+
 *** Download from Youtube
 
 #+begin_src emacs-lisp :tangle yes
@@ -1370,14 +1400,14 @@ Ready player mode is a nice way to play locally stored music and other media dir
   "Download a video from Youtube. Input is either video id or full url."
   (interactive)
   (let* ((url (read-and-return-yt-url))
-         (default-directory "~/Desktop/YT"))
+         (default-directory "~/Videot"))
     (async-shell-command (format "yt-dlp '%s' --no-playlist" url))))
 
 (defun tv/yt-download-as-audio ()
   "Download a video as an MP3 from Youtube. Input is either video id or full url."
   (interactive)
   (let* ((url (read-and-return-yt-url))
-         (default-directory "~/Desktop/YT"))
+         (default-directory "~/Videot"))
     (async-shell-command (format "yt-dlp -t mp3 '%s' --no-playlist" url))))
 #+end_src
 
@@ -1408,7 +1438,7 @@ Ready player mode is a nice way to play locally stored music and other media dir
   "Download a video from Yle Areena. Input is the video url."
   (interactive)
   (let* ((url (read-string "URL: "))
-         (default-directory "~/Desktop/YT"))
+         (default-directory "~/Videot"))
     (async-shell-command (format "yle-dl '%s'" url))))
 #+end_src
 
@@ -1421,7 +1451,7 @@ Download from BBC iPlayer or other compatible services.
   "Download from BBC iPlayer or other compatible streaming service."
   (interactive)
   (let* ((url (read-string "Id tai URL: "))
-         (default-directory "~/Desktop/YT"))
+         (default-directory "~/Videot/"))
     (async-shell-command (format "yt-dlp --write-subs --sub-langs 'en' '%s'" url))))
 #+end_src
 
@@ -1442,7 +1472,7 @@ This is a Youtube client.
 (use-package yeetube
   :defer t
   :custom
-  (yeetube-download-directory "~/Desktop/YT")
+  (yeetube-download-directory "~/Videot")
   :init
   (setq yeetube-ytdlp-program (or (executable-find "yt-dlp")
                                   "/opt/homebrew/bin/yt-dlp")
