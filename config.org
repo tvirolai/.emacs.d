@@ -283,8 +283,6 @@ Put backup files under =etc/.tmp/=.
                                                          user-emacs-directory))))
 (setq backup-by-copying t)
 
-(setq delete-by-moving-to-trash t)
-
 (setq auto-save-file-name-transforms
       `((".*" ,temporary-file-directory t)))
 #+end_src
@@ -1360,7 +1358,7 @@ Ready player mode is a nice way to play locally stored music and other media dir
 
 TODO: Finish this.
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (defvar tv/yt-queue nil)
 
 (defvar tv/yt-queue-process nil)
@@ -2267,7 +2265,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
 
 ** Completion-preview
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package completion-preview
   :ensure nil
   :demand t
@@ -3849,9 +3847,9 @@ Disable images.
   :ensure nil
   :config
   (setq shr-inhibit-images t)
-  (setq shr-indentation 2)
+  (setq shr-indentation 0)
   (setq shr-image-animate nil) ; No GIFs, even if images are temporarily enabled.
-  (setq shr-width 80)
+  (setq shr-width 70)
   (setq shr-use-fonts nil))
 #+end_src
 
@@ -3874,7 +3872,7 @@ Disable images.
   (dired-kill-when-opening-new-dired-buffer t) ;; Without this, each directory level opens in its own buffer.
   (dired-do-revert-buffer t)
   (dired-auto-revert-buffer t)
-  (delete-by-moving-to-trash nil)
+  (delete-by-moving-to-trash t)
   (dired-mouse-drag-files t)
   (dired-clean-up-buffers-too t)
   (dired-dwim-target t)
