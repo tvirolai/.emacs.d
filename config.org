@@ -144,6 +144,15 @@ Disable unnecessary stuff.
 (setq ring-bell-function 'ignore)
 #+end_src
 
+This is a workaround for an issue on Mac, where the tool bar sometimes shows up despite being disabled above.
+
+#+begin_src emacs-lisp :tangle yes
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (tool-bar-mode 1)
+            (tool-bar-mode -1)))
+#+end_src
+
 *** Disable bidirectional text scanning
 
 I've never needed to edit right-to-left language content, so support for it will be disabled by default in my config.
@@ -402,9 +411,7 @@ Configure fonts using Fontaine.
   :hook
   ((after-init . fontaine-mode)
    (after-init . (lambda ()
-                   ;; Set last preset or fall back to desired style from `fontaine-presets'.
-                   (fontaine-set-preset (or (fontaine-restore-latest-preset)
-                                            'regular)))))
+                   (fontaine-set-preset 'regular))))
   :config
   (setq fontaine-presets
         `((small
@@ -3856,6 +3863,18 @@ Disable images.
   (dired-clean-up-buffers-too t)
   (dired-dwim-target t)
   :config
+  ;; (defun my-dired-find-file ()
+  ;;   "Open PDFs externally; otherwise use `dired-find-file'."
+  ;;   (interactive)
+  ;;   (let ((file (dired-get-file-for-visit)))
+  ;;     (if (string-match-p "\\.pdf\\'" file)
+  ;;         (start-process "open-pdf" nil "open" file)
+  ;;       (dired-find-file))))
+  ;; (define-key dired-mode-map (kbd "RET") #'my-dired-find-file)
+  ;; (define-key dired-mode-map (kbd "<return>") #'my-dired-find-file)
+  ;; (evil-define-key 'normal dired-mode-map
+  ;;   (kbd "RET") #'my-dired-find-file
+  ;;   (kbd "<return>") #'my-dired-find-file)
   (setq dired-listing-switches "-alFh")
   (setq dired-use-ls-dired nil)
   (setq dired-create-destination-dirs 'ask)
