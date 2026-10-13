@@ -1296,8 +1296,7 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 (use-package agent-shell
   :if work-laptop-p
   :defer t
-  :vc (:url "https://github.com/xenodium/agent-shell"
-            :rev "c57c11c")
+  :vc (:url "https://github.com/xenodium/agent-shell")
   :bind ("C-c p a" . agent-shell)
   :ensure-system-package
   ;; Add agent installation configs here
@@ -1308,7 +1307,7 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
   :config
   (setq agent-shell-openai-authentication
         (agent-shell-openai-make-authentication :login t))
-  (defun shell-maker-welcome-message (config)
+  (defun agent-shell-welcome-message (config)
     (quotient-generate-excerpt 'eshell)))
 
 (defun agent-shell-transcript-path-fn ()
