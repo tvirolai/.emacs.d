@@ -3309,7 +3309,7 @@ Configuration adapted from [[https://systemcrafters.net/emacs-tips/presentations
 (use-package visual-fill-column
   :defer t
   :custom
-  (visual-fill-column-width 80))
+  (visual-fill-column-width 70))
 
 ;; Configure fill width
 (setq visual-fill-column-width 110
