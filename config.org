@@ -3819,6 +3819,9 @@ Disable images.
 (use-package eww
   :ensure nil
   :defer t
+  :custom
+  (url-privacy-level '(email cookies lastloc))
+  (shr-folding-mode t)
   :config
   (setq eww-auto-rename-buffer 'url)
    ;; browse-url-browser-function 'eww-browse-url
