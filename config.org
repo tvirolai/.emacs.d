@@ -359,7 +359,7 @@ The cursor may blink. Not in image buffers though.
   (blink-cursor-mode 1))
 
 (add-hook 'image-mode-hook #'disable-cursor-for-viewing)
-(add-hook 'reader-mode-hook #'disable-cursor-for-viewing)
+(add-hook 'docview-mode-hook #'disable-cursor-for-viewing)
 
 ;; Restore when exiting
 (add-hook 'change-major-mode-hook #'restore-cursor)
