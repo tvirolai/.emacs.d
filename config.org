@@ -463,6 +463,12 @@ Choose theme. Ensure that the customizations are done after loading the theme.
               (gui-setup))))
 #+end_src
 
+Add a teletype green theme for extra nerdery.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package green-phosphor-theme)
+#+end_src
+
 Add helpers to switch between themes.
 
 #+begin_src emacs-lisp :tangle yes
@@ -732,6 +738,33 @@ Bypass on-save hooks when needed.
   :defer t
   :config
   (global-set-key (kbd "C-c C-r") 'sudo-edit))
+#+end_src
+
+** Code folding
+
+Install treesit-fold.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package treesit-fold
+  :commands (treesit-fold-close
+             treesit-fold-close-all
+             treesit-fold-open
+             treesit-fold-toggle
+             treesit-fold-open-all
+             treesit-fold-mode
+             global-treesit-fold-mode
+             treesit-fold-open-recursively
+             treesit-fold-line-comment-mode)
+
+  :custom
+  (treesit-fold-line-count-show t)
+  (treesit-fold-line-count-format " ▼")
+
+  :config
+  (set-face-attribute 'treesit-fold-replacement-face nil
+                      :foreground "#808080"
+                      :box nil
+                      :weight 'bold))
 #+end_src
 
 * Tree-sitter
@@ -1799,60 +1832,6 @@ Haskell configs. Locally remap the =font-lock-keyword-face= attribute, since sla
   :after haskell-mode)
 #+end_src
 
-** SQL
-
-#+begin_src emacs-lisp :tangle yes
-(use-package sql
-  :hook ((sql-mode. lsp))
-  :defer t
-  :config
-  (setq lsp-sqls-workspace-config-path nil))
-#+end_src
-
-Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mode.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package sql-indent
-  :after sql
-  :defer t)
-#+end_src
-
-Sqlup-mode capitalizes SQL keywords automatically. Note that is has a [[https://github.com/Trevoke/sqlup-mode.el/issues/69][bug]] which might accidentally capitalize quoted strings. This has bitten me previously but I currently sometimes use this to format selections of SQL.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package sqlup-mode
-  :after sql
-  :defer t)
-#+end_src
-
-Custom functions for formatting SQL code.
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/format-sql-buffer ()
-  "A bug breaks the indentation (`sqlind-indent-line` specifically) when running it with `newline-and-indent`.
-I've resorted to this hack to run the indentation and capitalization for the whole buffer."
-  (interactive)
-  (sqlind-minor-mode)
-  (indent-region (point-min) (point-max))
-  (sqlup-capitalize-keywords-in-buffer)
-  (setq sqlind-minor-mode nil)
-  (progn
-    (kill-local-variable 'indent-line-function)
-    (kill-local-variable 'align-mode-rules-list)))
-#+end_src
-
-** Prisma ORM
-
-#+begin_src emacs-lisp :tangle yes
-;; (use-package prisma-ts-mode
-;;   :defer t
-;;   :mode (("\\.prisma" . prisma-ts-mode))
-;;   :config
-;;   (add-to-list
-;;    'treesit-language-source-alist
-;;    '(prisma "https://github.com/victorhqc/tree-sitter-prisma")))
-#+end_src
-
 ** Emacs Lisp
 
 #+begin_src emacs-lisp :tangle yes
@@ -2019,16 +1998,43 @@ Use smartparens.
 
 ** Python
 
+Keep Python editor support independent of the formatter.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package python
+  :ensure nil
+  :hook ((python-mode . lsp)
+         (python-ts-mode . lsp)
+         (python-ts-mode . indent-bars-mode)
+         (python-ts-mode . treesit-fold-mode))
+  :config (setq lsp-pylsp-plugins-flake8-ignore '("D103" "D100" "D105")))
+#+end_src
+
+Format on save with [[https://github.com/scop/emacs-ruff-format][Ruff]]. The active Python environment must provide the =ruff= executable.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package ruff-format
+  :hook ((python-mode . ruff-format-on-save-mode)
+         (python-ts-mode . ruff-format-on-save-mode)))
+#+end_src
+
+Keep Black available, but disabled while using Ruff.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package python-black
+  :disabled t
   :defer t
   :after python
   :hook ((python-mode . python-black-on-save-mode)
-         (python-mode . lsp)
-         (python-ts-mode . python-black-on-save-mode)
-         (python-ts-mode . lsp)
-         (python-ts-mode . indent-bars-mode))
-  :config (setq lsp-pylsp-plugins-flake8-ignore '("D103" "D100" "D105")))
+         (python-ts-mode . python-black-on-save-mode)))
+#+end_src
+
+Support pyenv.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package pyvenv
+  :config
+  (pyvenv-mode 1))
 #+end_src
 
 ** Groovy
@@ -2051,7 +2057,8 @@ I've only ever needed this for configuring Jenkins jobs.
   :config
   (setq lsp-completion-enable-additional-text-edit nil
         lsp-lens-enable t
-        lsp-completion-provider :capf
+        ;; Keep LSP completion available to Corfu without enabling Company.
+        lsp-completion-provider :none
         lsp-diagnostics-provider :flycheck
         lsp-session-file (expand-file-name ".lsp-session" user-emacs-directory)
         lsp-auto-guess-root t
@@ -2083,6 +2090,78 @@ Run Sonarlint in the editor.
   :custom
   (lsp-sonarlint-auto-download t)
   (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode css-ts-mode)))
+#+end_src
+
+* Database stuff
+
+** PGmacs
+
+A Postgres client in Emacs.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package pg
+  :ensure nil
+  :vc (:url "https://github.com/emarsden/pg-el" :rev :newest)
+  :defer t)
+
+(use-package pgmacs
+  :ensure nil
+  :vc (:url "https://github.com/emarsden/pgmacs" :rev :newest)
+  :demand t)
+#+end_src
+
+** SQL
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sql
+  :hook ((sql-mode. lsp))
+  :defer t
+  :config
+  (setq lsp-sqls-workspace-config-path nil))
+#+end_src
+
+Use [[https://github.com/alex-hhh/emacs-sql-indent][Emacs SQL indent]] minor mode.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sql-indent
+  :after sql
+  :defer t)
+#+end_src
+
+Sqlup-mode capitalizes SQL keywords automatically. Note that is has a [[https://github.com/Trevoke/sqlup-mode.el/issues/69][bug]] which might accidentally capitalize quoted strings. This has bitten me previously but I currently sometimes use this to format selections of SQL.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package sqlup-mode
+  :after sql
+  :defer t)
+#+end_src
+
+Custom functions for formatting SQL code.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/format-sql-buffer ()
+  "A bug breaks the indentation (`sqlind-indent-line` specifically) when running it with `newline-and-indent`.
+I've resorted to this hack to run the indentation and capitalization for the whole buffer."
+  (interactive)
+  (sqlind-minor-mode)
+  (indent-region (point-min) (point-max))
+  (sqlup-capitalize-keywords-in-buffer)
+  (setq sqlind-minor-mode nil)
+  (progn
+    (kill-local-variable 'indent-line-function)
+    (kill-local-variable 'align-mode-rules-list)))
+#+end_src
+
+** Prisma ORM
+
+#+begin_src emacs-lisp :tangle yes
+(use-package prisma-ts-mode
+  :defer t
+  :mode (("\\.prisma" . prisma-ts-mode))
+  :config
+  (add-to-list
+   'treesit-language-source-alist
+   '(prisma "https://github.com/victorhqc/tree-sitter-prisma")))
 #+end_src
 
 * Eldoc
@@ -2699,7 +2778,7 @@ Use 4 spaces as the default indentation level.
                         (?C . "#ff9200")
                         (?D . "#747474")))
   (org-todo-keywords
-   '((sequence "TODO(t!)" "HOLD(h@/!)" "DOING(g!)" "REVIEW(r!)" "REOPENED(o!)" "|" "DONE(d!)" "KILL(k)")
+   '((sequence "TODO(t!)" "BLOCKED(h@/!)" "DOING(g!)" "REVIEW(r!)" "REOPENED(o!)" "|" "DONE(d!)" "KILL(k)")
      (sequence "[ ](T)" "[-](S)" "[?](W)" "|" "[X](D)")
      (sequence "|" "OKAY(o)" "YES(y)" "NO(n)")))
   (org-done ((t (:foreground "PaleGreen"
@@ -2786,6 +2865,18 @@ Use 4 spaces as the default indentation level.
            (file "/Users/tuomo.virolainen/Documents/Journelly.org")
            "* [%<%Y-%m-%d %a %H:%M>] @ -%i\n%?"
            :prepend t)
+          ("w" "Työaika" entry
+           (file "työaika.org")
+           "* %<%Y-%m-%d>
+
+| Tiketti | Selite | Momentti | Aika |
+|---------+--------+----------+------|
+|         |        |          |      |
+|---------+--------+----------+------|
+|         |        |          |      |
+"
+           :prepend t
+           :empty-lines 1)
           ("q" "Quote" entry
            (file "notes/20260212T113823--lainauksia__lainaukset_linkit_listat_sitaatit.org")
            "* %^{Title} %^g\n:PROPERTIES:\n:CREATED: %U\n:SOURCE: %^{Source}\n:END:\n\n#+begin_quote\n\n#+end_quote\n\n"
@@ -2883,7 +2974,7 @@ Use 4 spaces as the default indentation level.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package org-modern
-  :hook (org-mode . org-modern-mode)
+  ;; :hook (org-mode . org-modern-mode)
   :config
   (setq org-modern-star '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶"))
   (setq org-modern-list '((43 . "➤")
@@ -3309,11 +3400,8 @@ Configuration adapted from [[https://systemcrafters.net/emacs-tips/presentations
 (use-package visual-fill-column
   :defer t
   :custom
-  (visual-fill-column-width 70))
-
-;; Configure fill width
-(setq visual-fill-column-width 110
-      visual-fill-column-center-text t)
+  (visual-fill-column-width 70)
+  (visual-fill-column-center-text t))
 
 (defun my/org-present-start ()
   "Center the presentation and wrap lines."
@@ -3531,6 +3619,12 @@ Use ansi-colors in shell.
 
 #+begin_src emacs-lisp :tangle yes
 (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
+#+end_src
+
+Use /bin/sh for subprocesses.
+
+#+begin_src emacs-lisp :tangle yes
+(setq shell-file-name "/bin/sh")
 #+end_src
 
 ** Eshell
@@ -4660,7 +4754,7 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
 ** Open a Jira ticket in the browser
 
 #+begin_src emacs-lisp :tangle yes
-(defconst jira-base-url nil)
+(defconst jira-base-url "https://wartsila.atlassian.net/browse/")
 
 (when (and work-laptop-p
            jira-base-url)
@@ -4674,7 +4768,7 @@ Insert a random 4-line quote from a corpus file on top of the scratch buffer. Th
                             (read-string "Tikettinumero: ")))
            (parsed-ticket (if (cl-search "-" ticket-number)
                               ticket-number
-                            (concat "OPISKELU-" ticket-number)))
+                            (concat "IDOP-" ticket-number)))
            (url (concat jira-base-url parsed-ticket)))
       (progn
         (push parsed-ticket visited-jira-issues)
