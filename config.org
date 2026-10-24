@@ -2107,7 +2107,9 @@ A Postgres client in Emacs.
 (use-package pgmacs
   :ensure nil
   :vc (:url "https://github.com/emarsden/pgmacs" :rev :newest)
-  :demand t)
+  :demand t
+  :config
+  (evil-set-initial-state 'pgmacs-mode 'emacs))
 #+end_src
 
 ** SQL
@@ -2866,14 +2868,17 @@ Use 4 spaces as the default indentation level.
            "* [%<%Y-%m-%d %a %H:%M>] @ -%i\n%?"
            :prepend t)
           ("w" "Työaika" entry
-           (file "työaika.org")
+           (file "notes/20261022T101621--työaikakirjaukset-wärtsilä-mydevops__työ_työaika_wärtsilä.org")
            "* %<%Y-%m-%d>
 
-| Tiketti | Selite | Momentti | Aika |
-|---------+--------+----------+------|
-|         |        |          |      |
-|---------+--------+----------+------|
-|         |        |          |      |
+| Tiketti | Selite | Aika |
+|---------+--------+------|
+|         |        |      |
+|---------+--------+------|
+|         |        |      |
+
+** TODO Kirjattu Wärtsilän Jiraan
+** TODO Kirjattu Timesheetiin
 "
            :prepend t
            :empty-lines 1)
