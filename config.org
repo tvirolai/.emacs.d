@@ -2095,9 +2095,9 @@ Run Sonarlint in the editor.
 
 * Database stuff
 
-** PGmacs
+** Postgres client in Emacs.
 
-A Postgres client in Emacs.
+PGmacs seems like a fun tool for working with Postgres databases. Since there's no Evil mode support for it, i.e. no mappings in evil-collection or otherwise, I've used AI to generate something for now. Looks pretty convoluted but we'll try that for now.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package pg
@@ -2110,7 +2110,62 @@ A Postgres client in Emacs.
   :vc (:url "https://github.com/emarsden/pgmacs" :rev :newest)
   :demand t
   :config
-  (evil-set-initial-state 'pgmacs-mode 'emacs))
+  (setq pgmacs-use-worker-thread nil)
+  (evil-set-initial-state 'pgmacs-mode 'normal)
+
+  ;; PGmacs puts keymaps on the table text itself, above Evil's maps.
+  ;; Adjust those maps directly so motions also work inside table rows.
+  (let* ((maps (list pgmacs-table-list-map pgmacs-table-list-map/table
+                     pgmacs-row-list-map pgmacs-row-list-map/table
+                     pgmacs-proc-list-map pgmacs-transient-map
+                     pgmacstbl-map))
+         ;; Save commands before changing parent maps; allow re-evaluation.
+         (bindings
+          (mapcar
+           (lambda (map)
+             (cons map
+                   (mapcar
+                    (lambda (binding)
+                      (let ((existing (lookup-key map (kbd (car binding)))))
+                        (cons (car binding)
+                              (if (commandp existing) existing
+                                (lookup-key map (kbd (cdr binding)))))))
+                    '(("g?" . "?") ("gr" . "g") ("gR" . "r")
+                      ("K" . "v") ("C-c j" . "j") ("C-c w" . "W")
+                      ("C-c C-s" . "e") ("C-c C-b" . "E")))))
+           maps)))
+    ;; Keep Evil motions, counts, search repeats and visual selection.
+    ;; Row copy/paste and procedure listing get replacements below.
+    (dolist (map maps)
+      (dolist (key '("h" "j" "k" "l" "g" "w" "e" "E" "W" "v" "y"
+                     "p" "?" "<" ">" "{" "}" "DEL" "<backspace>"
+                     "0" "1" "2" "3" "4" "5" "6" "7" "8" "9"))
+        (define-key map (kbd key) nil)))
+    (dolist (entry bindings)
+      (dolist (binding (cdr entry))
+        (when (commandp (cdr binding))
+          (define-key (car entry) (kbd (car binding)) (cdr binding))))))
+
+  ;; Match evil-collection's tabulated-list column navigation.
+  (dolist (map (list pgmacs-table-list-map pgmacs-row-list-map
+                     pgmacs-proc-list-map pgmacs-transient-map pgmacstbl-map))
+    (define-key map (kbd "gh") #'pgmacstbl-previous-column)
+    (define-key map (kbd "gl") #'pgmacstbl-next-column))
+  (define-key pgmacs-table-list-map (kbd "gp") #'pgmacs--display-procedures)
+  (define-key pgmacs-row-list-map/table (kbd "cw") #'pgmacs--edit-value-widget)
+  (define-key pgmacs-row-list-map/table (kbd "yy") #'pgmacs--copy-row)
+  (define-key pgmacs-row-list-map/table (kbd "p") #'pgmacs--yank-row)
+  ;; Leave n/N for Evil search repeats, even in paginated tables.
+  (define-key pgmacs-paginated-map (kbd "n") nil)
+  (define-key pgmacs-paginated-map (kbd "p") nil)
+  (define-key pgmacs-paginated-map (kbd "]p") #'pgmacs--paginated-next)
+  (define-key pgmacs-paginated-map (kbd "[p") #'pgmacs--paginated-prev)
+  ;; Give the remaining PGmacs commands priority in normal state too.
+  (dolist (map (list pgmacs-table-list-map pgmacs-table-list-map/table
+                     pgmacs-row-list-map pgmacs-row-list-map/table
+                     pgmacs-proc-list-map pgmacs-transient-map
+                     pgmacs-paginated-map pgmacstbl-map))
+    (evil-make-overriding-map map 'normal)))
 #+end_src
 
 ** SQL
