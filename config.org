@@ -2877,8 +2877,8 @@ Use 4 spaces as the default indentation level.
 |---------+--------+------|
 |         |        |      |
 
-** TODO Kirjattu Wärtsilän Jiraan
-** TODO Kirjattu Timesheetiin
+,** TODO Kirjattu Wärtsilän Jiraan
+,** TODO Kirjattu Timesheetiin
 "
            :prepend t
            :empty-lines 1)
@@ -3591,7 +3591,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
 (use-package elfeed-org
   :defer t
   :config
-  (setq rmh-elfeed-org-files (list (concat org-directory "elfeed.org"))))
+  (setq rmh-elfeed-org-files (list (concat org-directory "/elfeed.org"))))
 
 (defun tv/elfeed-mark-all-as-read ()
   "Mark all elfeed items as read."
@@ -3664,30 +3664,6 @@ Use /bin/sh for subprocesses.
         eshell-directory-name (expand-file-name "etc/eshell" user-emacs-directory)
         eshell-destroy-buffer-when-process-dies t)
   :config
-  ;; From Emacs Solo:
-  ;; MAKE ALL INSTANCES OF ESHELL SHARE/MERGE ITS COMMAND HISTORY
-  ;;
-  (defun emacs-solo/eshell--collect-all-history ()
-    "Return a list of all eshell history entries from all buffers and disk."
-    (let ((history-from-buffers
-           (cl-loop for buf in (buffer-list)
-                    when (with-current-buffer buf (derived-mode-p 'eshell-mode))
-                    append (with-current-buffer buf
-                             (when (boundp 'eshell-history-ring)
-                               (ring-elements eshell-history-ring)))))
-          (history-from-file
-           (when (file-exists-p eshell-history-file-name)
-             (with-temp-buffer
-               (insert-file-contents eshell-history-file-name)
-               (split-string (buffer-string) "\n" t)))))
-      (seq-uniq (append history-from-buffers history-from-file))))
-
-  (defun emacs-solo/eshell--save-merged-history ()
-    "Save all eshell buffer histories merged into `eshell-history-file-name`."
-    (let ((all-history (emacs-solo/eshell--collect-all-history)))
-      (with-temp-file eshell-history-file-name
-        (insert (mapconcat #'identity all-history "\n")))))
-  (add-hook 'kill-emacs-hook #'emacs-solo/eshell--save-merged-history)
   (evil-set-initial-state 'eshell-mode 'emacs))
 #+end_src
 
