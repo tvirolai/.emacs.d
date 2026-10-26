@@ -2925,7 +2925,7 @@ Use 4 spaces as the default indentation level.
            :prepend t)
           ("w" "Työaika" entry
            (file "notes/20261022T101621--työaikakirjaukset-wärtsilä-mydevops__työ_työaika_wärtsilä.org")
-           "* %<%Y-%m-%d>
+           "* %<%Y-%m-%d> [/]
 
 | Tiketti | Selite | Aika |
 |---------+--------+------|
