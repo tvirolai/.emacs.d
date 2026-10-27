@@ -9,7 +9,7 @@ This is my personal Emacs configuration. It is implemented using literate progra
 2. The org file is processed and the code blocks are tangled into a =config.el= file.
 3. The generated configuration file is then loaded.
 
-* General setup
+* Bootstrap and environment
 
 Enable lexical binding and spit out the preamble.
 
@@ -26,7 +26,7 @@ Enable lexical binding and spit out the preamble.
 
 ;;; Commentary:
 
-;; This is an Emacs configuration. There are many and this is mine.
+;; This is an Emacs configuration. Many exist but only one is this.
 
 ;;; License:
 
@@ -1189,7 +1189,7 @@ Frame management.
 #+begin_src emacs-lisp :tangle yes
 (if work-laptop-p
     (global-set-key (kbd "M-ESC") 'other-frame)
-    (global-set-key (kbd "M-§") 'other-frame))
+  (global-set-key (kbd "M-§") 'other-frame))
 (global-set-key (kbd "C-M-'") 'make-frame-command)
 (global-set-key (kbd "M-°") 'delete-frame)
 #+end_src
@@ -1294,9 +1294,10 @@ Set keybindings for profiler.
   ("C-x P 0"  . profiler-stop))
 #+end_src
 
-* AI
+* Applications
+** AI
 
-** Gptel
+*** Gptel
 
 Let's try whether this could be useful. Gptel is a light-weight LLM client supporting multiple backends.
 
@@ -1324,7 +1325,7 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
                         :models '(qwen3.8:27b))))
 #+end_src
 
-** Agent-shell
+*** Agent-shell
 
 #+begin_src emacs-lisp :tangle yes
 (use-package agent-shell
@@ -1360,9 +1361,9 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
     (expand-file-name filename dir)))
 #+end_src
 
-* Accounting
+** Accounting
 
-** Ledger
+*** Ledger
 
 Let's try plain text accounting.
 
@@ -1371,9 +1372,9 @@ Let's try plain text accounting.
   :defer t)
 #+end_src
 
-* Media playback
+** Media
 
-** Ready player mode
+*** Ready player mode
 
 Ready player mode is a nice way to play locally stored music and other media directly from Emacs.
 
@@ -1392,9 +1393,9 @@ Ready player mode is a nice way to play locally stored music and other media dir
     (ready-player-macos-use-sf-symbols)))
 #+end_src
 
-** Video / audio streaming
+*** Video / audio streaming
 
-*** A Youtube play queue
+**** A Youtube play queue
 
 TODO: Finish this.
 
@@ -1424,7 +1425,7 @@ TODO: Finish this.
 (defun tv/yt-queue-next ())
 #+end_src
 
-*** Download from Youtube
+**** Download from Youtube
 
 #+begin_src emacs-lisp :tangle yes
 (defun read-and-return-yt-url ()
@@ -1449,7 +1450,7 @@ TODO: Finish this.
     (async-shell-command (format "yt-dlp -t mp3 '%s' --no-playlist" url))))
 #+end_src
 
-*** Watch from Youtube
+**** Watch from Youtube
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/yt-watch ()
@@ -1459,7 +1460,7 @@ TODO: Finish this.
     (async-shell-command (format "mpv '%s'" url))))
 #+end_src
 
-*** Listen from Youtube
+**** Listen from Youtube
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/yt-listen (&optional url)
@@ -1469,7 +1470,7 @@ TODO: Finish this.
     (async-shell-command (format "mpv --no-video '%s'" url))))
 #+end_src
 
-*** Download from Yle Areena
+**** Download from Yle Areena
 
 #+begin_src emacs-lisp :tangle yes
 (defun tv/yle-dl ()
@@ -1480,7 +1481,7 @@ TODO: Finish this.
     (async-shell-command (format "yle-dl '%s'" url))))
 #+end_src
 
-*** Download from BBC etc.
+**** Download from BBC etc.
 
 Download from BBC iPlayer or other compatible services.
 
@@ -1493,7 +1494,7 @@ Download from BBC iPlayer or other compatible services.
     (async-shell-command (format "yt-dlp --write-subs --sub-langs 'en' '%s'" url))))
 #+end_src
 
-*** Yeetube
+**** Yeetube
 
 This is a Youtube client.
 
@@ -1514,7 +1515,7 @@ This is a Youtube client.
     (kbd "RET") #'yeetube-play))
 #+end_src
 
-*** The personal music knowledge base
+**** The personal music knowledge base
 
 Since I like to own my data, I don't feel like storing playlists, info about my favourite albums and such stuff in streaming service providers' systems. Instead I've decided to manage that stuff locally.
 
@@ -1523,19 +1524,19 @@ What I currently do is use an org file to store data about interesting music I'v
 This file should act as the master for data like this. Where the music is played from is a different thing. Streaming services, such as Youtube, act as backends. The backends can be both stored along as properties (such as a Youtube URL for a song, full album or a playlist) and be queried dynamically. If I have a node like the following:
 
 #+begin_src org
-* Music
-** Type O Negative
-*** October Rust
-**** Wolf Moon
+,* Music
+,** Type O Negative
+,*** October Rust
+,**** Wolf Moon
 #+end_src
 
 I can place the point on the innermost node and press =C-c q p=. This runs a query looking for ="Type O Negative Wolf Moon" from Youtube, returns the first match, adds that as a property and starts playing it. Afterwards, the section looks like the following.
 
 #+begin_src org
-* Music
-** Type O Negative
-*** October Rust
-**** Wolf Moon
+,* Music
+,** Type O Negative
+,*** October Rust
+,**** Wolf Moon
 :PROPERTIES:
 :YOUTUBE:  https://youtube.com/watch?v=3e1gkynGXXM
 :END:
@@ -1648,7 +1649,7 @@ If the property does not exist, fetch and store its value first."
 (global-set-key (kbd "C-c q p") #'tv/play-song-yt)
 #+end_src
 
-*** YTR
+**** YTR
 
 A Youtube radio player.
 
@@ -1657,6 +1658,7 @@ A Youtube radio player.
   :vc (:url "https://github.com/xenodium/ytr" :rev :newest)
   :commands (ytr))
 #+end_src
+
 
 * Flycheck
 
@@ -2095,9 +2097,9 @@ Run Sonarlint in the editor.
 
 * Database stuff
 
-** Postgres client in Emacs.
+** Postgres client in Emacs
 
-PGmacs seems like a fun tool for working with Postgres databases. Since there's no Evil mode support for it, i.e. no mappings in evil-collection or otherwise, I've used AI to generate something for now. Looks pretty convoluted but we'll try that for now.
+PGmacs seems like a fun tool for working with Postgres databases. Since there's no Evil mode support for it, i.e. no mappings in evil-collection or otherwise, I've used AI to generate something. Looks pretty convoluted but we'll try that for now.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package pg
@@ -2713,7 +2715,7 @@ Configure the packages.
          (:map global-map
                ;; C-c k is the prefix for custom killing commands.
                ("C-c k d" . tv/docker-kill-inactive-eat-buffers))))
- #+end_src
+#+end_src
 
 ** Markdown
 
@@ -3031,18 +3033,6 @@ Use 4 spaces as the default indentation level.
 (setq auto-save-default nil)
 #+end_src
 
-** Org modern
-
-#+begin_src emacs-lisp :tangle yes
-(use-package org-modern
-  ;; :hook (org-mode . org-modern-mode)
-  :config
-  (setq org-modern-star '("◉" "○" "✸" "✿" "✤" "✜" "◆" "▶"))
-  (setq org-modern-list '((43 . "➤")
-                          (45 . "–")
-                          (42 . "•"))))
-#+end_src
-
 ** Additional org export backends
 
 *** Jira markdown
@@ -3115,6 +3105,242 @@ Open multiple links at once.
               (push url links))))))
     (dolist (url (nreverse (delete-dups links)))
       (browse-url url))))
+#+end_src
+
+** Org Agenda
+:PROPERTIES:
+:ID:       DB9E54AF-CBBB-4C0E-B54E-A3EF408626A4
+:END:
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-agenda
+  :after org
+  :ensure nil
+  :bind (("C-c a" . org-agenda))
+  ;; :hook (org-agenda-finalize . org-agenda-entry-text-mode)
+  :custom
+  (org-agenda-current-time-string "<- now")
+  (org-agenda-timegrid-use-ampm t)
+  (org-agenda-tags-column 0)
+  (org-agenda-start-day "-2d") ;; Show the previous day.
+  (org-agenda-window-setup 'only-window)
+  (org-agenda-restore-windows-after-quit t)
+  (org-agenda-log-mode-items '(closed clock state))
+  (org-agenda-time-grid '((daily today require-timed)
+                          (600 800 1000 1200 1400 1600 1800 2000)
+                          " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+  (org-agenda-prefix-format
+   '((agenda . " %i %-20:c%?-12t% s")
+     (todo   . " %i %-12:c")
+     (tags   . " %i %-12:c")
+     (search . " %i %-12:c")))
+  ;; (org-agenda-start-with-log-mode '(closed clock state))
+  (org-agenda-files (list org-default-notes-file
+                          (concat org-directory "archive/Archive_inbox.org")))
+  ;; (org-agenda-files (directory-files-recursively org-directory "\\.org$"))
+  ;; (org-agenda-todo-ignore-scheduled 'future)
+  ;; TODO entries that can't be marked as done b/c of children are shown as dimmed in agenda view
+  (org-agenda-dim-blocked-tasks 'invisible)
+  ;; Start the week view on whatever day im on
+  (org-agenda-start-on-weekday nil)
+  ;; How to identify stuck/non-stuck projects
+  ;; Projects are identified by the 'project' tag and its always the first level
+  ;; Next any of these todo keywords means it's not a stuck project
+  ;; 3rd, theres no tags that I use to identify a stuck Project
+  ;; Finally, theres no special text that signify a non-stuck project
+  (org-stuck-projects
+   '("+project+LEVEL=1"
+     ("IN-PROGRESS" "WAITING" "DONE" "CANCELED" "DELEGATED")
+     nil
+     ""))
+  (org-agenda-prefix-format
+   '((agenda . " %-4e %i %-12:c%?-12t% s ")
+     (todo . " %i %-10:c %-5e %(get-schedule-or-deadline-if-available)")
+     (tags . " %i %-12:c")
+     (search . " %i %-12:c")))
+  :init
+  ;; Originally from here: https://stackoverflow.com/a/59001859/2178312
+  (defun get-schedule-or-deadline-if-available ()
+    (let ((scheduled (org-get-scheduled-time (point)))
+          (deadline (org-get-deadline-time (point))))
+      "   ")))
+#+end_src
+
+** Org present
+
+Configuration adapted from [[https://systemcrafters.net/emacs-tips/presentations-with-org-present/][System Crafters]].
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-present
+  :defer t)
+
+(use-package visual-fill-column
+  :defer t
+  :custom
+  (visual-fill-column-width 70)
+  (visual-fill-column-center-text t))
+
+(defun my/org-present-start ()
+  "Center the presentation and wrap lines."
+  (visual-fill-column-mode 1)
+  (visual-line-mode 1))
+
+(defun my/org-present-end ()
+  "Stop centering the document."
+  (visual-fill-column-mode 0)
+  (visual-line-mode 0))
+
+;; Register hooks with org-present
+(add-hook 'org-present-mode-hook 'my/org-present-start)
+(add-hook 'org-present-mode-quit-hook 'my/org-present-end)
+#+end_src
+
+Enable dragging and dropping images to org documents. Note that the command-line utility =pngpaste= must be installed for this to work.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-download
+  :config
+  (setq-default org-download-image-dir (concat org-directory "assets")))
+#+end_src
+
+** Copy articles from web to org
+
+#+begin_src emacs-lisp :tangle yes
+(use-package org-web-tools)
+#+end_src
+
+Modified from [[https://www.reddit.com/r/emacs/comments/1lnhtbs/how_do_you_store_and_revisit_articles_from_web/][Emacs Reddit]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/eww--strip-shr-margin (text)
+  "Remove SHR's common one-space left margin from TEXT."
+  (replace-regexp-in-string "\\(^\\|\n\\) " "\\1" text))
+
+(defun tv/eww--normalize-text (text)
+  "Prepare EWW text for Org export."
+  (replace-regexp-in-string "\\*" "·"
+                            (tv/eww--strip-shr-margin text)))
+
+(defun tv/eww--chunk-prop (props)
+  "Return the most relevant export property from PROPS."
+  (let ((k (seq-find (lambda (x) (plist-get props x))
+                     '(shr-url image-url outline-level face))))
+    (and k (list k (plist-get props k)))))
+
+(defun tv/eww--render-chunk-to-org (text prop)
+  "Convert TEXT with PROP into Org markup."
+  (pcase prop
+    ((and (or `(shr-url ,url) `(image-url ,url))
+          (guard (string-match-p "^http" url)))
+     (let ((tt (replace-regexp-in-string "\n\\([^$]\\)" " \\1" text)))
+       (org-link-make-string url tt)))
+
+    (`(outline-level ,n)
+     (concat (make-string (1- (* 2 n)) ?*) " " text "\n"))
+
+    ('(face italic)
+     (format "/%s/ " (string-trim text)))
+
+    ('(face bold)
+     (format "*%s* " (string-trim text)))
+
+    (_ text)))
+
+(defun tv/eww-to-org (&optional dest)
+  "Render the current EWW buffer using Org markup.
+If DEST is a buffer, insert the markup there."
+  (interactive)
+  (unless (org-region-active-p)
+    (let ((shr-width 80))
+      (eww-readable)))
+  (let* ((start (if (org-region-active-p) (region-beginning) (point-min)))
+         (end   (if (org-region-active-p) (region-end) (point-max)))
+         (buff  (or dest (generate-new-buffer "*eww-to-org*")))
+         (link  (eww-current-url))
+         (title (or (plist-get eww-data :title) "")))
+    (with-current-buffer buff
+      (erase-buffer)
+      (insert "#+title: " title "\n")
+      (insert "#+link: " link "\n\n")
+      (org-mode))
+    (save-excursion
+      (goto-char start)
+      (while (< (point) end)
+        (let* ((p (point))
+               (props (text-properties-at p))
+               (prop (tv/eww--chunk-prop props))
+               (next (if prop
+                         (next-single-property-change p (car prop) nil end)
+                       (next-property-change p nil end)))
+               (txt (tv/eww--normalize-text
+                     (buffer-substring-no-properties p next))))
+          (with-current-buffer buff
+            (insert (tv/eww--render-chunk-to-org txt prop)))
+          (goto-char next))))
+    (pop-to-buffer buff)
+    (goto-char (point-min))))
+#+end_src
+
+Remove extra line breaks from a selection.
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/unfill-region (beg end)
+  "Transform filled lines in region into unfilled paragraphs."
+  (interactive "r")
+  (let ((fill-column most-positive-fixnum))
+    (fill-region beg end)))
+#+end_src
+
+** Org-friendly word counting
+
+Source: [[https://chrismaiorana.com/summer-productivity-reset-emacs-functions/][Chris Maiorana]].
+
+#+begin_src emacs-lisp :tangle yes
+(defun org-word-count ()
+  "Count words in region/buffer, estimate pages, and reading time.
+Excludes lines beginning with * or #. Prints result in echo area."
+  (interactive)
+  (let* ((start (if (use-region-p) (region-beginning) (point-min)))
+         (end (if (use-region-p) (region-end) (point-max)))
+         (word-count
+          (save-excursion
+            (goto-char start)
+            (let ((count 0)
+                  (inhibit-field-text-motion t))
+              (while (< (point) end)
+                (beginning-of-line)
+                (unless (looking-at-p "^[*#<]")
+                  (let ((line-end (line-end-position)))
+                    (while (re-search-forward "\\w+\\W*" line-end t)
+                      (setq count (1+ count)))))
+                (forward-line 1))
+              count)))
+         (words-per-page 400)
+         (reading-speed 215)
+         (page-count (/ (+ word-count words-per-page -1) words-per-page))
+         (reading-time (/ (+ word-count reading-speed -1) reading-speed)))
+    (message "%d words, ~%d pages, ~%d min read"
+             word-count page-count reading-time)))
+#+end_src
+
+** org-autolist
+
+A bit more intuitive handling for lists in org mode, see [[https://github.com/calvinwyoung/org-autolist][org-autolist]].
+
+#+begin_src emacs-lisp :tangle yes
+;; (use-package org-autolist
+;;   :hook (org-mode . org-autolist-mode))
+#+end_src
+
+** Mark an entry as watched
+
+#+begin_src emacs-lisp :tangle yes
+(defun tv/org-set-watched ()
+  "Set WATCHED property on current heading."
+  (interactive)
+  (org-set-property
+   "WATCHED"
+   (format-time-string "[%Y-%m-%d %H:%M:%S]")))
 #+end_src
 
 * Denote
@@ -3389,242 +3615,6 @@ Helpers for adding new elements to front matter.
   (interactive)
   (let ((author-name (read-string "Author name: ")))
     (add-to-front-matter "book_author" author-name)))
-#+end_src
-
-** Org Agenda
-:PROPERTIES:
-:ID:       DB9E54AF-CBBB-4C0E-B54E-A3EF408626A4
-:END:
-
-#+begin_src emacs-lisp :tangle yes
-(use-package org-agenda
-  :after org
-  :ensure nil
-  :bind (("C-c a" . org-agenda))
-  ;; :hook (org-agenda-finalize . org-agenda-entry-text-mode)
-  :custom
-  (org-agenda-current-time-string "<- now")
-  (org-agenda-timegrid-use-ampm t)
-  (org-agenda-tags-column 0)
-  (org-agenda-start-day "-2d") ;; Show the previous day.
-  (org-agenda-window-setup 'only-window)
-  (org-agenda-restore-windows-after-quit t)
-  (org-agenda-log-mode-items '(closed clock state))
-  (org-agenda-time-grid '((daily today require-timed)
-                          (600 800 1000 1200 1400 1600 1800 2000)
-                          " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
-  (org-agenda-prefix-format
-   '((agenda . " %i %-20:c%?-12t% s")
-     (todo   . " %i %-12:c")
-     (tags   . " %i %-12:c")
-     (search . " %i %-12:c")))
-  ;; (org-agenda-start-with-log-mode '(closed clock state))
-  (org-agenda-files (list org-default-notes-file
-                          (concat org-directory "archive/Archive_inbox.org")))
-  ;; (org-agenda-files (directory-files-recursively org-directory "\\.org$"))
-  ;; (org-agenda-todo-ignore-scheduled 'future)
-  ;; TODO entries that can't be marked as done b/c of children are shown as dimmed in agenda view
-  (org-agenda-dim-blocked-tasks 'invisible)
-  ;; Start the week view on whatever day im on
-  (org-agenda-start-on-weekday nil)
-  ;; How to identify stuck/non-stuck projects
-  ;; Projects are identified by the 'project' tag and its always the first level
-  ;; Next any of these todo keywords means it's not a stuck project
-  ;; 3rd, theres no tags that I use to identify a stuck Project
-  ;; Finally, theres no special text that signify a non-stuck project
-  (org-stuck-projects
-   '("+project+LEVEL=1"
-     ("IN-PROGRESS" "WAITING" "DONE" "CANCELED" "DELEGATED")
-     nil
-     ""))
-  (org-agenda-prefix-format
-   '((agenda . " %-4e %i %-12:c%?-12t% s ")
-     (todo . " %i %-10:c %-5e %(get-schedule-or-deadline-if-available)")
-     (tags . " %i %-12:c")
-     (search . " %i %-12:c")))
-  :init
-  ;; Originally from here: https://stackoverflow.com/a/59001859/2178312
-  (defun get-schedule-or-deadline-if-available ()
-    (let ((scheduled (org-get-scheduled-time (point)))
-          (deadline (org-get-deadline-time (point))))
-      "   ")))
-#+end_src
-
-** Org present
-
-Configuration adapted from [[https://systemcrafters.net/emacs-tips/presentations-with-org-present/][System Crafters]].
-
-#+begin_src emacs-lisp :tangle yes
-(use-package org-present
-  :defer t)
-
-(use-package visual-fill-column
-  :defer t
-  :custom
-  (visual-fill-column-width 70)
-  (visual-fill-column-center-text t))
-
-(defun my/org-present-start ()
-  "Center the presentation and wrap lines."
-  (visual-fill-column-mode 1)
-  (visual-line-mode 1))
-
-(defun my/org-present-end ()
-  "Stop centering the document."
-  (visual-fill-column-mode 0)
-  (visual-line-mode 0))
-
-;; Register hooks with org-present
-(add-hook 'org-present-mode-hook 'my/org-present-start)
-(add-hook 'org-present-mode-quit-hook 'my/org-present-end)
-#+end_src
-
-Enable dragging and dropping images to org documents. Note that the command-line utility =pngpaste= must be installed for this to work.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package org-download
-  :config
-  (setq-default org-download-image-dir (concat org-directory "assets")))
-#+end_src
-
-** Copy articles from web to org
-
-#+begin_src emacs-lisp :tangle yes
-(use-package org-web-tools)
-#+end_src
-
-Modified from [[https://www.reddit.com/r/emacs/comments/1lnhtbs/how_do_you_store_and_revisit_articles_from_web/][Emacs Reddit]].
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/eww--strip-shr-margin (text)
-  "Remove SHR's common one-space left margin from TEXT."
-  (replace-regexp-in-string "\\(^\\|\n\\) " "\\1" text))
-
-(defun tv/eww--normalize-text (text)
-  "Prepare EWW text for Org export."
-  (replace-regexp-in-string "\\*" "·"
-                            (tv/eww--strip-shr-margin text)))
-
-(defun tv/eww--chunk-prop (props)
-  "Return the most relevant export property from PROPS."
-  (let ((k (seq-find (lambda (x) (plist-get props x))
-                     '(shr-url image-url outline-level face))))
-    (and k (list k (plist-get props k)))))
-
-(defun tv/eww--render-chunk-to-org (text prop)
-  "Convert TEXT with PROP into Org markup."
-  (pcase prop
-    ((and (or `(shr-url ,url) `(image-url ,url))
-          (guard (string-match-p "^http" url)))
-     (let ((tt (replace-regexp-in-string "\n\\([^$]\\)" " \\1" text)))
-       (org-link-make-string url tt)))
-
-    (`(outline-level ,n)
-     (concat (make-string (1- (* 2 n)) ?*) " " text "\n"))
-
-    ('(face italic)
-     (format "/%s/ " (string-trim text)))
-
-    ('(face bold)
-     (format "*%s* " (string-trim text)))
-
-    (_ text)))
-
-(defun tv/eww-to-org (&optional dest)
-  "Render the current EWW buffer using Org markup.
-If DEST is a buffer, insert the markup there."
-  (interactive)
-  (unless (org-region-active-p)
-    (let ((shr-width 80))
-      (eww-readable)))
-  (let* ((start (if (org-region-active-p) (region-beginning) (point-min)))
-         (end   (if (org-region-active-p) (region-end) (point-max)))
-         (buff  (or dest (generate-new-buffer "*eww-to-org*")))
-         (link  (eww-current-url))
-         (title (or (plist-get eww-data :title) "")))
-    (with-current-buffer buff
-      (erase-buffer)
-      (insert "#+title: " title "\n")
-      (insert "#+link: " link "\n\n")
-      (org-mode))
-    (save-excursion
-      (goto-char start)
-      (while (< (point) end)
-        (let* ((p (point))
-               (props (text-properties-at p))
-               (prop (tv/eww--chunk-prop props))
-               (next (if prop
-                         (next-single-property-change p (car prop) nil end)
-                       (next-property-change p nil end)))
-               (txt (tv/eww--normalize-text
-                     (buffer-substring-no-properties p next))))
-          (with-current-buffer buff
-            (insert (tv/eww--render-chunk-to-org txt prop)))
-          (goto-char next))))
-    (pop-to-buffer buff)
-    (goto-char (point-min))))
-#+end_src
-
-Remove extra line breaks from a selection.
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/unfill-region (beg end)
-  "Transform filled lines in region into unfilled paragraphs."
-  (interactive "r")
-  (let ((fill-column most-positive-fixnum))
-    (fill-region beg end)))
-#+end_src
-
-** Org-friendly word counting
-
-Source: [[https://chrismaiorana.com/summer-productivity-reset-emacs-functions/][Chris Maiorana]].
-
-#+begin_src emacs-lisp :tangle yes
-(defun org-word-count ()
-  "Count words in region/buffer, estimate pages, and reading time.
-Excludes lines beginning with * or #. Prints result in echo area."
-  (interactive)
-  (let* ((start (if (use-region-p) (region-beginning) (point-min)))
-         (end (if (use-region-p) (region-end) (point-max)))
-         (word-count
-          (save-excursion
-            (goto-char start)
-            (let ((count 0)
-                  (inhibit-field-text-motion t))
-              (while (< (point) end)
-                (beginning-of-line)
-                (unless (looking-at-p "^[*#<]")
-                  (let ((line-end (line-end-position)))
-                    (while (re-search-forward "\\w+\\W*" line-end t)
-                      (setq count (1+ count)))))
-                (forward-line 1))
-              count)))
-         (words-per-page 400)
-         (reading-speed 215)
-         (page-count (/ (+ word-count words-per-page -1) words-per-page))
-         (reading-time (/ (+ word-count reading-speed -1) reading-speed)))
-    (message "%d words, ~%d pages, ~%d min read"
-             word-count page-count reading-time)))
-#+end_src
-
-** org-autolist
-
-A bit more intuitive handling for lists in org mode, see [[https://github.com/calvinwyoung/org-autolist][org-autolist]].
-
-#+begin_src emacs-lisp :tangle yes
-;; (use-package org-autolist
-;;   :hook (org-mode . org-autolist-mode))
-#+end_src
-
-** Mark an entry as watched
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/org-set-watched ()
-  "Set WATCHED property on current heading."
-  (interactive)
-  (org-set-property
-   "WATCHED"
-   (format-time-string "[%Y-%m-%d %H:%M:%S]")))
 #+end_src
 
 * Elfeed
@@ -3955,7 +3945,7 @@ Disable images.
   (shr-folding-mode t)
   :config
   (setq eww-auto-rename-buffer 'url)
-   ;; browse-url-browser-function 'eww-browse-url
+  ;; browse-url-browser-function 'eww-browse-url
   )
 #+end_src
 
@@ -4108,7 +4098,7 @@ machine mail.kapsi.fi port 587 login my-username password my-password
 To automate fetching and indexing new mail, I've set up a cron job that runs at a five-minute interval:
 
 #+begin_src bash
-*/5 * * * * . $HOME/check-mail.sh
+,*/5 * * * * . $HOME/check-mail.sh
 #+end_src
 
 Here the =check-mail.sh= script looks like this.
@@ -4288,19 +4278,19 @@ that and instead tries to complete against dictionary entries."
   (remove-hook 'notmuch-search-hook #'notmuch-hl-line-mode) ; Check my `lin' package
   :bind
   (:map global-map
-    ("C-x m" . notmuch-mua-new-mail) ; override `compose-mail'
-    :map notmuch-search-mode-map ; I normally don't use the tree view, otherwise check `notmuch-tree-mode-map'
-    ("/" . notmuch-search-filter) ; alias for l
-    ("r" . notmuch-search-reply-to-thread) ; easier to reply to all by default
-    ("R" . notmuch-search-reply-to-thread-sender)
-    :map notmuch-show-mode-map
-    ("a" . nil) ; the default is too easy to hit accidentally and I do not archive stuff
-    ("A" . nil)
-    ("r" . notmuch-show-reply) ; easier to reply to all by default
-    ("R" . notmuch-show-reply-sender)
-    :map notmuch-hello-mode-map
-    ("C-<tab>" . nil)
-    ("§" . notmuch-sync-email)))
+        ("C-x m" . notmuch-mua-new-mail) ; override `compose-mail'
+        :map notmuch-search-mode-map ; I normally don't use the tree view, otherwise check `notmuch-tree-mode-map'
+        ("/" . notmuch-search-filter) ; alias for l
+        ("r" . notmuch-search-reply-to-thread) ; easier to reply to all by default
+        ("R" . notmuch-search-reply-to-thread-sender)
+        :map notmuch-show-mode-map
+        ("a" . nil) ; the default is too easy to hit accidentally and I do not archive stuff
+        ("A" . nil)
+        ("r" . notmuch-show-reply) ; easier to reply to all by default
+        ("R" . notmuch-show-reply-sender)
+        :map notmuch-hello-mode-map
+        ("C-<tab>" . nil)
+        ("§" . notmuch-sync-email)))
 
 ;;; My own tweaks for notmuch (prot-notmuch.el)
 (use-package prot-notmuch
@@ -4308,14 +4298,14 @@ that and instead tries to complete against dictionary entries."
   :after notmuch
   :bind
   (:map notmuch-search-mode-map
-    ("D" . prot-notmuch-search-delete-thread)
-    ("S" . prot-notmuch-search-spam-thread)
-    ("g" . prot-notmuch-refresh-buffer)
-    :map notmuch-show-mode-map
-    ("D" . prot-notmuch-show-delete-message)
-    ("S" . prot-notmuch-show-spam-message)
-    :map notmuch-show-stash-map
-    ("S" . prot-notmuch-stash-sourcehut-link))
+        ("D" . prot-notmuch-search-delete-thread)
+        ("S" . prot-notmuch-search-spam-thread)
+        ("g" . prot-notmuch-refresh-buffer)
+        :map notmuch-show-mode-map
+        ("D" . prot-notmuch-show-delete-message)
+        ("S" . prot-notmuch-show-spam-message)
+        :map notmuch-show-stash-map
+        ("S" . prot-notmuch-stash-sourcehut-link))
   :config
   ;; Those are for the actions that are available after pressing 'k'
   ;; (`notmuch-tag-jump').  For direct actions, refer to the key
@@ -4393,17 +4383,17 @@ that and instead tries to complete against dictionary entries."
   :after message
   :config
   (setq send-mail-function #'smtpmail-send-it
-      message-send-mail-function #'smtpmail-send-it
-      user-mail-address "tuomo.virolainen@kapsi.fi"
+        message-send-mail-function #'smtpmail-send-it
+        user-mail-address "tuomo.virolainen@kapsi.fi"
 
-      smtpmail-smtp-server "mail.kapsi.fi"
-      smtpmail-smtp-user "tvirolai"
-      smtpmail-smtp-service 587
-      smtpmail-stream-type 'starttls
-      smtpmail-auth-supported '(plain login)
+        smtpmail-smtp-server "mail.kapsi.fi"
+        smtpmail-smtp-user "tvirolai"
+        smtpmail-smtp-service 587
+        smtpmail-stream-type 'starttls
+        smtpmail-auth-supported '(plain login)
 
-      smtpmail-debug-info t
-      smtpmail-debug-verb t))
+        smtpmail-debug-info t
+        smtpmail-debug-verb t))
 
 ;; (setq smtpmail-stream-type 'ssl)
 #+end_src
@@ -4621,7 +4611,7 @@ A powerful collection of utility functions.
 * Various convenience functions and other miscellaneous stuff
 
 #+begin_src emacs-lisp :tangle yes
- ;; My dashboard is an editable org file which opens like this:
+;; My dashboard is an editable org file which opens like this:
 ;; (setq initial-buffer-choice "~/org/inbox.org")
 #+end_src
 
@@ -4885,75 +4875,75 @@ TODO: Determine if we need or like this.
   (proced-filter 'user)   ;; can be changed interactively with `f'
   :config
   (when (eq system-type 'darwin)
-	(defvar emacs-solo--proced-ps-cache (make-hash-table))
-	(defvar emacs-solo--proced-ps-timer nil)
+        (defvar emacs-solo--proced-ps-cache (make-hash-table))
+        (defvar emacs-solo--proced-ps-timer nil)
 
-	(defun emacs-solo--proced-ps-do-refresh ()
-	  (make-process
-	   :name "proced-ps-refresh"
-	   :buffer (generate-new-buffer " *proced-ps-temp*")
-	   :command '("env" "LC_ALL=C" "ps" "-axo"
-				  "pid=,%cpu=,%mem=")
-	   :noquery t
-	   :sentinel
-	   (lambda (proc _event)
-		 (when (eq (process-status proc) 'exit)
-		   (let ((new-cache (make-hash-table)))
-			 (with-current-buffer (process-buffer proc)
-			   (goto-char (point-min))
-			   (while (not (eobp))
-				 (when (looking-at
-						(rx (* blank)
-							(group (+ digit))
-							(+ blank)
-							(group (+ (any digit ?.)))
-							(+ blank)
-							(group (+ (any digit ?.)))))
-				   (puthash
-					(string-to-number (match-string 1))
-					(cons (string-to-number
-						   (match-string 2))
-						  (string-to-number
-						   (match-string 3)))
-					new-cache))
-				 (forward-line 1)))
-			 (kill-buffer (process-buffer proc))
-			 (setq emacs-solo--proced-ps-cache new-cache))))))
+        (defun emacs-solo--proced-ps-do-refresh ()
+          (make-process
+           :name "proced-ps-refresh"
+           :buffer (generate-new-buffer " *proced-ps-temp*")
+           :command '("env" "LC_ALL=C" "ps" "-axo"
+                                  "pid=,%cpu=,%mem=")
+           :noquery t
+           :sentinel
+           (lambda (proc _event)
+                 (when (eq (process-status proc) 'exit)
+                   (let ((new-cache (make-hash-table)))
+                         (with-current-buffer (process-buffer proc)
+                           (goto-char (point-min))
+                           (while (not (eobp))
+                                 (when (looking-at
+                                                (rx (* blank)
+                                                        (group (+ digit))
+                                                        (+ blank)
+                                                        (group (+ (any digit ?.)))
+                                                        (+ blank)
+                                                        (group (+ (any digit ?.)))))
+                                   (puthash
+                                        (string-to-number (match-string 1))
+                                        (cons (string-to-number
+                                                   (match-string 2))
+                                                  (string-to-number
+                                                   (match-string 3)))
+                                        new-cache))
+                                 (forward-line 1)))
+                         (kill-buffer (process-buffer proc))
+                         (setq emacs-solo--proced-ps-cache new-cache))))))
 
-	(defun emacs-solo--proced-pcpu (pid)
-	  (car (gethash pid emacs-solo--proced-ps-cache)))
+        (defun emacs-solo--proced-pcpu (pid)
+          (car (gethash pid emacs-solo--proced-ps-cache)))
 
-	(defun emacs-solo--proced-pmem (pid)
-	  (cdr (gethash pid emacs-solo--proced-ps-cache)))
+        (defun emacs-solo--proced-pmem (pid)
+          (cdr (gethash pid emacs-solo--proced-ps-cache)))
 
-	(add-hook 'proced-mode-hook
-			  (lambda ()
-				(unless (file-remote-p default-directory)
-				  (setq emacs-solo--proced-ps-timer
-						(run-with-timer 0 2
-										#'emacs-solo--proced-ps-do-refresh)))))
+        (add-hook 'proced-mode-hook
+                          (lambda ()
+                                (unless (file-remote-p default-directory)
+                                  (setq emacs-solo--proced-ps-timer
+                                                (run-with-timer 0 2
+                                                                                #'emacs-solo--proced-ps-do-refresh)))))
 
-	(add-hook 'kill-buffer-hook
-			  (lambda ()
-				(when (and (derived-mode-p 'proced-mode)
-						   (timerp emacs-solo--proced-ps-timer))
-				  (cancel-timer emacs-solo--proced-ps-timer)
-				  (setq emacs-solo--proced-ps-timer nil))))
+        (add-hook 'kill-buffer-hook
+                          (lambda ()
+                                (when (and (derived-mode-p 'proced-mode)
+                                                   (timerp emacs-solo--proced-ps-timer))
+                                  (cancel-timer emacs-solo--proced-ps-timer)
+                                  (setq emacs-solo--proced-ps-timer nil))))
 
-	(setq proced-custom-attributes
-		  (list
-		   (lambda (attrs)
-			 (unless (file-remote-p default-directory)
-			   (when-let*
-				   ((pid (cdr (assq 'pid attrs)))
-					(v (emacs-solo--proced-pcpu pid)))
-				 (cons 'pcpu v))))
-		   (lambda (attrs)
-			 (unless (file-remote-p default-directory)
-			   (when-let*
-				   ((pid (cdr (assq 'pid attrs)))
-					(v (emacs-solo--proced-pmem pid)))
-				 (cons 'pmem v))))))))
+        (setq proced-custom-attributes
+                  (list
+                   (lambda (attrs)
+                         (unless (file-remote-p default-directory)
+                           (when-let*
+                                   ((pid (cdr (assq 'pid attrs)))
+                                        (v (emacs-solo--proced-pcpu pid)))
+                                 (cons 'pcpu v))))
+                   (lambda (attrs)
+                         (unless (file-remote-p default-directory)
+                           (when-let*
+                                   ((pid (cdr (assq 'pid attrs)))
+                                        (v (emacs-solo--proced-pmem pid)))
+                                 (cons 'pmem v))))))))
 #+end_src
 
 ** Auto-chmod scripts on save
