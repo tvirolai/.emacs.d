@@ -2418,23 +2418,6 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (setq tab-always-indent 'complete))
 #+end_src
 
-*** Completion-preview
-
-#+begin_src emacs-lisp :tangle no
-(use-package completion-preview
-  :ensure nil
-  :demand t
-  :bind (:map completion-preview-active-mode-map
-              ("M-i" . completion-preview-insert-word)
-              ("M-n" . completion-preview-next-candidate)
-              ("M-p" . completion-preview-prev-candidate)
-              ("M-<return>" . completion-preview-insert)
-              ("<tab>" . completion-preview-complete))
-  :config
-  (setq completion-preview-minimum-symbol-length 2)
-  (global-completion-preview-mode nil))
-#+end_src
-
 *** Orderless
 
 #+begin_src emacs-lisp :tangle yes
