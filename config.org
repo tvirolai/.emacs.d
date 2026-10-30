@@ -722,7 +722,7 @@ We don't want line numbers to be shown in org-mode buffers, apart from this one.
 (add-hook 'org-mode-hook #'(lambda ()
                              (interactive)
                              (when (cl-search config-file (buffer-name))
-                               (electric-pair-mode)
+                               (electric-pair-local-mode)
                                (display-line-numbers-mode))))
 #+end_src
 
