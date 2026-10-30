@@ -854,7 +854,7 @@ Vim keybindings here.
   (make-directory tv/undo-dir))
 #+end_src
 
-Evil-surround.
+*** Evil-surround
 
 #+begin_src emacs-lisp :tangle yes
 (use-package evil-surround
@@ -863,7 +863,7 @@ Evil-surround.
   (global-evil-surround-mode 1))
 #+end_src
 
-Evil-matchit.
+*** Evil-matchit
 
 #+begin_src emacs-lisp :tangle yes
 (use-package evil-matchit
@@ -871,6 +871,8 @@ Evil-matchit.
   :config
   (global-evil-matchit-mode 1))
 #+end_src
+
+*** Evil-commentary
 
 Comment out / in stuff easily.
 
@@ -880,6 +882,8 @@ Comment out / in stuff easily.
   :config
   (evil-commentary-mode))
 #+end_src
+
+*** Evil-owl
 
 =evil-owl= provides a view to register contents.
 
@@ -910,15 +914,6 @@ This maybe fixes some indentation issues in org mode.
 
 #+begin_src emacs-lisp :tangle yes
 (setq evil-want-c-i-jump nil)
-#+end_src
-
-[[https://zck.org/balance-emacs-windows][Balance]] windows automatically.
-
-#+begin_src emacs-lisp :tangle yes
-(seq-doseq (fn (list #'split-window #'delete-window))
-  (advice-add fn
-              :after
-              #'(lambda (&rest _args) (balance-windows))))
 #+end_src
 
 ** Keybindings
@@ -1144,6 +1139,15 @@ Control the display of common ancillary windows.
                (window-height . 4) ; note this is literal lines, not relative
                (dedicated . t)
                (preserve-size . (t . t))))
+#+end_src
+
+[[https://zck.org/balance-emacs-windows][Balance]] windows automatically.
+
+#+begin_src emacs-lisp :tangle yes
+(seq-doseq (fn (list #'split-window #'delete-window))
+  (advice-add fn
+              :after
+              #'(lambda (&rest _args) (balance-windows))))
 #+end_src
 
 Easy buffer switching.
@@ -1769,7 +1773,7 @@ Run Sonarlint in the editor.
 
 ** Databases
 
-*** Postgres client in Emacs
+*** PGmacs
 
 PGmacs seems like a fun tool for working with Postgres databases. Since there's no Evil mode support for it, i.e. no mappings in evil-collection or otherwise, I've used AI to generate something. Looks pretty convoluted but we'll try that for now.
 
@@ -1886,6 +1890,8 @@ I've resorted to this hack to run the indentation and capitalization for the who
 
 *** Prisma ORM
 
+Support for an ORM for JS/TS. Emotional support would be in order too for cases where such a thing has to be used.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package prisma-ts-mode
   :defer t
@@ -1907,6 +1913,8 @@ I've resorted to this hack to run the indentation and capitalization for the who
 #+end_src
 
 ** Verb
+
+A HTTP queries in plain text.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package verb
@@ -1975,14 +1983,6 @@ Configure the packages.
 *** Markdown
 
 #+begin_src emacs-lisp :tangle yes
-;; (use-package markdown-mode
-;;   :hook (markdown-mode . display-line-numbers-mode)
-;;   :mode (("README\\.md\\'" . gfm-mode))
-;;   :init (setq markdown-command "multimarkdown")
-;;   :config
-;;   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-mode))
-;;   (add-to-list 'auto-mode-alist '("\\.markdown\\'" . markdown-mode)))
-
 (use-package markdown-ts-mode
   :ensure nil
   :defer t
