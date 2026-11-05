@@ -492,7 +492,7 @@ The cursor may blink. Not in image buffers though.
 (add-hook 'change-major-mode-hook #'restore-cursor)
 #+end_src
 
-*** Don't show cursors in non-focused windows
+Don't show cursors in non-focused windows.
 
 #+begin_src emacs-lisp :tangle yes
 (setq-default cursor-in-non-selected-windows nil)
@@ -565,6 +565,27 @@ Configure fonts using Fontaine.
            :variable-pitch-height 150))))
 #+end_src
 
+** Themes
+
+*** Green-phosphor-theme
+
+Add a teletype green theme for extra nerdery.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package green-phosphor-theme)
+#+end_src
+
+*** au-themes
+
+Add au-themes.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package au-themes
+  :vc (:url "https://github.com/szymonwilczek/au-themes" :rev :newest))
+#+end_src
+
+*** Theme switching
+
 Choose theme. Ensure that the customizations are done after loading the theme.
 
 #+begin_src emacs-lisp :tangle yes
@@ -588,12 +609,6 @@ Choose theme. Ensure that the customizations are done after loading the theme.
           (lambda (frame)
             (with-selected-frame frame
               (gui-setup))))
-#+end_src
-
-Add a teletype green theme for extra nerdery.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package green-phosphor-theme)
 #+end_src
 
 Add helpers to switch between themes.
@@ -3013,7 +3028,7 @@ Show information about the file under editing.
            :kill-buffer t
            :jump-to-captured t)
           ("j" "Journelly" entry
-           (file "/Users/tuomo.virolainen/Documents/Journelly.org")
+           (file "/Users/tuomo.virolainen/org/pixel/Journelly.org")
            "* [%<%Y-%m-%d %a %H:%M>] @ -%i\n%?"
            :prepend t)
           ("w" "Työaika" entry
@@ -4535,7 +4550,7 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
 (use-package elfeed-org
   :defer t
   :config
-  (setq rmh-elfeed-org-files (list (concat org-directory "/elfeed.org"))))
+  (setq rmh-elfeed-org-files (list (concat org-directory "elfeed.org"))))
 
 (defun tv/elfeed-mark-all-as-read ()
   "Mark all elfeed items as read."
