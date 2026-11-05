@@ -577,7 +577,7 @@ Add a teletype green theme for extra nerdery.
 
 *** au-themes
 
-Add au-themes.
+Add [[https://github.com/szymonwilczek/au-themes][au-themes]].
 
 #+begin_src emacs-lisp :tangle yes
 (use-package au-themes
