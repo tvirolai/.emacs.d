@@ -575,15 +575,6 @@ Add a teletype green theme for extra nerdery.
 (use-package green-phosphor-theme)
 #+end_src
 
-*** au-themes
-
-Add [[https://github.com/szymonwilczek/au-themes][au-themes]].
-
-#+begin_src emacs-lisp :tangle yes
-(use-package au-themes
-  :vc (:url "https://github.com/szymonwilczek/au-themes" :rev :newest))
-#+end_src
-
 *** Theme switching
 
 Choose theme. Ensure that the customizations are done after loading the theme.
