@@ -1400,55 +1400,14 @@ Generate a link to Github (or whatever forge the project uses) directly from cod
 
 *** lsp-sonarlint
 
-Run Sonarlint in the editor. Disabled.
+Run Sonarlint in the editor.
 
-#+begin_src emacs-lisp :tangle no
+#+begin_src emacs-lisp :tangle yes
 (use-package lsp-sonarlint
   :defer t
   :custom
   (lsp-sonarlint-auto-download t)
-  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode js-ts-mode css-ts-mode)))
-#+end_src
-
-*** eglot
-
-Now that running multiple LSP servers on a buffer is supported by [[https://www.rahuljuliato.com/posts/eglot-rassumfrassum][eglot]], I think I'll migrate to using that. I'll do it incrementally.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package eglot
-  :defer t
-  :custom
-  (eglot-autoshutdown t)
-  (eglot-confirm-server-edits nil)
-  (eglot-extend-to-xref t)
-  :bind
-  (:map eglot-mode-map
-        ("C-c c a" . eglot-code-actions)
-        ("C-c c r" . eglot-rename))
-  :config
-  (add-to-list 'eglot-server-programs
-               '(((js-mode :language-id "javascript")
-                  (js-ts-mode :language-id "javascript")
-                  (typescript-ts-mode :language-id "typescript")
-                  (tsx-ts-mode :language-id "typescriptreact"))
-                 . ("rass" "tslint"))))
-
-(use-package consult-eglot
-  :after eglot
-  :bind
-  (:map eglot-mode-map
-        ([remap xref-find-apropos] . consult-eglot-symbols)))
-
-(use-package consult-xref-stack
-  :vc
-  (:url "https://github.com/brett-lempereur/consult-xref-stack" :branch "main")
-  :bind
-  (("C-," . consult-xref-stack-backward)))
-
-(use-package consult-eglot-embark
-  :after (embark consult-eglot)
-  :config
-  (consult-eglot-embark-mode))
+  (lsp-sonarlint-modes-enabled '(java-ts-mode tsx-ts-mode css-ts-mode)))
 #+end_src
 
 ** Programming languages
@@ -1458,7 +1417,7 @@ Now that running multiple LSP servers on a buffer is supported by [[https://www.
 Use LSP when editing shell scripts.
 
 #+begin_src emacs-lisp :tangle yes
-(add-hook 'bash-ts-mode-hook #'eglot-ensure)
+(add-hook 'bash-ts-mode-hook #'lsp)
 (setq sh-basic-offset 4)
 #+end_src
 
@@ -1669,18 +1628,16 @@ Config adapted from [[https://www.rahuljuliato.com/posts/eslint-on-emacs][Rahul 
     (setq-local lsp-eslint-auto-fix-on-save nil)
     (prettier-js-mode 1))
   ;; Use LSP for completion.
-  ;(corfu-mode -1)
-  )
-
+  (corfu-mode -1))
 #+end_src
 
 Since the =lsp-eslint-auto-fix-on-save= variable doesn't seem to have any effect, this is a workaround to achieving the same thing.
 
 #+begin_src emacs-lisp :tangle yes
-;; (add-hook 'before-save-hook
-;;           (lambda ()
-;;             (when (bound-and-true-p lsp-eslint-auto-fix-on-save)
-;;               (lsp-eslint-fix-all))))
+(add-hook 'before-save-hook
+          (lambda ()
+            (when (bound-and-true-p lsp-eslint-auto-fix-on-save)
+              (lsp-eslint-fix-all))))
 #+end_src
 
 **** Prettier
@@ -1704,8 +1661,7 @@ Setup TypeScript. Note that =rainbow-delimiters-mode= clashes with =tsx-ts-mode=
   (rainbow-delimiters-mode -1)
   (indent-bars-mode 1)
   (tv/configure-js-ts-lsp)
-  ;; (lsp-deferred)
-  (eglot-ensure))
+  (lsp-deferred))
 
 (use-package typescript-mode
   :defer t
@@ -1778,16 +1734,11 @@ Keep Python editor support independent of the formatter.
 #+begin_src emacs-lisp :tangle yes
 (use-package python
   :ensure nil
-  :hook ((python-mode . eglot-ensure)
-         (python-ts-mode . eglot-ensure)
+  :hook ((python-mode . lsp)
+         (python-ts-mode . lsp)
          (python-ts-mode . indent-bars-mode)
          (python-ts-mode . treesit-fold-mode))
-  :config
-  (setq lsp-pylsp-plugins-flake8-ignore '("D103" "D100" "D105"))
-  (require 'eglot)
-  (add-to-list 'eglot-server-programs
-               '((python-mode python-ts-mode)
-                 . ("rass" "python"))))
+  :config (setq lsp-pylsp-plugins-flake8-ignore '("D103" "D100" "D105")))
 #+end_src
 
 Format on save with [[https://github.com/scop/emacs-ruff-format][Ruff]]. The active Python environment must provide the =ruff= executable.
