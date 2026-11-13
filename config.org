@@ -1387,11 +1387,11 @@ Generate a link to Github (or whatever forge the project uses) directly from cod
         lsp-keep-workspace-alive nil)
   (require 'lsp-eslint)
   (push 'jsts-ls lsp-disabled-clients)
-  (setq-local completion-at-point-functions
-              (list (cape-capf-super
-                     #'lsp-completion-at-point
-                     #'cape-file
-                     #'cape-dabbrev)))
+  (setq completion-at-point-functions
+        (list (cape-capf-super
+               #'lsp-completion-at-point
+               #'cape-file
+               #'cape-dabbrev)))
   (with-eval-after-load 'lsp-mode
     (advice-add 'tv/kill-other-buffers
                 :after
@@ -2376,7 +2376,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
 
 *** Corfu
 
-#+begin_src emacs-lisp :tangle yes
+#+begin_src emacs-lisp :tangle no
 (use-package corfu
   ;; Optional customizations
   :custom
@@ -2394,8 +2394,7 @@ Writable grep. This makes possible to use workflows for search and replace like:
 
 (use-package cape
   :init
-  (setq cape-dabbrev-min-length 2)
-  (setq cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
+  (setq cape-dabbrev-buffer-function #'cape-same-mode-buffers)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   (add-to-list 'completion-at-point-functions #'cape-history)
@@ -2419,6 +2418,68 @@ Writable grep. This makes possible to use workflows for search and replace like:
   :init
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
+  ;; Enable indentation+completion using the TAB key.
+  ;; `completion-at-point' is often bound to M-TAB.
+  (setq tab-always-indent 'complete))
+#+end_src
+
+*** Completion-preview-mode
+
+#+begin_src emacs-lisp :tangle yes
+(use-package completion-preview
+  :ensure nil
+  :demand t
+  :bind
+  ( :map completion-preview-active-mode-map
+    ("M-i" . completion-preview-insert-word)
+    ("M-n" . completion-preview-next-candidate)
+    ("M-p" . completion-preview-prev-candidate)
+    ("M-<return>" . completion-preview-insert)
+    ;; With TAB we effectively defer to the *Completions* buffer to
+    ;; show more completion candidates at once.
+    ("<tab>" . completion-preview-complete))
+  :config
+  (setq completion-preview-minimum-symbol-length 2)
+  (with-eval-after-load 'org
+    (add-to-list 'completion-preview-commands #'org-self-insert-command))
+  (global-completion-preview-mode 1))
+
+;; I have a more detailed configuration (and explanation) that works
+;; with Emacs 31 built-in completion capabilities:
+;; https://protesilaos.com/codelog/2026-07-29-emacs-default-minibuffer-completion-overview/.
+(use-package minibuffer
+  :ensure nil
+  :demand t
+  :bind
+  ( :map completion-in-region-mode-map
+    ("M-i" . minibuffer-choose-completion)
+    ("M-n" . minibuffer-next-completion)
+    ("M-p" . minibuffer-previous-completion))
+  :config
+  (setq completions-format 'one-column)
+  (setq completions-max-height 12)
+  (setq completions-sort 'historical)
+  (setq completion-auto-help t)
+  (setq completion-auto-select nil)
+  (setq minibuffer-visible-completions t)
+  (setq completion-eager-update t))
+
+(use-package cape
+  :init
+  (setq cape-dabbrev-buffer-function #'cape-same-mode-buffers)
+  ;; Modify the global hook even when evaluating this in a buffer with
+  ;; buffer-local completion sources, such as Org or Emacs Lisp.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-keyword)
+  (add-hook 'completion-at-point-functions #'cape-history)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  :bind ("C-c SPC" . cape-dabbrev))
+
+(use-package emacs
+  :init
+  ;; TAB cycle if there are only few candidates
+  (setq completion-cycle-threshold 2)
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
