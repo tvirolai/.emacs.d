@@ -2903,6 +2903,26 @@ Show information about the file under editing.
 (use-package file-info
   :bind (("C-c f" . 'file-info-show)))
 #+end_src
+** Popper
+
+Popper lets convert buffers to popups and vice versa. Maybe this would be useful every now and then.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package popper
+  :ensure t ; or :straight t
+  :bind (("C-+"   . popper-toggle)
+         ("M-+"   . popper-cycle)
+         ("C-M-+" . popper-toggle-type))
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          help-mode
+          compilation-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1))
+#+end_src
 
 * Notes, tasks, and writing
 
