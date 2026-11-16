@@ -2454,7 +2454,7 @@ Add "marginalia" to the minibuffer completion candidates.
 
 *** Consult
 
-Select options from lists of candidates with a performat preview.
+Select options from lists of candidates with a preview.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package consult
@@ -2485,6 +2485,15 @@ Select options from lists of candidates with a performat preview.
   (setq consult-line-start-from-top nil))
 #+end_src
 
+*** Recent completion settings
+
+#+begin_src emacs-lisp :tangle yes
+(setq completion-eager-update t)               ;; EMACS-31
+(setq completion-eager-display 'auto)          ;; EMACS-31
+(setq minibuffer-visible-completions 'up-down) ;; EMACS-31
+#+end_src
+
+** Search
 *** Avy
 
 #+begin_src emacs-lisp :tangle yes
@@ -2552,40 +2561,6 @@ Select options from lists of candidates with a performat preview.
                '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
                  nil
                  (window-parameters (mode-line-format . none)))))
-#+end_src
-
-*** Yasnippet
-
-Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
-
-#+begin_src emacs-lisp :tangle yes
-(use-package yasnippet
-  :diminish yas-minor-mode
-  :init (yas-global-mode)
-  :config
-  (push '(yasnippet backquote-change) warning-suppress-types)
-  (yas-global-mode)
-  (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
-  (setq yas-key-syntaxes '("w_" "w_." "^ "))
-  (setq own-snippets-dir (expand-file-name "snippets" user-emacs-directory))
-  (setq yas-expand-only-for-last-commands nil)
-  (yas-global-mode 1)
-  (bind-key "\t" 'hippie-expand yas-minor-mode-map)
-  (add-to-list 'yas-snippet-dirs 'own-snippets-dir)
-  (yas-load-directory own-snippets-dir t))
-
-(use-package doom-snippets
-  :if (file-directory-p "~/dev/snippets")
-  :load-path "~/dev/snippets"
-  :after yasnippet)
-#+end_src
-
-*** New stuff in Emacs 31
-
-#+begin_src emacs-lisp :tangle yes
-(setq completion-eager-update t)               ;; EMACS-31
-(setq completion-eager-display 'auto)          ;; EMACS-31
-(setq minibuffer-visible-completions 'up-down) ;; EMACS-31
 #+end_src
 
 ** Re-builder
@@ -2685,6 +2660,32 @@ Similar logic than [[Grep for the symbol at point]] below, only this one calls =
     (multi-occur bufs input-re)))
 
 (global-set-key (kbd "C-c o i") 'occur-input-in-open-buffers)
+#+end_src
+
+** Yasnippet
+
+Yasnippets are very handy, and Doom Emacs contains a nice bundle of them.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :init (yas-global-mode)
+  :config
+  (push '(yasnippet backquote-change) warning-suppress-types)
+  (yas-global-mode)
+  (add-hook 'hippie-expand-try-functions-list 'yas-hippie-try-expand)
+  (setq yas-key-syntaxes '("w_" "w_." "^ "))
+  (setq own-snippets-dir (expand-file-name "snippets" user-emacs-directory))
+  (setq yas-expand-only-for-last-commands nil)
+  (yas-global-mode 1)
+  (bind-key "\t" 'hippie-expand yas-minor-mode-map)
+  (add-to-list 'yas-snippet-dirs 'own-snippets-dir)
+  (yas-load-directory own-snippets-dir t))
+
+(use-package doom-snippets
+  :if (file-directory-p "~/dev/snippets")
+  :load-path "~/dev/snippets"
+  :after yasnippet)
 #+end_src
 
 ** Grep for the symbol at point
