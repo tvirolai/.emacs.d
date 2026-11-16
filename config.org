@@ -5081,6 +5081,14 @@ Trying this. Source: https://erichlf.github.io/blog/2020/09/09/how-to-setup-emac
 ;; (add-to-list 'alert-user-configuration
 ;;   '(((:category . "slack")) my/alert-style nil))
 #+end_src
+** Emacs reader
+
+#+begin_src emacs-lisp :tangle yes
+(setq package-vc-allow-build-commands t)
+(use-package reader
+  :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
+	    :make "all"))
+#+end_src
 
 ** Open a Jira ticket in the browser
 
