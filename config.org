@@ -2349,6 +2349,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
 
 *** Vertico
 
+Vertical completion for the minibuffer.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package vertico
   :hook (rfn-eshadow-update-overlay . vertico-directory-tidy)
@@ -2375,6 +2377,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
 #+end_src
 
 *** Corfu
+
+Provide completion candidates via a small popup.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package corfu
@@ -2427,6 +2431,8 @@ Writable grep. This makes possible to use workflows for search and replace like:
 
 *** Orderless
 
+A completion style.
+
 #+begin_src emacs-lisp :tangle yes
 (use-package orderless
   :init
@@ -2435,7 +2441,20 @@ Writable grep. This makes possible to use workflows for search and replace like:
         completion-category-overrides '((file (styles partial-completion)))))
 #+end_src
 
+*** Marginalia
+
+Add "marginalia" to the minibuffer completion candidates.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package marginalia
+  :ensure t
+  :init
+  (marginalia-mode 1))
+#+end_src
+
 *** Consult
+
+Select options from lists of candidates with a performat preview.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package consult
@@ -2489,15 +2508,6 @@ Writable grep. This makes possible to use workflows for search and replace like:
   (setq isearch-lazy-count t)
   (setq lazy-count-prefix-format "(%s/%s) ")
   (setq lazy-count-suffix-format nil))
-#+end_src
-
-*** Marginalia
-
-#+begin_src emacs-lisp :tangle yes
-(use-package marginalia
-  :ensure t
-  :init
-  (marginalia-mode 1))
 #+end_src
 
 *** Embark
@@ -2902,6 +2912,7 @@ Show information about the file under editing.
 (use-package file-info
   :bind (("C-c f" . 'file-info-show)))
 #+end_src
+
 ** Popper
 
 Popper lets convert buffers to popups and vice versa. Maybe this would be useful every now and then.
@@ -2917,7 +2928,6 @@ Popper lets convert buffers to popups and vice versa. Maybe this would be useful
         '("\\*Messages\\*"
           "Output\\*$"
           "\\*Async Shell Command\\*"
-          help-mode
           compilation-mode))
   (popper-mode +1)
   (popper-echo-mode +1))
