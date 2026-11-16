@@ -2394,25 +2394,26 @@ Writable grep. This makes possible to use workflows for search and replace like:
 
 (use-package cape
   :init
-  (setq cape-dabbrev-min-length 2)
-  (setq cape-dabbrev-check-other-buffers 'cape--buffers-major-mode)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-history)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-elisp-block)
-
-  (defun corfu-enable-always-in-minibuffer ()
-    "Enable Corfu in the minibuffer if Vertico/Mct are not active."
-    (unless (or (bound-and-true-p mct--active)
-                (bound-and-true-p vertico--input)
-                (eq (current-local-map) read-passwd-map))
-      (setq-local corfu-auto nil) ;; Enable/disable auto completion
-      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                  corfu-popupinfo-delay nil)
-      (corfu-mode 1)))
-
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+  (setq cape-dabbrev-buffer-function #'cape-same-mode-buffers)
+  ;; Modify the global hook even when evaluating this in a buffer with
+  ;; buffer-local completion sources, such as Org or Emacs Lisp.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-keyword)
+  (add-hook 'completion-at-point-functions #'cape-history)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  ;; Text completion should only use words already present in buffers.
+  (setq text-mode-ispell-word-completion nil)
+  (defun tv/text-buffer-completion ()
+    "Complete text using words from existing text and programming buffers."
+    (setq-local completion-at-point-functions '(cape-dabbrev))
+    (setq-local cape-dabbrev-buffer-function #'cape-text-buffers))
+  (add-hook 'text-mode-hook #'tv/text-buffer-completion)
+  ;; Also apply when re-evaluating this configuration with buffers open.
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when (derived-mode-p 'text-mode)
+        (tv/text-buffer-completion))))
   :bind ("C-c SPC" . cape-dabbrev))
 
 (use-package emacs
