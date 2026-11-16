@@ -487,7 +487,6 @@ The cursor may blink. Not in image buffers though.
 
 (add-hook 'image-mode-hook #'disable-cursor-for-viewing)
 (add-hook 'docview-mode-hook #'disable-cursor-for-viewing)
-(add-hook 'emacs-reader-mode-hook #'disable-cursor-for-viewing)
 
 ;; Restore when exiting
 (add-hook 'change-major-mode-hook #'restore-cursor)
@@ -5101,14 +5100,6 @@ Trying this. Source: https://erichlf.github.io/blog/2020/09/09/how-to-setup-emac
 
 ;; (add-to-list 'alert-user-configuration
 ;;   '(((:category . "slack")) my/alert-style nil))
-#+end_src
-** Emacs reader
-
-#+begin_src emacs-lisp :tangle yes
-(setq package-vc-allow-build-commands t)
-(use-package reader
-  :vc (:url "https://codeberg.org/divyaranjan/emacs-reader"
-	    :make "all"))
 #+end_src
 
 ** Open a Jira ticket in the browser
