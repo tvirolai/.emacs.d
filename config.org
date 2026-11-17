@@ -214,7 +214,7 @@ Replace a selection with yanked content.
 Shut Emacs down when I'm asking, even if processes are running.
 
 #+begin_src emacs-lisp :tangle yes
-(setq confirm-kill-processes nil)
+(setq confirm-kill-processes t)
 #+end_src
 
 Revert buffers when the underlying file has changed.
@@ -802,6 +802,8 @@ A bit wider line spacing than the default.
 
 ** Evil mode
 
+*** General Evil mode setup
+
 Vim keybindings here.
 
 #+begin_src emacs-lisp :tangle yes
@@ -830,7 +832,25 @@ Vim keybindings here.
   (evil-add-command-properties #'flymake-goto-next-error :jump t)
   (evil-add-command-properties #'evil-scroll-up :jump t)
   (evil-add-command-properties #'consult-grep :jump t))
+#+end_src
 
+*** Evil Collection
+
+A collection of Evil keybindings for packages. This a package I want to have the bleeding edge features available at all times.
+
+#+begin_src emacs-lisp :tangle yes
+(use-package evil-collection
+  :vc (:url "https://github.com/emacs-evil/evil-collection"
+       :branch "master"
+       :rev :newest)
+  :after evil
+  :config
+  (evil-collection-init))
+#+end_src
+
+*** Undo-fu
+
+#+begin_src emacs-lisp :tangle yes
 (use-package undo-fu
   :after evil
   :custom
@@ -846,13 +866,6 @@ Vim keybindings here.
   (setq undo-fu-session-incompatible-files '("/COMMIT_EDITMSG\\'" "/git-rebase-todo\\'")
         undo-fu-session-file-limit 10))
 
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
-#+end_src
-
-#+begin_src emacs-lisp :tangle yes
 (defconst tv/undo-dir-name "etc/undo")
 (defconst tv/undo-dir (expand-file-name tv/undo-dir-name user-emacs-directory))
 
@@ -888,6 +901,7 @@ Comment out / in stuff easily.
   :config
   (evil-commentary-mode))
 #+end_src
+
 
 *** Evil-owl
 
@@ -4596,6 +4610,12 @@ RSS feeds are a convenient way to consume information on a pull-basis from diffe
   (let ((buffer (get-buffer "elfeed.org")))
     (kill-buffer buffer)
     (elfeed-kill-buffer)))
+#+end_src
+
+** Emureader
+
+#+begin_src emacs-lisp :tangle yes
+(use-package emureader)
 #+end_src
 
 ** Browsing the web
