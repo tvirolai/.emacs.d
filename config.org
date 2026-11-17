@@ -792,14 +792,6 @@ A bit wider line spacing than the default.
 
 * Keymaps and modal editing
 
-** Undo system
-
-#+begin_src emacs-lisp :tangle yes
-(use-package undo-fu
-  :config
-  (setq evil-undo-system 'undo-fu))
-#+end_src
-
 ** Evil mode
 
 *** General Evil mode setup
@@ -810,25 +802,21 @@ Vim keybindings here.
 (use-package evil
   :demand t
   :bind (("<escape>" . keyboard-escape-quit))
+  :custom
+  (evil-undo-system 'undo-fu)
+  (evil-disable-insert-state-bindings t)
+  (evil-want-keybinding nil)
+  (evil-split-window-below t)
+  (evil-split-window-right t)
+  (evil-ex-substitute-global t)
+  (evil-kill-on-visual-paste nil)
+  (evil-shift-width 2)
+  (evil-respect-visual-line-mode nil)
   :init
-  ;; no vim insert bindings
-  (setq evil-want-keybinding nil)
   :config
   ;; https://github.com/emacs-evil/evil/issues/1983
   (defvar evil-mode-buffers '())
   (evil-mode 1)
-  (setopt evil-disable-insert-state-bindings t)
-  ;; (evil-set-undo-system 'vundo)
-  ;; (evil-set-undo-system 'undo-tree)
-  ;; (evil-set-undo-system 'undo-redo)
-  (setq evil-undo-system 'undo-fu)
-  ;; (setq evil-undo-system 'vundo)
-  (setq evil-split-window-below t
-        evil-vsplit-window-right t)
-  (setq evil-ex-substitute-global t)
-  (setq evil-kill-on-visual-paste nil)
-  (setq evil-shift-width 2)
-  (setq evil-respect-visual-line-mode nil)
   (evil-add-command-properties #'flymake-goto-next-error :jump t)
   (evil-add-command-properties #'evil-scroll-up :jump t)
   (evil-add-command-properties #'consult-grep :jump t))
@@ -1955,34 +1943,7 @@ Pick up formatting settings from =.editorconfig= files.
 
 *** Docker
 
-Some custom code to clean up inactive buffers.
-
-#+begin_src emacs-lisp :tangle yes
-(defun tv/docker-kill-inactive-eat-buffers (&optional include-visible)
-  "Kill all inactive Eat buffers.
-
-An Eat buffer is considered inactive when it has no live process.
-
-By default, skip Eat buffers currently visible in a window.
-With prefix arg INCLUDE-VISIBLE, kill those too."
-  (interactive "P")
-  (let ((visible-buffers (mapcar #'window-buffer (window-list)))
-        (killed 0))
-    (dolist (buf (buffer-list))
-      (with-current-buffer buf
-        (when (and (derived-mode-p 'eat-mode)
-                   (or include-visible
-                       (not (memq buf visible-buffers)))
-                   (let ((proc (get-buffer-process buf)))
-                     (not (and proc (process-live-p proc)))))
-          (kill-buffer buf)
-          (setq killed (1+ killed)))))
-    (message "Killed %d inactive Eat buffer%s"
-             killed
-             (if (= killed 1) "" "s"))))
-#+end_src
-
-Configure the packages.
+Dockerfile editing and Docker management, with a command to clean up inactive Eat buffers.
 
 #+begin_src emacs-lisp :tangle yes
 (use-package dockerfile-mode
@@ -1997,7 +1958,30 @@ Configure the packages.
                ("?" . docker-container-help))
          (:map global-map
                ;; C-c k is the prefix for custom killing commands.
-               ("C-c k d" . tv/docker-kill-inactive-eat-buffers))))
+               ("C-c k d" . tv/docker-kill-inactive-eat-buffers)))
+  :init
+  (defun tv/docker-kill-inactive-eat-buffers (&optional include-visible)
+    "Kill all inactive Eat buffers.
+
+An Eat buffer is considered inactive when it has no live process.
+
+By default, skip Eat buffers currently visible in a window.
+With prefix arg INCLUDE-VISIBLE, kill those too."
+    (interactive "P")
+    (let ((visible-buffers (mapcar #'window-buffer (window-list)))
+          (killed 0))
+      (dolist (buf (buffer-list))
+        (with-current-buffer buf
+          (when (and (derived-mode-p 'eat-mode)
+                     (or include-visible
+                         (not (memq buf visible-buffers)))
+                     (let ((proc (get-buffer-process buf)))
+                       (not (and proc (process-live-p proc)))))
+            (kill-buffer buf)
+            (setq killed (1+ killed)))))
+      (message "Killed %d inactive Eat buffer%s"
+               killed
+               (if (= killed 1) "" "s")))))
 #+end_src
 
 *** Markdown
