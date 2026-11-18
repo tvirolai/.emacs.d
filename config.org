@@ -470,27 +470,22 @@ Highlight the current line.
 
 ** Cursor
 
-The cursor may blink. Not in image buffers though.
+Control cursor blinking. ~blink-cursor-mode~ is a global minor mode, which some major modes (at least emureader-mode) disable upon initialization. This results in blinking being /globally/ disabled when opening certain types of files. I like having it on by default, which is why I'm setting it explicitly each time when switching buffers.
 
 #+begin_src emacs-lisp :tangle yes
-(blink-cursor-mode t)
+(defconst tv/blinking-disabled-modes
+  '(image-mode
+    emureader-mode
+    view-mode))
 
-(defun disable-cursor-for-viewing ()
-  "Hide the cursor when viewing content that's not edited."
-  (setq-local cursor-type nil)
-  (blink-cursor-mode -1))
+(defun tv/maybe-return-blinking-cursor (&optional _frame)
+  "Ensure that the cursor is blinking, unless we're in a mode where the
+cursor should be disabled."
+  (if (memq major-mode tv/blinking-disabled-modes)
+    (setopt blink-cursor-mode nil)
+    (setopt blink-cursor-mode t)))
 
-(defun restore-cursor ()
-  "Show the cursor when exiting a mode for viewing non-editable buffers."
-  (kill-local-variable 'cursor-type)
-  (blink-cursor-mode 1))
-
-(add-hook 'image-mode-hook #'disable-cursor-for-viewing)
-(add-hook 'docview-mode-hook #'disable-cursor-for-viewing)
-(add-hook 'emureader-mode-hook #'disable-cursor-for-viewing)
-
-;; Restore when exiting
-(add-hook 'change-major-mode-hook #'restore-cursor)
+(add-hook 'window-buffer-change-functions #'tv/maybe-return-blinking-cursor)
 #+end_src
 
 Don't show cursors in non-focused windows.
