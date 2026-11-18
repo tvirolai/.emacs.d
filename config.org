@@ -146,6 +146,7 @@ Disable unnecessary stuff.
 (menu-bar-mode t)
 (setq inhibit-startup-screen t)
 (setq ring-bell-function 'ignore)
+(setq use-dialog-box nil)
 #+end_src
 
 This is a workaround for an issue on Mac, where the tool bar sometimes shows up despite being disabled above.
@@ -2465,6 +2466,7 @@ Select options from lists of candidates with a preview.
          ("M-z" . consult-buffer) ;; I don't use zap-to-char, can be overridden.
          ("C-x r b" . consult-bookmark)
          ("M-y" . consult-yank-pop)
+         ("s-å" . consult-info)
          ;; M-g bindings (goto-map)
          ("M-g M-g" . consult-goto-line)
          ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
@@ -2477,9 +2479,6 @@ Select options from lists of candidates with a preview.
          :map prog-mode-map
          ("M-g o" . consult-imenu))
   :init
-  (defun remove-items (x y)
-    (setq y (cl-remove-if (lambda (item) (memq item x)) y))
-    y)
   ;; Any themes that are incomplete/lacking don't work with centaur tabs/solair mode
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
