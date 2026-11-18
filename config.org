@@ -175,10 +175,17 @@ I've never needed to edit right-to-left language content, so support for it will
 
 ** General things
 
-Set 10MB as the limit for garbage collection.
+Garbage collection settings copied from [[https://github.com/yantar92/emacs-config/blob/master/config.org#performance-garbage-collection][yantar92]], who's [[https://emacsconf.org/2023/talks/gc/][researched]] the topic.
 
 #+begin_src emacs-lisp :tangle yes
-(setq gc-cons-threshold 10000000)
+;; For IGC branch
+(setq igc-step-interval 0.04)
+(setq gc-cons-percentage 0.2)
+(setq gc-cons-threshold (* 200 1000 1000))
+      (add-hook
+       'after-init-hook
+       (lambda () (setq gc-cons-threshold (* 20 1000 1000))))
+(setq garbage-collection-messages nil) ; nil is default, this is just to remind about the option
 #+end_src
 
 Warn when opening files bigger than 100MB.
