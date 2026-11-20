@@ -478,22 +478,22 @@ Highlight the current line.
 
 ** Cursor
 
-Control cursor blinking. ~blink-cursor-mode~ is a global minor mode, which some major modes (at least emureader-mode) disable upon initialization. This results in blinking being /globally/ disabled when opening certain types of files. I like having it on by default, which is why I'm setting it explicitly each time when switching buffers.
+Control cursor blinking. ~blink-cursor-mode~ is a global minor mode, which some major modes (at least [[https://codeberg.org/MonadicSheep/emureader/issues/224][emureader-mode]]) disable upon initialization. This results in blinking being /globally/ disabled when opening certain types of files. I like having it on by default, which is why I'm setting it explicitly each time when switching buffers.
 
 #+begin_src emacs-lisp :tangle yes
-(defconst tv/blinking-disabled-modes
+(defconst tv/cursor-blinking-disabled-modes
   '(image-mode
     emureader-mode
     view-mode))
 
-(defun tv/maybe-return-blinking-cursor (&optional _frame)
+(defun tv/cursor-set-blinking (&optional _frame)
   "Ensure that the cursor is blinking, unless we're in a mode where the
 cursor should be disabled."
-  (if (memq major-mode tv/blinking-disabled-modes)
-    (setopt blink-cursor-mode nil)
+  (if (memq major-mode tv/cursor-blinking-disabled-modes)
+      (setopt blink-cursor-mode nil)
     (setopt blink-cursor-mode t)))
 
-(add-hook 'window-buffer-change-functions #'tv/maybe-return-blinking-cursor)
+(add-hook 'window-buffer-change-functions #'tv/cursor-set-blinking)
 #+end_src
 
 Don't show cursors in non-focused windows.
@@ -2463,7 +2463,7 @@ Select options from lists of candidates with a preview.
   :bind (("C-å" . consult-line)
          ("C-c M-x" . consult-mode-command)
          ("C-x b" . consult-buffer)
-         ("M-z" . consult-buffer) ;; I don't use zap-to-char, can be overridden.
+         ("C-<" . consult-buffer)
          ("C-x r b" . consult-bookmark)
          ("M-y" . consult-yank-pop)
          ("s-å" . consult-info)
@@ -2479,7 +2479,6 @@ Select options from lists of candidates with a preview.
          :map prog-mode-map
          ("M-g o" . consult-imenu))
   :init
-  ;; Any themes that are incomplete/lacking don't work with centaur tabs/solair mode
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
   (setq consult-narrow-key "<")
@@ -4225,7 +4224,7 @@ Let's try whether this could be useful. Gptel is a light-weight LLM client suppo
 (use-package agent-shell
   :if work-laptop-p
   :defer t
-  :vc (:url "https://github.com/xenodium/agent-shell")
+  :vc (:url "https://github.com/xenodium/agent-shell" :rev :newest)
   :bind ("C-c p a" . agent-shell)
   :ensure-system-package
   ;; Add agent installation configs here
@@ -4361,7 +4360,7 @@ TODO: Finish this.
   "Play a Youtube video as audio. Input is either video id or full url."
   (interactive)
   (let ((url (or url (read-and-return-yt-url))))
-    (async-shell-command (format "mpv --no-video '%s'" url))))
+    (async-shell-command (format "mpv --no-video --force-window=no '%s'" url))))
 #+end_src
 
 **** Download from Yle Areena
